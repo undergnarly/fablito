@@ -7,6 +7,9 @@ export interface FavoriteStory {
   title: string
   createdAt: string
   previewImage?: string
+  style?: {
+    language: 'ru' | 'en' | 'kz'
+  }
 }
 
 // Hook to manage favorites
@@ -56,11 +59,29 @@ export function useFavorites() {
     return favorites.some((story) => story.id === storyId)
   }
 
+  // Clean up favorites by removing stories that no longer exist
+  const cleanupFavorites = async (existingStoryIds: string[]) => {
+    setFavorites((prev) => {
+      const cleanedFavorites = prev.filter((favorite) => 
+        existingStoryIds.includes(favorite.id)
+      )
+      
+      // Only update if there were changes
+      if (cleanedFavorites.length !== prev.length) {
+        console.log(`[FAVORITES] Cleaned up ${prev.length - cleanedFavorites.length} non-existent stories from favorites`)
+        return cleanedFavorites
+      }
+      
+      return prev
+    })
+  }
+
   return {
     favorites,
     addFavorite,
     removeFavorite,
     isFavorite,
+    cleanupFavorites,
     loaded,
   }
 }

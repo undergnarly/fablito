@@ -15,6 +15,12 @@ export async function uploadImageToBlob(base64Data: string, storyId: string, pag
       return base64Data
     }
 
+    // Для локальной разработки без BLOB_READ_WRITE_TOKEN возвращаем base64 данные
+    if (!process.env.BLOB_READ_WRITE_TOKEN) {
+      console.log("[BLOB-STORAGE] Local development mode: returning base64 data")
+      return base64Data
+    }
+
     // Extract the mime type and base64 content
     const matches = base64Data.match(/^data:([A-Za-z-+/]+);base64,(.+)$/)
 
@@ -55,6 +61,12 @@ export async function uploadImageToBlob(base64Data: string, storyId: string, pag
 export async function convertImagesToBlob(images: string[], storyId: string): Promise<string[]> {
   if (!images || !Array.isArray(images)) {
     return []
+  }
+
+  // Для локальной разработки без BLOB_READ_WRITE_TOKEN возвращаем исходные данные
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    console.log("[BLOB-STORAGE] Local development mode: returning original images")
+    return images
   }
 
   const blobUrls = []

@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
 
     // Get params
-    const title = searchParams.get("title") || "StoryMaker"
+    const title = searchParams.get("title") || "StoryBook"
     const subtitle = searchParams.get("subtitle") || "AI-generated alphabet stories for children"
     const imageUrl = searchParams.get("image") || ""
     const type = searchParams.get("type") || "story" // story, home, etc.
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
               color: "#9333ea",
             }}
           >
-            StoryMaker
+            StoryBook
           </span>
         </div>
 
@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
               }}
             >
               <img
-                src={absoluteImageUrl || "/placeholder.svg"}
+                src={absoluteImageUrl || "/api/placeholder?text=Image&width=300&height=300"}
                 alt={title}
                 width={300}
                 height={300}

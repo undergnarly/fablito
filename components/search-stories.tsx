@@ -5,12 +5,14 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { Input } from "@/components/ui/input"
 import { Search } from "lucide-react"
 import { useDebounce } from "@/hooks/use-debounce"
+import { useLanguage } from "@/lib/language-context"
 
 interface SearchStoriesProps {
   className?: string
 }
 
 export function SearchStories({ className }: SearchStoriesProps) {
+  const { t } = useLanguage()
   const router = useRouter()
   const searchParams = useSearchParams()
   const [searchTerm, setSearchTerm] = useState(searchParams?.get("search") || "")
@@ -51,7 +53,7 @@ export function SearchStories({ className }: SearchStoriesProps) {
       <Input
         id="story-search"
         type="search"
-        placeholder="Search stories..."
+        placeholder={t.searchPlaceholder}
         className="pl-10 pr-4"
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}

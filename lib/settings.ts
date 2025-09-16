@@ -2,12 +2,19 @@ import { kv } from "@vercel/kv"
 
 // Default settings
 const DEFAULT_SETTINGS = {
-  ALPHABET_LETTERS_COUNT: 8,
+  ALPHABET_LETTERS_COUNT: 2, // Ограничиваем до 2 страниц для быстрого тестирования
   SUBMISSIONS_HALTED: false,
 }
 
 // Type for app settings
 export type AppSettings = typeof DEFAULT_SETTINGS
+
+// Проверяем, доступен ли KV для локальной разработки
+export const isKvAvailable = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN && 
+  process.env.KV_REST_API_URL !== "your_kv_rest_api_url_here" && 
+  process.env.KV_REST_API_TOKEN !== "your_kv_rest_api_token_here" &&
+  process.env.KV_REST_API_URL !== "https://your-kv-url" && 
+  process.env.KV_REST_API_TOKEN !== "your-kv-token"
 
 /**
  * Get a specific setting from KV storage
@@ -15,6 +22,11 @@ export type AppSettings = typeof DEFAULT_SETTINGS
  * @returns The setting value
  */
 export async function getSetting<K extends keyof AppSettings>(key: K): Promise<AppSettings[K]> {
+  // Для локальной разработки без KV возвращаем значения по умолчанию
+  if (!isKvAvailable) {
+    return DEFAULT_SETTINGS[key]
+  }
+
   try {
     // Try to get the setting from KV
     const value = await kv.get(`settings:${key}`)
@@ -39,6 +51,11 @@ export async function getSetting<K extends keyof AppSettings>(key: K): Promise<A
  * @returns True if successful
  */
 export async function updateSetting<K extends keyof AppSettings>(key: K, value: AppSettings[K]): Promise<boolean> {
+  // Для локальной разработки без KV возвращаем true
+  if (!isKvAvailable) {
+    return true
+  }
+
   try {
     await kv.set(`settings:${key}`, value)
     return true

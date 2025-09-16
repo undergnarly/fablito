@@ -3,20 +3,42 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { BookOpen, ArrowLeft, Heart } from "lucide-react"
 import Image from "next/image"
 import { useFavorites, type FavoriteStory } from "@/lib/favorites"
 import { useToast } from "@/hooks/use-toast"
+import { LanguageFlag } from "@/components/language-flag"
 
 export default function FavoritesPage() {
-  const { favorites, removeFavorite, loaded } = useFavorites()
+  const { favorites, removeFavorite, cleanupFavorites, loaded } = useFavorites()
   const { toast } = useToast()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
     setMounted(true)
   }, [])
+
+  // Clean up favorites when component mounts
+  useEffect(() => {
+    if (loaded && favorites.length > 0) {
+      const cleanupFavoritesAsync = async () => {
+        try {
+          // Fetch all existing stories
+          const response = await fetch('/api/stories')
+          if (response.ok) {
+            const stories = await response.json()
+            const existingStoryIds = stories.map((story: any) => story.id)
+            await cleanupFavorites(existingStoryIds)
+          }
+        } catch (error) {
+          console.error('Error cleaning up favorites:', error)
+        }
+      }
+      
+      cleanupFavoritesAsync()
+    }
+  }, [loaded, cleanupFavorites])
 
   const handleRemoveFavorite = (story: FavoriteStory) => {
     removeFavorite(story.id)
@@ -114,7 +136,7 @@ export default function FavoritesPage() {
             {favorites.map((story, index) => (
               <Card
                 key={story.id}
-                className="border border-primary/20 shadow-lg overflow-hidden rounded-xl transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 dark:bg-gray-800 dark:border-primary/10"
+                className="border border-primary/20 shadow-lg overflow-hidden rounded-xl transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 dark:bg-gray-800 dark:border-primary/10 h-[400px] flex flex-col"
                 style={{
                   animationDelay: `${index * 0.1}s`,
                   opacity: 0,
@@ -122,41 +144,55 @@ export default function FavoritesPage() {
                   animationDelay: `${index * 0.1}s`,
                 }}
               >
-                <div className="relative h-48 w-full bg-gray-100 dark:bg-gray-700">
-                  {story.previewImage ? (
-                    <Image
-                      src={story.previewImage || "/placeholder.svg"}
-                      alt={story.title}
-                      fill
-                      className="object-cover"
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full">
-                      <BookOpen className="h-12 w-12 text-gray-300" />
-                    </div>
-                  )}
-                </div>
-                <CardHeader>
-                  <CardTitle className="text-xl">{story.title}</CardTitle>
+                <CardHeader className="flex-shrink-0">
+                  <CardTitle className="text-xl line-clamp-2">{story.title}</CardTitle>
+                  <CardDescription>
+                    {story.childName && `Starring ${story.childName} • `}
+                    Added on {formatDate(story.createdAt)}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">Added on {formatDate(story.createdAt)}</p>
-                </CardContent>
-                <CardFooter className="flex justify-between">
-                  <Link href={`/story/${story.id}`} className="flex-1 mr-2">
-                    <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
-                      Read Story
+                <CardContent className="flex-1 flex flex-col justify-between">
+                  <div className="space-y-3 flex-1">
+                    {story.previewImage ? (
+                      <div className="aspect-video relative overflow-hidden rounded-md">
+                        <Image
+                          src={story.previewImage || "/api/placeholder?text=Изображение&width=400&height=400"}
+                          alt={story.title}
+                          fill
+                          className="object-cover"
+                          priority={index < 3}
+                        />
+                        
+                        {/* Language flag */}
+                        {story.style?.language && (
+                          <div className="absolute top-2 left-2">
+                            <LanguageFlag language={story.style.language} size="sm" />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center">
+                        <BookOpen className="h-12 w-12 text-gray-300" />
+                      </div>
+                    )}
+                  </div>
+                  
+                  <div className="mt-4 flex justify-between">
+                    <Link href={`/story/${story.id}`} className="flex-1 mr-2">
+                      <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
+                        Read Story
+                      </Button>
+                    </Link>
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => handleRemoveFavorite(story)}
+                      className="flex-shrink-0"
+                    >
+                      <Heart className="h-4 w-4 fill-primary text-primary" />
                     </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => handleRemoveFavorite(story)}
-                    className="flex-shrink-0"
-                  >
-                    <Heart className="h-4 w-4 fill-primary text-primary" />
-                  </Button>
-                </CardFooter>
+                  </div>
+                </CardContent>
               </Card>
             ))}
           </div>

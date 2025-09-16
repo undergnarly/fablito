@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import Link from "next/link"
 import Image from "next/image"
+import { LanguageFlag } from "@/components/language-flag"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SettingsPanel from "./settings-panel"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -30,6 +31,9 @@ interface Story {
   createdAt: string
   previewImage?: string
   visibility: string
+  style?: {
+    language: 'ru' | 'en' | 'kz'
+  }
 }
 
 export default function AdminDashboard() {
@@ -322,19 +326,27 @@ export default function AdminDashboard() {
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {stories.map((story) => (
-                <Card key={story.id} className="border border-primary/10 shadow overflow-hidden rounded-lg">
+                <Card key={story.id} className="border border-primary/10 shadow overflow-hidden rounded-lg h-[200px] flex flex-col">
                   <div className="flex flex-col md:flex-row">
                     <div className="relative h-32 md:w-48 bg-gray-100">
                       {story.previewImage ? (
                         <Image
-                          src={story.previewImage || "/placeholder.svg"}
+                          src={story.previewImage || "/api/placeholder?text=Изображение&width=400&height=400"}
                           alt={story.title}
                           fill
                           className="object-cover"
+                          priority={index < 2}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full">
                           <BookOpen className="h-8 w-8 text-gray-300" />
+                        </div>
+                      )}
+
+                      {/* Language flag */}
+                      {story.style?.language && (
+                        <div className="absolute top-2 left-2">
+                          <LanguageFlag language={story.style.language} size="sm" />
                         </div>
                       )}
                     </div>

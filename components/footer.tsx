@@ -1,7 +1,11 @@
-import { Sparkles, GithubIcon, Twitter } from "lucide-react"
+'use client'
+
+import { GithubIcon, Twitter } from "lucide-react"
 import Link from "next/link"
+import { useLanguage } from "@/lib/language-context"
 
 export function Footer() {
+  const { t } = useLanguage()
   return (
     <footer
       className="w-full py-12 mt-auto border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60"
@@ -11,47 +15,34 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="flex flex-col space-y-4">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold">StoryMaker</span>
+              <span className="text-2xl font-bold">StoryBook</span>
             </div>
             <p className="text-sm text-muted-foreground">
-              Creating magical alphabet stories for children using AI. Designed to make learning fun and interactive.
+              {t.footerDescription}
             </p>
-            <div className="flex items-center space-x-3">
-              <Link
-                href="https://v0.dev"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center rounded-full bg-gradient-to-r from-purple-600 to-pink-600 px-3 py-1 text-sm text-white transition-transform hover:scale-105 hover:shadow-lg"
-                aria-label="Made with v0"
-              >
-                <span className="mr-1">Made with</span>
-                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                <span className="ml-1 font-bold">v0</span>
-              </Link>
-            </div>
           </div>
 
           <div className="flex flex-col space-y-3">
-            <h3 className="text-base font-medium">Explore</h3>
+            <h3 className="text-base font-medium">{t.explore}</h3>
             <Link href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Home
+              {t.home}
             </Link>
             <Link href="/stories" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              Browse Stories
+              {t.browseStories}
             </Link>
             <Link
               href="/#create-story"
               className="text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
-              Create Story
+              {t.createStory}
             </Link>
             <Link href="/favorites" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
-              My Favorites
+              {t.myFavorites}
             </Link>
           </div>
 
           <div className="flex flex-col space-y-3">
-            <h3 className="text-base font-medium">Connect</h3>
+            <h3 className="text-base font-medium">{t.connect}</h3>
             <div className="flex space-x-4">
               <Link href="https://github.com/vercel" target="_blank" rel="noopener noreferrer" aria-label="GitHub">
                 <GithubIcon className="h-5 w-5 text-muted-foreground hover:text-foreground" />
@@ -62,10 +53,10 @@ export function Footer() {
             </div>
             <div className="flex space-x-4 mt-4">
               <Link href="/privacy" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                Privacy Policy
+                {t.privacyPolicy}
               </Link>
               <Link href="/terms" className="text-xs text-muted-foreground hover:text-foreground transition-colors">
-                Terms of Service
+                {t.termsOfService}
               </Link>
             </div>
           </div>

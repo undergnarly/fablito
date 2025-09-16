@@ -1,25 +1,26 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Loader2, BookOpen, ImageIcon, Sparkles, Eye } from "lucide-react"
-import { ALPHABET } from "@/lib/constants"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { useLanguage } from "@/lib/language-context"
 
-export default function GeneratingPage({ params }: { params: { id: string } }) {
+export default function GeneratingPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params)
   const router = useRouter()
+  const { t } = useLanguage()
   const [status, setStatus] = useState<string>("generating")
   const [progress, setProgress] = useState<number>(0)
   const [error, setError] = useState<string | null>(null)
-  const [currentLetter, setCurrentLetter] = useState<string>("A")
   const [imagesGenerated, setImagesGenerated] = useState<number>(0)
   const [notificationPermission, setNotificationPermission] = useState<string>("default")
   const [storyData, setStoryData] = useState<any>(null)
   const [notificationSent, setNotificationSent] = useState<boolean>(false)
-  const [alphabetLettersCount, setAlphabetLettersCount] = useState<number>(8)
+  const [pagesCount, setPagesCount] = useState<number>(10)
 
   // Request notification permission on component mount
   useEffect(() => {
@@ -37,7 +38,7 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        const response = await fetch(`/api/story/${params.id}`)
+        const response = await fetch(`/api/story/${id}`)
 
         if (!response.ok) {
           throw new Error("Failed to fetch story status")
@@ -47,12 +48,12 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
         setStatus(data.status)
         setStoryData(data)
 
-        // Get the alphabet letters count from the story content
+        // Get the pages count from the story content
         if (data.storyContent) {
           try {
             const content = JSON.parse(data.storyContent)
             if (content && content.pages) {
-              setAlphabetLettersCount(content.pages.length)
+              setPagesCount(content.pages.length)
             }
           } catch (e) {
             console.error("Error parsing story content:", e)
@@ -62,10 +63,8 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
         // Calculate progress based on status
         if (data.status === "generating") {
           setProgress(10)
-          setCurrentLetter("A")
         } else if (data.status === "generating_story") {
           setProgress(40)
-          setCurrentLetter("B")
         } else if (data.status === "generating_images") {
           // Check how many images have been generated so far
           let imageCount = 0
@@ -82,33 +81,25 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
           // Calculate progress based on image generation
           const baseProgress = 40 // Story generation complete
           const imageProgress = 60 // Remaining progress for images
-          const letterCount = alphabetLettersCount
 
           // Calculate progress percentage
-          const imageProgressPercentage = imageCount / letterCount
+          const imageProgressPercentage = imageCount / pagesCount
           const totalProgress = baseProgress + imageProgress * imageProgressPercentage
 
           setProgress(totalProgress)
-
-          // Set current letter based on image generation progress
-          if (imageCount < letterCount) {
-            const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            setCurrentLetter(alphabet[imageCount])
-          }
         } else if (data.status === "complete") {
           setProgress(100)
-          setCurrentLetter("✓")
 
           // Send browser notification if permission granted and not already sent
           if (notificationPermission === "granted" && !notificationSent) {
-            const notification = new Notification("Your ABC Story is Ready!", {
+            const notification = new Notification(t.storyReady, {
               body: `"${data.title}" is now ready to read!`,
               icon: "/favicon.ico",
             })
 
             notification.onclick = () => {
               window.focus()
-              router.push(`/story/${params.id}`)
+              router.push(`/story/${id}`)
             }
 
             setNotificationSent(true)
@@ -116,7 +107,7 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
 
           // Redirect to the story page after a short delay
           setTimeout(() => {
-            router.push(`/story/${params.id}`)
+            router.push(`/story/${id}`)
           }, 1500)
         } else if (data.status === "failed") {
           setError(data.error || "Story generation failed")
@@ -134,22 +125,22 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
 
     // Clean up interval on unmount
     return () => clearInterval(interval)
-  }, [params.id, router, notificationPermission, notificationSent, alphabetLettersCount])
+  }, [id, router, notificationPermission, notificationSent, pagesCount])
 
   const getStatusMessage = () => {
     switch (status) {
       case "generating":
-        return "Preparing to create your ABC story..."
+        return t.preparingStory
       case "generating_story":
-        return `Writing your magical ABC story (${alphabetLettersCount} letters)...`
+        return t.writingStory
       case "generating_images":
-        return `Drawing illustrations (${imagesGenerated}/${alphabetLettersCount} complete)...`
+        return `${t.drawingIllustrations} (${imagesGenerated}/${pagesCount} complete)...`
       case "complete":
-        return "Your ABC story is ready!"
+        return t.storyReady
       case "failed":
-        return "Oops! Something went wrong."
+        return t.somethingWentWrong
       default:
-        return "Creating your ABC story..."
+        return t.creatingYourStory
     }
   }
 
@@ -168,9 +159,9 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
     }
   }
 
-  // Check if we can show a preview (story content exists but images might still be generating)
+  // Check if we can show a preview (story content exists)
   const canShowPreview = () => {
-    return status === "generating_images" && storyData?.storyContent && imagesGenerated > 0
+    return status === "generating_images" || status === "complete"
   }
 
   return (
@@ -180,7 +171,7 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
           <div className="flex flex-col items-center text-center space-y-6">
             {error ? (
               <div className="text-red-500">
-                <h2 className="text-xl font-bold mb-2">Error</h2>
+                <h2 className="text-xl font-bold mb-2">{t.error}</h2>
                 <p>{error}</p>
               </div>
             ) : (
@@ -190,53 +181,27 @@ export default function GeneratingPage({ params }: { params: { id: string } }) {
                     <Loader2 className="w-16 h-16 text-primary/30 animate-spin" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">{getStatusIcon()}</div>
-                  <div className="absolute bottom-0 right-0 bg-white rounded-full p-1 shadow-md">
-                    <span className="text-xl font-bold text-primary">{currentLetter}</span>
-                  </div>
                 </div>
 
                 <div className="space-y-4 w-full">
                   <h2 className="text-xl font-bold">{getStatusMessage()}</h2>
                   <Progress value={progress} className="h-2" />
                   <p className="text-muted-foreground text-sm">
-                    This may take a minute or two. Our AI is hard at work creating a special ABC story just for you!
+                    {t.generationTakesTime}
                   </p>
                 </div>
 
-                <div className="w-full pt-4">
-                  <div className="flex items-center justify-center space-x-2">
-                    {Array.from(ALPHABET.slice(0, Math.min(8, alphabetLettersCount))).map((letter, i) => (
-                      <div
-                        key={letter}
-                        className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${
-                          letter === currentLetter
-                            ? "bg-primary text-white"
-                            : i < ALPHABET.indexOf(currentLetter)
-                              ? "bg-primary/70 text-white"
-                              : "bg-primary/30 text-primary/70"
-                        }`}
-                      >
-                        {letter}
-                      </div>
-                    ))}
-                    {alphabetLettersCount > 8 && (
-                      <div className="w-8 h-8 rounded-full flex items-center justify-center font-bold bg-primary/30 text-primary/70">
-                        ...
-                      </div>
-                    )}
-                  </div>
-                </div>
 
                 {canShowPreview() && (
                   <div className="w-full pt-4">
-                    <Link href={`/story/${params.id}`}>
+                    <Link href={`/story/${id}`}>
                       <Button className="w-full">
                         <Eye className="mr-2 h-4 w-4" />
-                        View Story in Progress
+                        {t.viewStoryInProgress}
                       </Button>
                     </Link>
                     <p className="text-xs text-muted-foreground mt-2">
-                      You can view the story while images are still being generated
+                      {t.storyStillGenerating}
                     </p>
                   </div>
                 )}

@@ -3,6 +3,7 @@ import type React from "react"
 import "./globals.css"
 import { Inter } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
+import { LanguageProvider } from "@/lib/language-context"
 import { Footer } from "@/components/footer"
 import { Header } from "@/components/header"
 import { MobileNav } from "@/components/mobile-nav"
@@ -17,38 +18,38 @@ const baseUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000"
 
 // Create the OG image URL with parameters
 const ogImageUrl = new URL(`${baseUrl}/api/og`)
-ogImageUrl.searchParams.append("title", "StoryMaker")
+ogImageUrl.searchParams.append("title", "StoryBook")
 ogImageUrl.searchParams.append("subtitle", "Create magical alphabet stories for children with AI")
 ogImageUrl.searchParams.append("type", "home")
 
 export const metadata: Metadata = {
   title: {
-    default: "StoryMaker - AI-Generated Alphabet Stories",
-    template: "%s | StoryMaker",
+    default: "StoryBook - AI-Generated Alphabet Stories",
+    template: "%s | StoryBook",
   },
   description:
     "Create magical alphabet storybooks for children with AI. Perfect for learning the alphabet in a fun, interactive way.",
   keywords: ["alphabet", "children's stories", "ABC", "learning", "AI stories", "educational"],
-  authors: [{ name: "StoryMaker Team" }],
+  authors: [{ name: "StoryBook Team" }],
   openGraph: {
     type: "website",
     locale: "en_US",
     url: "https://v0-story-maker.vercel.app",
-    title: "StoryMaker - AI-Generated Alphabet Stories",
+    title: "StoryBook - AI-Generated Alphabet Stories",
     description: "Create magical alphabet storybooks for children with AI",
-    siteName: "StoryMaker",
+    siteName: "StoryBook",
     images: [
       {
         url: ogImageUrl.toString(),
         width: 1200,
         height: 630,
-        alt: "StoryMaker",
+        alt: "StoryBook",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "StoryMaker - AI-Generated Alphabet Stories",
+    title: "StoryBook - AI-Generated Alphabet Stories",
     description: "Create magical alphabet storybooks for children with AI",
     images: [ogImageUrl.toString()],
   },
@@ -68,13 +69,15 @@ export default function RootLayout({
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <Header />
-          <MobileNav />
-          <main id="main-content" className="flex-1 pb-16 md:pb-0">
-            {children}
-          </main>
-          <Footer />
-          <Toaster />
+          <LanguageProvider>
+            <Header />
+            <MobileNav />
+            <main id="main-content" className="flex-1 pb-16 md:pb-0">
+              {children}
+            </main>
+            <Footer />
+            <Toaster />
+          </LanguageProvider>
         </ThemeProvider>
       </body>
     </html>

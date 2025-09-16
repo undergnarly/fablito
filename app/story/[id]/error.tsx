@@ -39,6 +39,12 @@ export default function Error({
           </CardHeader>
           <CardContent>
             <p className="mb-4">We encountered an error while trying to load this story.</p>
+            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+              <p className="text-sm text-blue-700">
+                <strong>For developers:</strong> If you're running this locally and seeing database errors, 
+                make sure to set up your Vercel KV credentials in the <code>.env.local</code> file.
+              </p>
+            </div>
             <Button onClick={reset} className="mr-2">
               <RefreshCw className="mr-2 h-4 w-4" />
               Try again

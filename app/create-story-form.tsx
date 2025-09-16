@@ -6,20 +6,31 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Sparkles, Wand2, AlertTriangle } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Sparkles, Wand2, AlertTriangle, Upload, Mic, MicOff, User, Palette, FileText, X, Volume2, Trash2 } from "lucide-react"
 import { createStoryAction } from "./actions"
 import { useFormStatus } from "react-dom"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
+import { useLanguage } from "@/lib/language-context"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { SpeechRecognition } from "@/components/speech-recognition"
+
+// Extend the Window interface to include webkitSpeechRecognition
+declare global {
+  interface Window {
+    SpeechRecognition: typeof SpeechRecognition
+    webkitSpeechRecognition: typeof SpeechRecognition
+  }
+}
 
 // Add submissionsHalted prop
 interface CreateStoryFormProps {
   submissionsHalted?: boolean
 }
 
-function SubmitButton({ disabled }: { disabled?: boolean }) {
+function SubmitButton({ disabled, createText, creatingText }: { disabled?: boolean, createText: string, creatingText: string }) {
   const { pending } = useFormStatus()
 
   return (
@@ -44,13 +55,13 @@ function SubmitButton({ disabled }: { disabled?: boolean }) {
               d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
             ></path>
           </svg>
-          Creating your ABC story...
+          {creatingText}
         </span>
       ) : (
         <>
           <span className="relative z-10 flex items-center justify-center">
             <Sparkles className="mr-2 h-5 w-5" />
-            Create My ABC Story
+            {createText}
           </span>
           <span className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity"></span>
         </>
@@ -62,13 +73,208 @@ function SubmitButton({ disabled }: { disabled?: boolean }) {
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 export default function CreateStoryForm({ submissionsHalted = false }: CreateStoryFormProps) {
-  const [titleValue, setTitleValue] = useState("")
+  const { t, language } = useLanguage()
+  
+  console.log("CreateStoryForm mounted/rendered. submissionsHalted:", submissionsHalted)
+  
+  // New form state
+  const [childName, setChildName] = useState("")
+  const [childAge, setChildAge] = useState(5)
+  const [theme, setTheme] = useState("")
+  const [storyLanguage, setStoryLanguage] = useState("en")
+  const [illustrationStyle, setIllustrationStyle] = useState("watercolor")
+  const [voiceStory, setVoiceStory] = useState<File | null>(null)
+  const [textStory, setTextStory] = useState("")
+  const [storyInputMode, setStoryInputMode] = useState<'none' | 'text' | 'voice'>('none')
+  const [isRecording, setIsRecording] = useState(false)
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const [recordingTime, setRecordingTime] = useState(0)
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([])
+  const [recognizedText, setRecognizedText] = useState("")
+  const [isRecognizing, setIsRecognizing] = useState(false)
+  const recordingIntervalRef = useRef<NodeJS.Timeout | null>(null)
+  const recognitionRef = useRef<SpeechRecognition | null>(null)
+  
+  // Auto-select story language based on interface language
+  useEffect(() => {
+    setStoryLanguage(language)
+  }, [language])
+
+  // Initialize speech recognition
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+      
+      if (SpeechRecognition) {
+        const recognition = new SpeechRecognition()
+        recognition.continuous = true
+        recognition.interimResults = true
+        recognition.lang = storyLanguage === 'ru' ? 'ru-RU' : storyLanguage === 'kz' ? 'kk-KZ' : 'en-US'
+        
+        recognition.onresult = (event) => {
+          let finalTranscript = ''
+          let interimTranscript = ''
+
+          for (let i = event.resultIndex; i < event.results.length; i++) {
+            const result = event.results[i]
+            if (result.isFinal) {
+              finalTranscript += result[0].transcript
+            } else {
+              interimTranscript += result[0].transcript
+            }
+          }
+
+          if (finalTranscript) {
+            setRecognizedText(prev => prev + finalTranscript)
+          }
+        }
+
+        recognition.onerror = (event) => {
+          console.error('Speech recognition error:', event.error)
+          setIsRecognizing(false)
+        }
+
+        recognition.onend = () => {
+          setIsRecognizing(false)
+        }
+
+        recognitionRef.current = recognition
+      }
+    }
+  }, [storyLanguage])
+  
+  // Legacy fields for compatibility
   const [promptValue, setPromptValue] = useState("")
   const [ageRange, setAgeRange] = useState([3, 8])
+  
   const [errors, setErrors] = useState({
-    title: "",
+    childName: "",
+    theme: "",
   })
   const [alphabetLettersCount, setAlphabetLettersCount] = useState(8)
+  const [submitError, setSubmitError] = useState("")
+
+  // Voice recording functions
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      const chunks: Blob[] = []
+
+      recorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          chunks.push(event.data)
+        }
+      }
+
+      recorder.onstop = () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/wav' })
+        const audioFile = new File([audioBlob], 'voice-story.wav', { type: 'audio/wav' })
+        setVoiceStory(audioFile)
+        setAudioChunks([])
+        stream.getTracks().forEach(track => track.stop())
+        setStoryInputMode('voice')
+      }
+
+      setMediaRecorder(recorder)
+      setAudioChunks(chunks)
+      recorder.start()
+      setIsRecording(true)
+      setRecordingTime(0)
+
+      // Start speech recognition
+      if (recognitionRef.current) {
+        setIsRecognizing(true)
+        setRecognizedText("")
+        recognitionRef.current.start()
+      }
+
+      // Запуск таймера
+      recordingIntervalRef.current = setInterval(() => {
+        setRecordingTime(prev => prev + 1)
+      }, 1000)
+
+    } catch (error) {
+      console.error('Ошибка доступа к микрофону:', error)
+      setSubmitError('Не удалось получить доступ к микрофону. Проверьте разрешения.')
+    }
+  }
+
+  const stopRecording = () => {
+    if (mediaRecorder && mediaRecorder.state === 'recording') {
+      mediaRecorder.stop()
+      setIsRecording(false)
+      
+      // Stop speech recognition
+      if (recognitionRef.current) {
+        recognitionRef.current.stop()
+        setIsRecognizing(false)
+      }
+      
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current)
+        recordingIntervalRef.current = null
+      }
+    }
+  }
+
+  const handleRecordingToggle = () => {
+    if (isRecording) {
+      stopRecording()
+    } else {
+      startRecording()
+    }
+  }
+
+  const deleteRecording = () => {
+    setVoiceStory(null)
+    setRecordingTime(0)
+    setRecognizedText("")
+    if (storyInputMode === 'voice') {
+      setStoryInputMode('none')
+    }
+  }
+
+  const enableTextMode = () => {
+    console.log("Enabling text mode")
+    setStoryInputMode('text')
+    // Clear voice recording if it exists
+    if (voiceStory) {
+      setVoiceStory(null)
+      setRecordingTime(0)
+    }
+  }
+
+  const enableVoiceMode = () => {
+    setStoryInputMode('voice')
+    // Очистка текста если он был
+    if (textStory) {
+      setTextStory("")
+    }
+  }
+
+  const clearStoryInput = () => {
+    setStoryInputMode('none')
+    setTextStory("")
+    setVoiceStory(null)
+    setRecordingTime(0)
+  }
+
+  // Recording time formatting
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60)
+    const secs = seconds % 60
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  // Очистка таймера при размонтировании компонента
+  useEffect(() => {
+    return () => {
+      if (recordingIntervalRef.current) {
+        clearInterval(recordingIntervalRef.current)
+      }
+    }
+  }, [])
 
   // Fetch the alphabet letters count from the API
   useEffect(() => {
@@ -93,25 +299,50 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
     setAgeRange(value)
   }
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
+    console.log("Form submit started")
 
     // Don't submit if submissions are halted
     if (submissionsHalted) {
+      console.log("Submissions halted, aborting")
       return
     }
 
+    console.log("Form data:", { childName, theme, storyLanguage })
+
     // Validate form
     const newErrors = {
-      title: titleValue.trim() === "" ? "Title is required" : "",
+      childName: childName.trim() === "" ? t.heroNameRequired : "",
+      theme: theme.trim() === "" ? t.storyThemeRequired : "",
     }
 
+    console.log("Validation errors:", newErrors)
     setErrors(newErrors)
 
     // If no errors, submit the form
     if (Object.values(newErrors).every((error) => error === "")) {
+      console.log("Validation passed, creating form data")
       const formData = new FormData(e.currentTarget)
-      createStoryAction(formData)
+      
+      // Log form data for debugging
+      console.log("FormData contents:")
+      for (let [key, value] of formData.entries()) {
+        console.log(`${key}: ${value}`)
+      }
+      
+      setSubmitError("") // Clear previous errors
+      
+      console.log("Calling createStoryAction...")
+      try {
+        await createStoryAction(formData)
+        // Redirect happens in server action - no need to handle here
+      } catch (error) {
+        console.error("Error creating story:", error)
+        setSubmitError(error instanceof Error ? error.message : "Failed to create story. Please try again.")
+      }
+    } else {
+      console.log("Validation failed, not submitting")
     }
   }
 
@@ -139,84 +370,328 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
+      {/* Child Name */}
       <div className="space-y-2">
-        <Label htmlFor="title" className="text-lg">
+        <Label htmlFor="childName" className="text-lg font-semibold">
           <span className="flex items-center gap-2">
-            <Wand2 className="h-5 w-5 text-primary" />
-            Story Title
+            <User className="h-5 w-5 text-primary" />
+            {t.heroName}
           </span>
         </Label>
         <Input
-          id="title"
-          name="title"
-          placeholder="Max's Alphabet Adventure"
+          id="childName"
+          name="childName"
+          placeholder={t.heroNamePlaceholder}
           required
           aria-required="true"
-          aria-invalid={errors.title ? "true" : "false"}
-          aria-describedby={errors.title ? "title-error" : undefined}
-          className={`border-2 ${errors.title ? "border-red-400" : "border-primary/20"} text-xl py-6 px-4 rounded-xl transition-all duration-200 focus-visible:ring-purple-400 focus-visible:border-purple-400 focus-visible:ring-offset-2`}
-          value={titleValue}
-          onChange={(e) => setTitleValue(e.target.value)}
+          aria-invalid={errors.childName ? "true" : "false"}
+          aria-describedby={errors.childName ? "childName-error" : undefined}
+          className={`border-2 ${errors.childName ? "border-red-400" : "border-primary/20"} text-xl py-6 px-4 rounded-xl transition-all duration-200 focus-visible:ring-purple-400 focus-visible:border-purple-400 focus-visible:ring-offset-2`}
+          style={{ 
+            pointerEvents: 'auto', 
+            userSelect: 'text', 
+            cursor: 'text',
+            opacity: 1,
+            backgroundColor: 'white'
+          }}
+          value={childName}
+          onChange={(e) => {
+            console.log("Input change:", e.target.value)
+            setChildName(e.target.value)
+          }}
         />
-        {errors.title && (
-          <p id="title-error" className="text-red-500 text-sm mt-1">
-            {errors.title}
+        {errors.childName && (
+          <p id="childName-error" className="text-red-500 text-sm mt-1">
+            {errors.childName}
           </p>
         )}
       </div>
+
+      {/* Child Age */}
+      <div className="space-y-4">
+        <Label className="text-lg font-semibold">
+          {t.childAge}: {childAge} {t.childAgeYears}
+        </Label>
+        <Slider
+          value={[childAge]}
+          onValueChange={(value) => setChildAge(value[0])}
+          max={12}
+          min={2}
+          step={1}
+          className="w-full"
+        />
+        <div className="flex justify-between text-sm text-muted-foreground">
+          <span>2 {t.years}</span>
+          <span>12 {t.years}</span>
+        </div>
+      </div>
+
+      {submitError && (
+        <Alert className="border-red-200 bg-red-50">
+          <AlertTriangle className="h-4 w-4 text-red-600" />
+          <AlertTitle className="text-red-800">{t.error}</AlertTitle>
+          <AlertDescription className="text-red-700">
+            {submitError}
+          </AlertDescription>
+        </Alert>
+      )}
+
+      {/* Theme/Moral */}
       <div className="space-y-2">
-        <Label htmlFor="prompt" className="text-lg">
+        <Label className="text-lg font-semibold">
           <span className="flex items-center gap-2">
             <Sparkles className="h-5 w-5 text-primary" />
-            Story Theme <span className="text-xs text-muted-foreground ml-1">(Optional)</span>
+            {t.storyTheme}
           </span>
         </Label>
-        <Textarea
-          id="prompt"
-          name="prompt"
-          placeholder="A child exploring a magical forest and making new friends..."
-          className="min-h-20 border-2 border-primary/20 text-lg rounded-xl transition-all duration-200 focus-visible:ring-purple-400 focus-visible:border-purple-400 focus-visible:ring-offset-2"
-          value={promptValue}
-          onChange={(e) => setPromptValue(e.target.value)}
-        />
-        <p className="text-xs text-muted-foreground">
-          Your story will include {alphabetLettersCount} letters of the alphabet (A-{ALPHABET[alphabetLettersCount - 1]}
-          )
-        </p>
+        <Select value={theme} onValueChange={setTheme}>
+          <SelectTrigger className={`border-2 ${errors.theme ? "border-red-400" : "border-primary/20"} rounded-xl transition-all duration-200`}>
+            <SelectValue placeholder={t.selectThemePlaceholder} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="relationships-friendship">{t.relationshipsFriendship}</SelectItem>
+            <SelectItem value="character-courage">{t.characterCourage}</SelectItem>
+            <SelectItem value="responsibility">{t.responsibility}</SelectItem>
+            <SelectItem value="family-care">{t.familyCare}</SelectItem>
+            <SelectItem value="nature-world">{t.natureWorld}</SelectItem>
+            <SelectItem value="learning-development">{t.learningDevelopment}</SelectItem>
+            <SelectItem value="emotions-inner-world">{t.emotionsInnerWorld}</SelectItem>
+          </SelectContent>
+        </Select>
+        {errors.theme && (
+          <p id="theme-error" className="text-red-500 text-sm mt-1">
+            {errors.theme}
+          </p>
+        )}
       </div>
 
-      {/* Simplified Age Range Slider */}
+      {/* Language Selection */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
-            Age Range: {ageRange[0]}-{ageRange[1]} years
-          </span>
-          <span className="text-xs text-muted-foreground">Optional</span>
-        </div>
-        <Slider defaultValue={[3, 8]} min={2} max={12} step={1} value={ageRange} onValueChange={handleAgeRangeChange} />
-        <div className="flex justify-between text-xs text-muted-foreground">
-          <span>Younger (2)</span>
-          <span>Older (12)</span>
-        </div>
+        <Label className="text-lg font-semibold">{t.storyLanguage}</Label>
+        <Select value={storyLanguage} onValueChange={setStoryLanguage}>
+          <SelectTrigger className="border-2 border-primary/20 rounded-xl">
+            <SelectValue placeholder={t.selectLanguagePlaceholder} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="ru">Русский</SelectItem>
+            <SelectItem value="en">English</SelectItem>
+            <SelectItem value="kz">Қазақша</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
 
-      {/* Hidden age field with value from slider */}
-      <input type="hidden" name="age" value={`${ageRange[0]}-${ageRange[1]}`} />
+      {/* Illustration Style */}
+      <div className="space-y-2">
+        <Label className="text-lg font-semibold">
+          <span className="flex items-center gap-2">
+            <Palette className="h-5 w-5 text-primary" />
+            {t.illustrationStyle}
+          </span>
+        </Label>
+        <Select value={illustrationStyle} onValueChange={setIllustrationStyle}>
+          <SelectTrigger className="border-2 border-primary/20 rounded-xl transition-all duration-200">
+            <SelectValue placeholder={t.selectStyle} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="watercolor">{t.watercolor}</SelectItem>
+            <SelectItem value="cartoon">{t.cartoon}</SelectItem>
+            <SelectItem value="realistic">{t.realistic}</SelectItem>
+            <SelectItem value="fantasy">{t.fantasy}</SelectItem>
+            <SelectItem value="minimalist">{t.minimalist}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Story Input Options */}
+      <div className="space-y-4">
+        <Label className="text-lg font-semibold">
+          {t.addOwnStory} <span className="text-sm text-muted-foreground">({t.optional})</span>
+        </Label>
+        
+        {storyInputMode === 'none' && (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="h-24 border-2 border-dashed border-primary/20 hover:border-primary/40 transition-all"
+              onClick={enableTextMode}
+            >
+              <div className="flex flex-col items-center space-y-2">
+                <FileText className="h-8 w-8 text-primary" />
+                <span className="font-medium">{t.writeAsText}</span>
+                <span className="text-sm text-muted-foreground">{t.writeAsTextDesc}</span>
+              </div>
+            </Button>
+            
+            <Button 
+              type="button" 
+              variant="outline" 
+              className="h-24 border-2 border-dashed border-primary/20 hover:border-primary/40 transition-all"
+              onClick={enableVoiceMode}
+            >
+              <div className="flex flex-col items-center space-y-2">
+                <Mic className="h-8 w-8 text-primary" />
+                <span className="font-medium">{t.recordWithVoice}</span>
+                <span className="text-sm text-muted-foreground">{t.recordWithVoiceDesc}</span>
+              </div>
+            </Button>
+          </div>
+        )}
+
+        {storyInputMode === 'text' && (
+          <div className="border-2 border-primary/20 rounded-xl p-6 space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <span className="font-medium">{t.yourStory}</span>
+              </div>
+              <Button type="button" variant="ghost" size="sm" onClick={clearStoryInput}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <Textarea
+              placeholder={t.yourStoryPlaceholder}
+              value={textStory}
+              onChange={(e) => {
+                console.log("Text story change:", e.target.value)
+                setTextStory(e.target.value)
+              }}
+              className="min-h-32 resize-none"
+              maxLength={1000}
+            />
+            
+            {/* Speech Recognition Component */}
+            <SpeechRecognition
+              onTranscriptChange={(transcript) => {
+                setTextStory(transcript)
+              }}
+              language={storyLanguage === 'ru' ? 'ru-RU' : storyLanguage === 'kz' ? 'kk-KZ' : 'en-US'}
+              className="mt-2"
+            />
+            
+            <div className="text-right text-sm text-muted-foreground">
+              {textStory.length}/1000 {t.charactersCount}
+            </div>
+          </div>
+        )}
+
+        {storyInputMode === 'voice' && (
+          <div className="border-2 border-primary/20 rounded-xl p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Mic className="h-5 w-5 text-primary" />
+                <span className="font-medium">{t.voiceRecording}</span>
+              </div>
+              <Button type="button" variant="ghost" size="sm" onClick={clearStoryInput}>
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="flex flex-col items-center space-y-4">
+              {voiceStory ? (
+                <div className="text-center space-y-3 w-full">
+                  <div className="text-lg text-green-600 font-medium">✓ {t.audioRecorded} ({formatTime(recordingTime)})</div>
+                  <div className="flex gap-2 justify-center">
+                    <Button type="button" variant="outline" size="sm" onClick={deleteRecording}>
+                      {t.delete}
+                    </Button>
+                    <Button type="button" variant="outline" size="sm" onClick={handleRecordingToggle}>
+                      {t.reRecord}
+                    </Button>
+                  </div>
+                  <audio controls className="w-full max-w-sm mx-auto">
+                    <source src={URL.createObjectURL(voiceStory)} type="audio/wav" />
+                    Ваш браузер не поддерживает воспроизведение аудио.
+                  </audio>
+                  
+                  {/* Display recognized text */}
+                  {recognizedText && (
+                    <div className="mt-4 p-3 bg-muted rounded-md w-full">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Volume2 className="h-4 w-4" />
+                        <span className="text-sm font-medium">Распознанный текст:</span>
+                      </div>
+                      <p className="text-sm">{recognizedText}</p>
+                      <div className="flex gap-2 mt-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => {
+                            setTextStory(recognizedText)
+                            setStoryInputMode('text')
+                          }}
+                        >
+                          Использовать как текст истории
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setRecognizedText("")}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="text-center space-y-3">
+                  {isRecording && (
+                    <div className="text-center space-y-2">
+                      <div className="text-lg font-medium text-red-600 animate-pulse">
+                        🔴 Запись... {formatTime(recordingTime)}
+                      </div>
+                      {isRecognizing && (
+                        <div className="text-sm text-blue-600 flex items-center justify-center gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                          Распознавание речи...
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <Button
+                    type="button"
+                    variant={isRecording ? "destructive" : "outline"}
+                    size="lg"
+                    className="rounded-full"
+                    onClick={handleRecordingToggle}
+                  >
+                    {isRecording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
+                    {isRecording ? t.stopRecording : t.startRecording}
+                  </Button>
+                  <div className="text-sm text-muted-foreground">
+                    {isRecording ? t.tellYourStory : t.clickToStartRecording}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Hidden fields for form data */}
+      <input type="hidden" name="childAge" value={childAge} />
+      <input type="hidden" name="theme" value={theme} />
+      <input type="hidden" name="language" value={storyLanguage} />
+      <input type="hidden" name="illustrationStyle" value={illustrationStyle} />
+      <input type="hidden" name="textStory" value={textStory} />
 
       <div className="flex items-center justify-between space-x-2">
         <div className="space-y-0.5">
           <Label htmlFor="visibility" className="text-base">
-            Unlisted Story
+            {t.privateStory}
           </Label>
           <p className="text-xs text-muted-foreground">
-            Unlisted stories won't appear in public listings but can be shared via direct link
+            {t.privateStoryDesc}
           </p>
         </div>
-        <Switch id="visibility" name="visibility" value="unlisted" aria-label="Make story unlisted" />
+        <Switch id="visibility" name="visibility" value="unlisted" aria-label="Make story private" />
       </div>
 
-      <SubmitButton disabled={submissionsHalted} />
+      <SubmitButton disabled={submissionsHalted} createText={t.createStory} creatingText={t.creatingStory} />
     </form>
   )
 }

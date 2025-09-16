@@ -11,9 +11,12 @@ interface FavoriteButtonProps {
   storyTitle: string
   createdAt: string
   previewImage?: string
+  style?: {
+    language: 'ru' | 'en' | 'kz'
+  }
 }
 
-export function FavoriteButton({ storyId, storyTitle, createdAt, previewImage }: FavoriteButtonProps) {
+export function FavoriteButton({ storyId, storyTitle, createdAt, previewImage, style }: FavoriteButtonProps) {
   const { isFavorite, addFavorite, removeFavorite, loaded } = useFavorites()
   const { toast } = useToast()
   const [mounted, setMounted] = useState(false)
@@ -30,6 +33,16 @@ export function FavoriteButton({ storyId, storyTitle, createdAt, previewImage }:
   }, [loaded, storyId, isFavorite])
 
   const toggleFavorite = () => {
+    // Валидация данных перед добавлением в избранное
+    if (!storyId || storyId === 'undefined' || !storyTitle || storyTitle === 'undefined') {
+      toast({
+        title: "Error",
+        description: "Cannot add story to favorites: invalid story data",
+        variant: "destructive",
+      })
+      return
+    }
+
     if (isFav) {
       removeFavorite(storyId)
       toast({
@@ -42,6 +55,7 @@ export function FavoriteButton({ storyId, storyTitle, createdAt, previewImage }:
         title: storyTitle,
         createdAt,
         previewImage,
+        style,
       })
       toast({
         title: "Added to favorites",

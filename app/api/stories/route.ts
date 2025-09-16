@@ -1,63 +1,62 @@
-import { type NextRequest, NextResponse } from "next/server"
-import { listStories } from "@/lib/db"
-import { checkAdminAuth } from "@/app/admin/actions"
+import { NextRequest, NextResponse } from 'next/server'
+import { listStories } from '@/lib/db'
+import { detectLanguageFromStory } from '@/lib/language-detector'
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
-    const includeUnlisted = searchParams.get("includeUnlisted") === "true"
-
-    // Check if admin auth is required for unlisted stories
-    if (includeUnlisted) {
-      const isAdmin = await checkAdminAuth()
-      if (!isAdmin) {
-        return NextResponse.json(
-          { error: "Unauthorized. Admin access required to view unlisted stories." },
-          { status: 403 },
-        )
-      }
-    }
-
-    // Get all stories
+    const search = searchParams.get('search')
+    
     const allStories = await listStories()
-
+    
     if (!allStories || allStories.length === 0) {
-      return NextResponse.json({ stories: [] })
+      return NextResponse.json([])
     }
 
-    // Process stories for the response
-    const processedStories = allStories.map((story) => {
-      // Remove sensitive data
-      const { deletionToken, storyContent, images, ...safeStoryData } = story
-
-      // Parse images with error handling
-      let previewImage = null
-      try {
-        if (images) {
-          const parsedImages = JSON.parse(images)
-          previewImage = parsedImages[0] || null
+    // Filter public stories and sort by creation date
+    let filteredStories = allStories
+      .filter((story) => story.visibility !== "unlisted")
+      .map((story) => {
+        // Parse images to get preview image
+        let previewImage = null
+        try {
+          if (story.images) {
+            const parsedImages = JSON.parse(story.images)
+            previewImage = parsedImages[0] || null
+            console.log(`[API] Story ${story.id} (${story.title}):`, {
+              hasImages: !!story.images,
+              imagesType: typeof story.images,
+              parsedImagesLength: parsedImages.length,
+              previewImage: previewImage
+            })
+          } else {
+            console.log(`[API] Story ${story.id} (${story.title}): No images field`)
+          }
+        } catch (error) {
+          console.error(`Error parsing images for story ${story.id}:`, error)
         }
-      } catch (error) {
-        console.error(`Error parsing images for story ${story.id}:`, error)
-      }
 
-      return {
-        ...safeStoryData,
-        previewImage,
-      }
-    })
-
-    // Filter out failed stories and unlisted stories (unless includeUnlisted is true)
-    // Then sort by creation date (newest first)
-    const sortedStories = processedStories
-      .filter((story) => story.status !== "failed")
-      .filter((story) => includeUnlisted || story.visibility !== "unlisted")
+        return {
+          ...story,
+          previewImage,
+          // Ensure style information is preserved
+          style: story.style || { language: detectLanguageFromStory(story) }
+        }
+      })
       .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
 
-    return NextResponse.json({ stories: sortedStories })
+    // Apply search filter if provided
+    if (search) {
+      const term = search.toLowerCase()
+      filteredStories = filteredStories.filter(
+        (story) =>
+          story.title.toLowerCase().includes(term) || (story.prompt && story.prompt.toLowerCase().includes(term)),
+      )
+    }
+
+    return NextResponse.json(filteredStories)
   } catch (error) {
-    console.error("Error fetching stories:", error)
-    return NextResponse.json({ error: "Failed to fetch stories" }, { status: 500 })
+    console.error('Error fetching stories:', error)
+    return NextResponse.json({ error: 'Failed to fetch stories' }, { status: 500 })
   }
 }
-

@@ -16,12 +16,23 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Check if it's a protected user route
+  if (pathname.startsWith("/api/user") || pathname.startsWith("/user")) {
+    // Get the user session cookie
+    const userSession = request.cookies.get("user_session")
+
+    // If no user session, return 401 Unauthorized
+    if (!userSession?.value) {
+      return NextResponse.json({ error: "Unauthorized. Please log in." }, { status: 401 })
+    }
+  }
+
   // Continue with the request
   return NextResponse.next()
 }
 
-// Configure the middleware to run only on admin API routes
+// Configure the middleware to run on admin and user routes
 export const config = {
-  matcher: ["/api/admin/:path*"],
+  matcher: ["/api/admin/:path*", "/api/user/:path*", "/user/:path*"],
 }
 
