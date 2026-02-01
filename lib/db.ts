@@ -55,7 +55,7 @@ export const StorySchema = z.object({
   
   // Legacy fields (для совместимости)
   prompt: z.string().optional(),
-  age: z.string().optional(),
+  age: z.union([z.string(), z.number()]).optional().transform(val => val !== undefined ? String(val) : undefined),
   
   status: z.enum(["generating", "generating_story", "generating_images", "complete", "failed"]),
   visibility: z.enum(["public", "unlisted"]).default("public"),

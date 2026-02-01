@@ -1,37 +1,5 @@
 import { GoogleGenAI, Modality } from "@google/genai"
-import { writeFile, mkdir } from "fs/promises"
-import { join } from "path"
-
-/**
- * Save image to local file system
- */
-async function saveImageLocally(base64Data: string, storyId: string, pageIndex: number): Promise<string> {
-  try {
-    // Create images directory if it doesn't exist
-    const imagesDir = join(process.cwd(), 'public', 'generated-images')
-    await mkdir(imagesDir, { recursive: true })
-
-    // Generate filename
-    const filename = `${storyId}-page-${pageIndex}-${Date.now()}.png`
-    const filepath = join(imagesDir, filename)
-
-    // Convert base64 to buffer (remove data URL prefix if present)
-    const base64Content = base64Data.replace(/^data:image\/[a-z]+;base64,/, '')
-    const buffer = Buffer.from(base64Content, 'base64')
-
-    // Write file
-    await writeFile(filepath, buffer)
-
-    // Return public URL
-    const publicUrl = `/generated-images/${filename}`
-    console.log(`[NANO-BANANA] Saved image to: ${publicUrl}`)
-
-    return publicUrl
-  } catch (error) {
-    console.error(`[NANO-BANANA] Error saving image:`, error)
-    throw error
-  }
-}
+import { uploadImageToBlob } from "./blob-storage"
 
 /**
  * Generate an image using Nano Banana Pro (Google Gemini 3 Pro Image)
@@ -138,11 +106,11 @@ export async function generateImageWithNanoBanana(
     console.log(`[NANO-BANANA] Image generated successfully`)
     console.log(`[NANO-BANANA] Image data size: ${base64Image.length} characters`)
 
-    // Save image locally
+    // Upload image to Vercel Blob
     const dataUrl = `data:image/png;base64,${base64Image}`
-    const imageUrl = await saveImageLocally(dataUrl, storyId, pageIndex)
+    const imageUrl = await uploadImageToBlob(dataUrl, storyId, pageIndex)
 
-    console.log(`[NANO-BANANA] Successfully generated and saved image: ${imageUrl}`)
+    console.log(`[NANO-BANANA] Successfully generated and uploaded image: ${imageUrl}`)
 
     return {
       imageUrl,
