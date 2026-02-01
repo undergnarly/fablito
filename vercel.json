@@ -1,9 +1,4 @@
 {
-  "crons": [
-    {
-      "path": "/api/cron/cleanup?cronSecret=$CRON_SECRET",
-      "schedule": "0 0 * * *"
-    }
-  ]
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build"
 }
-
