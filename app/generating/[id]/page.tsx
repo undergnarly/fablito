@@ -4,15 +4,16 @@ import { useEffect, useState, use } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
-import { Loader2, BookOpen, ImageIcon, Sparkles, Eye } from "lucide-react"
+import { Eye, Lightbulb } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useLanguage } from "@/lib/language-context"
+import { FUN_FACTS } from "@/lib/fun-facts"
 
 export default function GeneratingPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const [status, setStatus] = useState<string>("generating")
   const [progress, setProgress] = useState<number>(0)
   const [error, setError] = useState<string | null>(null)
@@ -21,6 +22,31 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
   const [storyData, setStoryData] = useState<any>(null)
   const [notificationSent, setNotificationSent] = useState<boolean>(false)
   const [pagesCount, setPagesCount] = useState<number>(10)
+  const [currentFactIndex, setCurrentFactIndex] = useState<number>(() =>
+    Math.floor(Math.random() * FUN_FACTS.length)
+  )
+  const [factFading, setFactFading] = useState<boolean>(false)
+
+  // Change fact every 15 seconds with fade animation
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setFactFading(true)
+      setTimeout(() => {
+        // Pick a random fact different from current
+        let newIndex
+        do {
+          newIndex = Math.floor(Math.random() * FUN_FACTS.length)
+        } while (newIndex === currentFactIndex && FUN_FACTS.length > 1)
+        setCurrentFactIndex(newIndex)
+        setFactFading(false)
+      }, 300) // Fade out duration
+    }, 15000)
+
+    return () => clearInterval(interval)
+  }, [currentFactIndex])
+
+  // Get current fact in user's language
+  const currentFact = FUN_FACTS[currentFactIndex]?.[language as 'en' | 'ru' | 'kz'] || FUN_FACTS[currentFactIndex]?.en
 
   // Request notification permission on component mount
   useEffect(() => {
@@ -32,13 +58,11 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
           Notification.requestPermission().then((permission) => {
             setNotificationPermission(permission)
           }).catch(() => {
-            // Notification API not fully supported (mobile browsers)
             console.log('Notification permission not available on this device')
           })
         }
       }
     } catch (e) {
-      // Notification API not supported
       console.log('Notifications not supported on this device')
     }
   }, [])
@@ -101,7 +125,6 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
           // Send browser notification if permission granted and not already sent
           if (notificationPermission === "granted" && !notificationSent) {
             try {
-              // Check if Notification constructor is supported (not on mobile)
               if (typeof Notification !== 'undefined' && 'Notification' in window) {
                 const notification = new Notification(t.storyReady, {
                   body: `"${data.title}" is now ready to read!`,
@@ -114,7 +137,6 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
                 }
               }
             } catch (e) {
-              // Notification API not fully supported (mobile browsers)
               console.log('Browser notifications not supported on this device')
             }
             setNotificationSent(true)
@@ -140,7 +162,7 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
 
     // Clean up interval on unmount
     return () => clearInterval(interval)
-  }, [id, router, notificationPermission, notificationSent, pagesCount])
+  }, [id, router, notificationPermission, notificationSent, pagesCount, t.storyReady])
 
   const getStatusMessage = () => {
     switch (status) {
@@ -149,7 +171,7 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
       case "generating_story":
         return t.writingStory
       case "generating_images":
-        return `${t.drawingIllustrations} (${imagesGenerated}/${pagesCount} complete)...`
+        return `${t.drawingIllustrations} (${imagesGenerated}/${pagesCount})`
       case "complete":
         return t.storyReady
       case "failed":
@@ -159,31 +181,18 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
     }
   }
 
-  const getStatusIcon = () => {
-    switch (status) {
-      case "generating":
-        return <Sparkles className="w-8 h-8 text-yellow-500" />
-      case "generating_story":
-        return <BookOpen className="w-8 h-8 text-blue-500" />
-      case "generating_images":
-        return <ImageIcon className="w-8 h-8 text-green-500" />
-      case "complete":
-        return <Sparkles className="w-8 h-8 text-primary" />
-      default:
-        return <Loader2 className="w-8 h-8 text-primary animate-spin" />
-    }
-  }
-
   // Check if we can show a preview (story content exists)
   const canShowPreview = () => {
     return status === "generating_images" || status === "complete"
   }
 
+  const didYouKnow = language === 'ru' ? 'А ты знал?' : language === 'kz' ? 'Сен білесің бе?' : 'Did you know?'
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#411369] via-[#5a1a8a] to-[#411369] p-4 md:p-8 flex items-center justify-center">
       <Card className="w-full max-w-md border border-white/20 shadow-2xl rounded-2xl bg-gradient-to-br from-[#A31CF5]/90 to-[#7b2cbf]/90 backdrop-blur-sm">
-        <CardContent className="pt-8 pb-8">
-          <div className="flex flex-col items-center text-center space-y-6">
+        <CardContent className="pt-6 pb-6">
+          <div className="flex flex-col items-center text-center space-y-4">
             {error ? (
               <div className="text-red-300">
                 <h2 className="text-xl font-bold mb-2 text-white">{t.error}</h2>
@@ -191,25 +200,32 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
               </div>
             ) : (
               <>
-                <div className="relative w-24 h-24 flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Loader2 className="w-16 h-16 text-white/30 animate-spin" />
-                  </div>
-                  <div className="absolute inset-0 flex items-center justify-center">{getStatusIcon()}</div>
+                {/* Status and Progress */}
+                <div className="space-y-3 w-full">
+                  <h2 className="text-lg font-bold text-white">{getStatusMessage()}</h2>
+                  <Progress value={progress} className="h-2 bg-white/20" />
                 </div>
 
-                <div className="space-y-4 w-full">
-                  <h2 className="text-xl font-bold text-white">{getStatusMessage()}</h2>
-                  <Progress value={progress} className="h-2 bg-white/20" />
-                  <p className="text-white/70 text-sm">
-                    {t.generationTakesTime}
+                {/* Fun Fact Section */}
+                <div className="w-full bg-white/10 rounded-xl p-4 min-h-[120px] flex flex-col justify-center">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Lightbulb className="w-5 h-5 text-yellow-400" />
+                    <span className="text-sm font-semibold text-yellow-400">{didYouKnow}</span>
+                  </div>
+                  <p
+                    className={`text-white/90 text-sm leading-relaxed transition-opacity duration-300 ${
+                      factFading ? 'opacity-0' : 'opacity-100'
+                    }`}
+                  >
+                    {currentFact}
                   </p>
                 </div>
 
+                {/* Preview Button */}
                 {canShowPreview() && (
-                  <div className="w-full pt-4">
+                  <div className="w-full pt-2">
                     <Link href={`/story/${id}`}>
-                      <Button className="w-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white rounded-full py-6 font-semibold">
+                      <Button className="w-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white rounded-full py-5 font-semibold">
                         <Eye className="mr-2 h-4 w-4" />
                         {t.viewStoryInProgress}
                       </Button>
@@ -227,4 +243,3 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
     </main>
   )
 }
-
