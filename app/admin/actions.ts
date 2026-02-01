@@ -72,21 +72,36 @@ export async function deleteAllStoriesAction() {
   }
 
   try {
-    // Get all story keys
-    const storyKeys = await kv.keys("story:*")
+    // Use SCAN instead of KEYS to avoid "too many keys" error
+    const storyKeys: string[] = []
+    let cursor: string | number = "0"
+    let iterations = 0
+    const MAX_ITERATIONS = 100
+
+    do {
+      const [nextCursor, keys] = await kv.scan(cursor, { match: 'story:*', count: 100 })
+      cursor = nextCursor
+      iterations++
+
+      for (const key of keys) {
+        storyKeys.push(key)
+      }
+
+      if (iterations >= MAX_ITERATIONS) break
+    } while (String(cursor) !== "0")
 
     if (storyKeys.length === 0) {
       return { success: true, message: "No stories to delete" }
     }
 
-    // Delete all stories
-    let deletedCount = 0
+    // Delete all stories using pipeline for better performance
+    const pipeline = kv.pipeline()
     for (const key of storyKeys) {
-      await kv.del(key)
-      deletedCount++
+      pipeline.del(key)
     }
+    await pipeline.exec()
 
-    return { success: true, message: `Successfully deleted ${deletedCount} stories` }
+    return { success: true, message: `Successfully deleted ${storyKeys.length} stories` }
   } catch (error) {
     console.error("Error deleting all stories:", error)
     return { success: false, message: "Failed to delete all stories" }
