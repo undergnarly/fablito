@@ -676,11 +676,14 @@ export async function getAllUsers(): Promise<User[]> {
   try {
     // Use SCAN instead of KEYS to avoid "too many keys" error
     const userKeys: string[] = []
-    let cursor = 0
+    let cursor: string | number = "0"
+    let iterations = 0
+    const MAX_ITERATIONS = 100 // Safety limit to prevent infinite loops
 
     do {
       const [nextCursor, keys] = await kv.scan(cursor, { match: 'user:*', count: 100 })
       cursor = nextCursor
+      iterations++
 
       // Filter to only include actual user keys (user:uuid format)
       // Exclude: user:email:*, user:uuid:transactions, referral:*, etc.
@@ -691,9 +694,15 @@ export async function getAllUsers(): Promise<User[]> {
           userKeys.push(key)
         }
       }
-    } while (cursor !== 0)
 
-    console.log(`[DB] Found ${userKeys.length} user keys via SCAN`)
+      // Safety check to prevent infinite loop
+      if (iterations >= MAX_ITERATIONS) {
+        console.warn(`[DB] SCAN reached max iterations (${MAX_ITERATIONS}), stopping`)
+        break
+      }
+    } while (String(cursor) !== "0")
+
+    console.log(`[DB] Found ${userKeys.length} user keys via SCAN in ${iterations} iterations`)
 
     // Fetch users in batches to avoid overwhelming the connection
     const BATCH_SIZE = 50
