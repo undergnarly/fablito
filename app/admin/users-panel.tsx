@@ -66,10 +66,25 @@ export default function UsersPanel() {
     coins: 500,
   })
 
+  // Helper for fetch with retry on network errors
+  const fetchWithRetry = async (url: string, options?: RequestInit, retries = 3): Promise<Response> => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url, options)
+        return response
+      } catch (error) {
+        console.log(`Fetch attempt ${i + 1} failed, retrying...`)
+        if (i === retries - 1) throw error
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)))
+      }
+    }
+    throw new Error("Failed to fetch after retries")
+  }
+
   const fetchUsers = async () => {
     setLoading(true)
     try {
-      const response = await fetch("/api/admin/users")
+      const response = await fetchWithRetry("/api/admin/users")
       if (!response.ok) throw new Error("Failed to fetch users")
       const data = await response.json()
       setUsers(data.users || [])
@@ -77,7 +92,7 @@ export default function UsersPanel() {
       console.error("Error fetching users:", error)
       toast({
         title: "Error",
-        description: "Failed to load users",
+        description: "Failed to load users. Please refresh the page.",
         variant: "destructive",
       })
     } finally {

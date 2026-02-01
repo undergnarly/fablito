@@ -73,18 +73,33 @@ export default function AdminDashboard() {
   const [totalStories, setTotalStories] = useState(0)
   const STORIES_PER_PAGE = 20
 
+  // Helper for fetch with retry on network errors
+  const fetchWithRetry = async (url: string, retries = 3): Promise<Response> => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await fetch(url)
+        return response
+      } catch (error) {
+        console.log(`Fetch attempt ${i + 1} failed, retrying...`)
+        if (i === retries - 1) throw error
+        await new Promise(resolve => setTimeout(resolve, 1000 * (i + 1)))
+      }
+    }
+    throw new Error("Failed to fetch after retries")
+  }
+
   const fetchStories = async (pageNum = page) => {
     setLoading(true)
     try {
       // Check if still authenticated
-      const response = await fetch("/api/admin/check-auth")
+      const response = await fetchWithRetry("/api/admin/check-auth")
       if (!response.ok) {
         // If not authenticated, redirect to admin login
         router.push("/admin")
         return
       }
 
-      const storiesResponse = await fetch(`/api/stories?includeUnlisted=true&page=${pageNum}&limit=${STORIES_PER_PAGE}`)
+      const storiesResponse = await fetchWithRetry(`/api/stories?includeUnlisted=true&page=${pageNum}&limit=${STORIES_PER_PAGE}`)
       if (!storiesResponse.ok) throw new Error("Failed to fetch stories")
 
       const data = await storiesResponse.json()
@@ -101,7 +116,7 @@ export default function AdminDashboard() {
       console.error("Error fetching stories:", error)
       toast({
         title: "Error",
-        description: "Failed to load stories",
+        description: "Failed to load stories. Please refresh the page.",
         variant: "destructive",
       })
     } finally {
