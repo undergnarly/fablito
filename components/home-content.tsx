@@ -3,7 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
-import { Sparkles, Wand2, ChevronRight, Star, BookOpen } from "lucide-react"
+import { Sparkles, Wand2, ChevronRight, BookOpen } from "lucide-react"
 import { ShimmerButton } from "@/components/magicui/shimmer-button"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageFlag } from "@/components/language-flag"
@@ -36,37 +36,21 @@ export function HomeContent({ stories }: HomeContentProps) {
   }
 
   return (
-    <div className="min-h-screen overflow-hidden">
-      {/* Floating Stars Background - hidden on mobile for performance */}
-      <div className="hidden md:block fixed inset-0 pointer-events-none overflow-hidden">
-        {[...Array(15)].map((_, i) => (
-          <Star
-            key={i}
-            className="absolute text-white/20 star"
-            size={Math.random() * 12 + 6}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`
-            }}
-          />
-        ))}
-      </div>
-
-      {/* Hero Section - Mobile First Design */}
-      <section className="relative min-h-[100svh] md:min-h-[90vh] flex flex-col justify-between overflow-hidden">
-        {/* Background image - responsive */}
+    <div className="min-h-screen">
+      {/* Fixed Hero Background - stays in place while scrolling */}
+      <div className="fixed inset-0 h-[100svh] z-0">
+        {/* Background image */}
         <div className="absolute inset-0 bg-cover bg-center bg-no-repeat hero-background" />
-        {/* Gradient overlay for text readability */}
+        {/* Minimal gradient only at bottom for smooth transition */}
         <div
           className="absolute inset-0"
           style={{
-            background: 'linear-gradient(to bottom, rgba(76, 24, 121, 0.3) 0%, transparent 30%, transparent 50%, rgba(65, 19, 105, 0.7) 75%, rgb(76, 24, 121) 100%)'
+            background: 'linear-gradient(to bottom, transparent 0%, transparent 70%, rgba(65, 19, 105, 0.8) 90%, rgb(65, 19, 105) 100%)'
           }}
         />
 
-        {/* Center content with text and buttons together */}
-        <div className="relative z-10 flex-1 flex flex-col items-center justify-center px-4">
+        {/* Hero content - centered */}
+        <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
           <div className="text-center space-y-4 md:space-y-6">
             {/* Title with custom font */}
             <h1
@@ -108,18 +92,21 @@ export function HomeContent({ stories }: HomeContentProps) {
               </Link>
             </div>
           </div>
-        </div>
 
-        {/* Scroll indicator - only on desktop */}
-        <div className="relative z-10 pb-8 md:pb-12">
-          <div className="hidden md:flex justify-center animate-bounce">
+          {/* Scroll indicator */}
+          <div className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 animate-bounce">
             <ChevronRight className="h-6 w-6 text-white/50 rotate-90" />
           </div>
         </div>
-      </section>
+      </div>
 
-      {/* Features Section - Card-based on mobile */}
-      <section className="py-12 md:py-20 px-4 md:px-8 relative">
+      {/* Spacer for hero height */}
+      <div className="h-[100svh]" />
+
+      {/* Content that slides over the hero */}
+      <div className="relative z-10 bg-gradient-to-b from-[#411369] via-[#5a1a8a] to-[#411369] rounded-t-[2rem] md:rounded-t-[3rem] -mt-8">
+        {/* Features Section */}
+        <section className="py-12 md:py-20 px-4 md:px-8 relative">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-10 md:mb-16">
             <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-3 md:mb-4 glow-text">
@@ -273,6 +260,7 @@ export function HomeContent({ stories }: HomeContentProps) {
           )}
         </div>
       </section>
+      </div>
     </div>
   )
 }
