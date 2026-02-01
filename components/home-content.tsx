@@ -54,17 +54,17 @@ export function HomeContent({ stories }: HomeContentProps) {
           <div className="text-center space-y-4 md:space-y-6">
             {/* Title with custom font */}
             <h1
-              className="text-6xl md:text-8xl lg:text-9xl text-white drop-shadow-lg"
+              className="text-6xl md:text-8xl lg:text-9xl text-white"
               style={{
                 fontFamily: 'SuperJoyful, cursive',
-                textShadow: '0 4px 20px rgba(0,0,0,0.5), 0 8px 40px rgba(163,28,245,0.3)'
+                textShadow: '0 4px 8px rgba(0,0,0,0.8), 0 8px 25px rgba(0,0,0,0.6), 0 12px 50px rgba(0,0,0,0.4), 0 0 80px rgba(163,28,245,0.5)'
               }}
             >
               Fablito
             </h1>
 
-            <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-medium max-w-sm md:max-w-2xl mx-auto drop-shadow-lg"
-               style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
+            <p className="text-lg md:text-xl lg:text-2xl text-white font-semibold max-w-sm md:max-w-2xl mx-auto"
+               style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 4px 15px rgba(0,0,0,0.6), 0 8px 30px rgba(0,0,0,0.4)' }}>
               {t.heroSubtitle}
             </p>
 
@@ -72,9 +72,9 @@ export function HomeContent({ stories }: HomeContentProps) {
             <div className="flex flex-col md:flex-row gap-3 md:gap-4 justify-center max-w-md mx-auto md:max-w-none">
               <a href="#create-story" className="block w-full md:w-auto">
                 <ShimmerButton
-                  background="linear-gradient(135deg, #A31CF5 0%, #ff6b9d 100%)"
-                  shimmerColor="rgba(255, 255, 255, 0.5)"
-                  className="w-full text-base md:text-lg px-8 py-4 md:py-5 font-bold shadow-2xl active:scale-95 transition-transform"
+                  background="linear-gradient(135deg, #ff6b35 0%, #e63946 100%)"
+                  shimmerColor="rgba(255, 255, 255, 0.6)"
+                  className="w-full h-14 md:h-16 text-base md:text-lg px-8 font-bold shadow-2xl active:scale-95 transition-transform"
                 >
                   <Sparkles className="mr-2 h-5 w-5" />
                   {t.createStoryButton}
@@ -84,7 +84,7 @@ export function HomeContent({ stories }: HomeContentProps) {
                 <Button
                   variant="outline"
                   size="lg"
-                  className="w-full text-base md:text-lg px-8 py-6 md:py-7 rounded-full border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:border-white/50 active:scale-95 transition-all"
+                  className="w-full h-14 md:h-16 text-base md:text-lg px-8 rounded-full border-2 border-white/30 bg-white/10 backdrop-blur-sm text-white hover:bg-white/20 hover:border-white/50 active:scale-95 transition-all"
                 >
                   {t.stories}
                   <ChevronRight className="ml-2 h-5 w-5" />
