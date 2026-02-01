@@ -38,7 +38,7 @@ function SubmitButton({ disabled, createText, creatingText }: { disabled?: boole
       type="submit"
       size="lg"
       disabled={pending || disabled}
-      className="w-full text-lg py-6 rounded-xl bg-pink-500 hover:bg-pink-600 text-white transition-colors"
+      className="w-full text-lg py-6 rounded-xl bg-pink-500 hover:bg-orange-500 text-white font-semibold transition-colors"
     >
       {pending ? (
         <span className="flex items-center">

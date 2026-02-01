@@ -163,14 +163,14 @@ export default async function StoryPage({
       const isAdmin = await checkAdminAuth()
 
       return (
-        <main className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+        <main className="min-h-screen bg-background">
           <div className="max-w-4xl mx-auto p-4 md:p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
               <Link href="/">
-                <Button variant="ghost" className="gap-2">
+                <Button variant="ghost" className="gap-2 text-white hover:text-white/80 hover:bg-white/10">
                   <ArrowLeft className="w-4 h-4" />
-                  Back to Stories
+                  Назад
                 </Button>
               </Link>
               <div className="flex gap-2">
@@ -194,10 +194,10 @@ export default async function StoryPage({
 
             {/* Story Header */}
             <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-700 to-pink-700 mb-4">
+              <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-4" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
                 {storyData.title}
               </h1>
-              <p className="text-lg text-muted-foreground">
+              <p className="text-lg text-white/70">
                 {storyData.childName ? `Персональная история для ${storyData.childName}` : 'Персональная детская история'}
               </p>
             </div>
@@ -252,30 +252,28 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-black dark:via-black dark:to-black/90 p-2 md:p-4"
+        className="min-h-screen bg-background p-2 md:p-4"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <Link href="/stories">
-              <Button variant="ghost" className="group">
+              <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 font-medium">
-                  Back to Stories
-                </span>
+                <span className="font-medium">Назад к историям</span>
               </Button>
             </Link>
           </div>
 
-          <Card className="border-2 border-primary/20 shadow-lg rounded-xl">
+          <Card className="magic-card border-0 rounded-xl">
             <div className="p-6 text-center">
               <div className="flex justify-center mb-6">
-                <Loader2 className="h-12 w-12 text-primary animate-spin" />
+                <Loader2 className="h-12 w-12 text-white animate-spin" />
               </div>
-              <h2 className="text-xl font-bold mb-2">Story is Still Generating</h2>
-              <p className="mb-6">This story is still being created. Please check back soon!</p>
+              <h2 className="text-xl font-bold mb-2 text-white">История создаётся...</h2>
+              <p className="mb-6 text-white/70">Волшебная история ещё готовится. Скоро всё будет готово!</p>
               <Link href={`/generating/${params.id}`}>
-                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
-                  View Generation Progress
+                <Button className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 transition-all duration-300 text-white font-semibold">
+                  Смотреть прогресс
                 </Button>
               </Link>
             </div>
@@ -290,25 +288,23 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-black dark:via-black dark:to-black/90 p-4 md:p-8"
+        className="min-h-screen bg-background p-4 md:p-8"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <Link href="/stories">
-              <Button variant="ghost" className="group">
+              <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 font-medium">
-                  Back to Stories
-                </span>
+                <span className="font-medium">Назад к историям</span>
               </Button>
             </Link>
           </div>
 
-          <Card className="border-2 border-red-200 shadow-lg rounded-xl">
-            <div className="p-3 text-center text-red-500">
-              <h2 className="text-xl font-bold mb-2">Generation Failed</h2>
-              <p>We couldn't generate this story. Please try creating a new one.</p>
-              {storyData.error && <p className="mt-2 text-sm bg-red-50 p-2 rounded">Error: {storyData.error}</p>}
+          <Card className="magic-card border-0 rounded-xl">
+            <div className="p-6 text-center">
+              <h2 className="text-xl font-bold mb-2 text-red-300">Ошибка генерации</h2>
+              <p className="text-white/70">К сожалению, не удалось создать эту историю. Попробуйте создать новую.</p>
+              {storyData.error && <p className="mt-2 text-sm bg-red-500/20 p-2 rounded text-red-300">Ошибка: {storyData.error}</p>}
             </div>
           </Card>
         </div>
@@ -321,24 +317,22 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-black dark:via-black dark:to-black/90 p-4 md:p-8"
+        className="min-h-screen bg-background p-4 md:p-8"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <Link href="/stories">
-              <Button variant="ghost" className="group">
+              <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 font-medium">
-                  Back to Stories
-                </span>
+                <span className="font-medium">Назад к историям</span>
               </Button>
             </Link>
           </div>
 
-          <Card className="border-2 border-red-200 shadow-lg rounded-xl">
-            <div className="p-6 text-center text-red-500">
-              <h2 className="text-xl font-bold mb-2">Story Data Error</h2>
-              <p>There was a problem with this story's data. Please try creating a new one.</p>
+          <Card className="magic-card border-0 rounded-xl">
+            <div className="p-6 text-center">
+              <h2 className="text-xl font-bold mb-2 text-red-300">Ошибка данных истории</h2>
+              <p className="text-white/70">Произошла проблема с данными истории. Попробуйте создать новую.</p>
             </div>
           </Card>
         </div>
@@ -358,35 +352,33 @@ export default async function StoryPage({
   return (
     <main
       id="main-content"
-      className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-black dark:via-black dark:to-black/90 p-2 md:p-4"
+      className="min-h-screen bg-background p-2 md:p-4"
     >
       <div className="max-w-4xl mx-auto">
         <div className="mb-4">
           <Link href="/stories">
-            <Button variant="ghost" className="group">
+            <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
               <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 font-medium">
-                Back to Stories
-              </span>
+              <span className="font-medium">Назад к историям</span>
             </Button>
           </Link>
         </div>
 
         {isGenerating && (
-          <Card className="border-2 border-yellow-200 shadow-lg rounded-xl mb-4 bg-yellow-50/50 dark:bg-yellow-900/20">
-            <div className="p-4 text-center text-yellow-700 dark:text-yellow-500 flex items-center justify-center">
+          <Card className="magic-card border-0 rounded-xl mb-4">
+            <div className="p-4 text-center text-yellow-300 flex items-center justify-center">
               <Loader2 className="h-5 w-5 mr-2 animate-spin" />
               <p>
-                This story is still being generated. Some images may be missing or incomplete.{" "}
-                <Link href={`/generating/${params.id}`} className="underline font-medium">
-                  View progress
+                История ещё создаётся. Некоторые изображения могут отсутствовать.{" "}
+                <Link href={`/generating/${params.id}`} className="underline font-medium text-pink-400 hover:text-pink-300">
+                  Смотреть прогресс
                 </Link>
               </p>
             </div>
           </Card>
         )}
 
-        <div className="text-center mb-4 relative">
+        <div className="text-center mb-6 relative">
           <div className="absolute right-0 top-0">
             <FavoriteButton
               storyId={params.id}
@@ -396,10 +388,10 @@ export default async function StoryPage({
               style={storyData.style}
             />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-3">
+          <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-3" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
             {storyContent.title}
           </h1>
-          <p className="text-muted-foreground mt-2">A story for ages {storyData.age}</p>
+          <p className="text-white/60 mt-2">История для возраста {storyData.age}</p>
           {isAdmin && (
             <div className="mt-2">
               <VisibilityToggle storyId={params.id} initialVisibility={storyData.visibility || "public"} />

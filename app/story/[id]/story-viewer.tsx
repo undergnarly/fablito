@@ -566,7 +566,7 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
           size="icon"
           onClick={printStory}
           title={t.printOrSavePDF}
-          className="relative overflow-hidden group"
+          className="relative overflow-hidden group bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
         >
           <Download className="h-4 w-4 group-hover:scale-110 transition-transform" />
           <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
@@ -578,40 +578,40 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
             size="icon"
             onClick={refreshImages}
             title={t.refreshImages}
-            className="relative overflow-hidden group"
+            className="relative overflow-hidden group bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
           >
             <RefreshCw className="h-4 w-4 group-hover:animate-spin" />
             <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
           </Button>
         )}
 
-        <Button variant="outline" size="icon" onClick={handleShare} className="relative overflow-hidden group">
+        <Button variant="outline" size="icon" onClick={handleShare} className="relative overflow-hidden group bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white">
           <Share2 className="h-4 w-4" />
           <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
         </Button>
 
         {/* Fullscreen and Zoom Controls */}
         <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon" onClick={handleZoomOut} disabled={zoomLevel <= 0.5}>
+          <Button variant="outline" size="icon" onClick={handleZoomOut} disabled={zoomLevel <= 0.5} className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white disabled:opacity-50">
             <ZoomOut className="h-4 w-4" />
           </Button>
-          <Button variant="outline" size="sm" onClick={resetZoom} className="min-w-[60px]">
+          <Button variant="outline" size="sm" onClick={resetZoom} className="min-w-[60px] bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white">
             {Math.round(zoomLevel * 100)}%
           </Button>
-          <Button variant="outline" size="icon" onClick={handleZoomIn} disabled={zoomLevel >= 2}>
+          <Button variant="outline" size="icon" onClick={handleZoomIn} disabled={zoomLevel >= 2} className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white disabled:opacity-50">
             <ZoomIn className="h-4 w-4" />
           </Button>
-        <Button variant="outline" size="icon" onClick={toggleFullscreen} className="relative overflow-hidden group">
+        <Button variant="outline" size="icon" onClick={toggleFullscreen} className="relative overflow-hidden group bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white">
           {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
           <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
         </Button>
 
         {/* Full story audio */}
-        <Button 
-          variant="outline" 
-          size="icon" 
+        <Button
+          variant="outline"
+          size="icon"
           onClick={isPlayingFullStory ? stopFullStory : playFullStory}
-          className="relative overflow-hidden group"
+          className="relative overflow-hidden group bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white"
           title={isPlayingFullStory ? t.stopAudio : t.listenFullStory}
         >
           <Volume2 className="h-4 w-4" />
@@ -619,11 +619,11 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
         </Button>
 
         {/* Auto-play page toggle */}
-        <Button 
+        <Button
           variant={autoPlayPage ? "default" : "outline"}
-          size="icon" 
+          size="icon"
           onClick={() => setAutoPlayPage(!autoPlayPage)}
-          className="relative overflow-hidden group"
+          className={`relative overflow-hidden group ${autoPlayPage ? 'bg-pink-500 hover:bg-pink-600 text-white border-pink-500' : 'bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white'}`}
           title={autoPlayPage ? t.disableAutoPlay : t.enableAutoPlay}
         >
           <Play className="h-4 w-4" />
@@ -634,7 +634,7 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
 
       {/* Keyboard shortcuts hint */}
       {!isFullscreen && (
-        <div className="text-center text-xs text-muted-foreground mb-4">
+        <div className="text-center text-xs text-white/50 mb-4">
           <span className="hidden sm:inline">
             Нажмите F11 для полноэкранного режима • + / - для масштабирования • 0 для сброса
           </span>
@@ -745,16 +745,16 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
             </div>
 
             {/* Right page - Text */}
-            <div className="w-1/2 relative book-page bg-gradient-to-br from-orange-50 via-yellow-50 to-pink-50">
+            <div className="w-1/2 relative book-page bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
               <div
-                className={`p-8 md:p-12 h-full flex flex-col justify-center transition-all duration-300 ${
+                className={`p-6 md:p-10 h-full flex flex-col justify-center transition-all duration-300 ${
                   pageTransition === "fade-out" ? "opacity-0" : pageTransition === "fade-in" ? "opacity-100" : ""
                 }`}
               >
                 {/* Page content */}
                 <div className="space-y-6">
-                  <p className="text-lg md:text-xl leading-relaxed text-gray-800 font-serif">
-                    <span className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 float-left mr-2 leading-none">
+                  <p className="text-xl md:text-2xl leading-relaxed text-gray-800 font-serif" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
+                    <span className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 float-left mr-3 leading-none drop-shadow-sm">
                       {storyContent.pages[currentPage].text.charAt(0)}
                     </span>
                     {storyContent.pages[currentPage].text.substring(1)}
@@ -779,32 +779,35 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
           </div>
 
           {/* Book navigation */}
-          <div className="p-4 bg-gradient-to-r from-purple-50 via-blue-50 to-pink-50 border-t border-gray-200 flex justify-between items-center">
+          <div className="p-4 bg-gradient-to-r from-purple-100 via-pink-100 to-orange-100 border-t border-purple-200 flex justify-between items-center">
             <Button
               onClick={handlePrevPage}
               disabled={currentPage === 0}
               variant="outline"
-              className="group relative overflow-hidden"
+              className="group relative overflow-hidden bg-white/80 border-purple-300 text-purple-700 hover:bg-purple-100 disabled:opacity-50"
               aria-label={t.previousPageAria}
             >
               <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
               {t.previousPage}
-              <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
             </Button>
+
+            <div className="text-purple-600 font-medium">
+              {currentPage + 1} / {storyContent.pages.length}
+            </div>
 
             <Button
               onClick={handleNextPage}
               disabled={isLastPage && !storyContent.moral}
-              variant={isLastPage ? "outline" : "default"}
               className={`group relative overflow-hidden ${
-                isLastPage ? "" : "bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                isLastPage
+                  ? "bg-white/80 border border-purple-300 text-purple-700 hover:bg-purple-100"
+                  : "bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white"
               }`}
               aria-label={isLastPage ? t.endOfStoryAria : t.nextPageAria}
             >
               {isLastPage ? (
                 <>
                   {storyContent.moral ? t.seeMoral : t.theEnd}
-                  <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
                 </>
               ) : (
                 <>

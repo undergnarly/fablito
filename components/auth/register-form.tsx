@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,7 +30,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    
+
     // Clear errors when user starts typing
     if (error) setError(null)
     if (name === 'password' && passwordErrors.length > 0) {
@@ -41,23 +40,23 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
 
   const validateForm = () => {
     const errors: string[] = []
-    
+
     if (!formData.name.trim()) {
       errors.push(t.nameRequired)
     }
-    
+
     if (!formData.email.trim()) {
       errors.push(t.emailRequired)
     }
-    
+
     if (!formData.password) {
       errors.push(t.passwordRequired)
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       errors.push(t.passwordsDoNotMatch)
     }
-    
+
     return errors
   }
 
@@ -113,27 +112,27 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto border-2 border-primary/20 shadow-lg rounded-xl">
-      <CardHeader className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-          <UserPlus className="h-6 w-6 text-primary" />
+    <div className="w-full space-y-6">
+      <div className="text-center space-y-2">
+        <div className="mx-auto w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+          <UserPlus className="h-6 w-6 text-white" />
         </div>
-        <CardTitle className="text-2xl font-bold">{t.createAccount}</CardTitle>
-        <CardDescription>
+        <h2 className="text-2xl font-bold text-white">{t.createAccount}</h2>
+        <p className="text-white/60 text-sm">
           {t.joinUs}
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
+        </p>
+      </div>
+
+      <div className="space-y-4">
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="bg-red-500/20 border-red-500/50 text-white">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
-        
+
         {passwordErrors.length > 0 && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="bg-red-500/20 border-red-500/50 text-white">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>
               <ul className="list-disc list-inside space-y-1">
@@ -147,7 +146,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name" className="flex items-center gap-2">
+            <Label htmlFor="name" className="flex items-center gap-2 text-white/80">
               <User className="h-4 w-4" />
               {t.fullName}
             </Label>
@@ -160,11 +159,12 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
               onChange={handleInputChange}
               required
               disabled={isLoading}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-pink-400 focus:ring-pink-400"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
+            <Label htmlFor="email" className="flex items-center gap-2 text-white/80">
               <Mail className="h-4 w-4" />
               {t.email}
             </Label>
@@ -177,11 +177,12 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
               onChange={handleInputChange}
               required
               disabled={isLoading}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-pink-400 focus:ring-pink-400"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="flex items-center gap-2">
+            <Label htmlFor="password" className="flex items-center gap-2 text-white/80">
               <Lock className="h-4 w-4" />
               {t.password}
             </Label>
@@ -194,11 +195,12 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
               onChange={handleInputChange}
               required
               disabled={isLoading}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-pink-400 focus:ring-pink-400"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword" className="flex items-center gap-2">
+            <Label htmlFor="confirmPassword" className="flex items-center gap-2 text-white/80">
               <Lock className="h-4 w-4" />
               {t.confirmPassword}
             </Label>
@@ -211,12 +213,13 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
               onChange={handleInputChange}
               required
               disabled={isLoading}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-pink-400 focus:ring-pink-400"
             />
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full" 
+          <Button
+            type="submit"
+            className="w-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-semibold"
             disabled={isLoading}
           >
             {isLoading ? t.creatingAccount : t.createAccount}
@@ -224,18 +227,18 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
         </form>
 
         {onSwitchToLogin && (
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-sm text-white/60">
             {t.alreadyHaveAccount}{" "}
             <button
               type="button"
               onClick={onSwitchToLogin}
-              className="text-primary hover:underline font-medium"
+              className="text-pink-400 hover:text-pink-300 font-medium"
             >
               {t.signIn}
             </button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }

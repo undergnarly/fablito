@@ -24,14 +24,22 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
 
   // Request notification permission on component mount
   useEffect(() => {
-    if ("Notification" in window) {
-      setNotificationPermission(Notification.permission)
+    try {
+      if ("Notification" in window && typeof Notification !== 'undefined') {
+        setNotificationPermission(Notification.permission)
 
-      if (Notification.permission === "default") {
-        Notification.requestPermission().then((permission) => {
-          setNotificationPermission(permission)
-        })
+        if (Notification.permission === "default") {
+          Notification.requestPermission().then((permission) => {
+            setNotificationPermission(permission)
+          }).catch(() => {
+            // Notification API not fully supported (mobile browsers)
+            console.log('Notification permission not available on this device')
+          })
+        }
       }
+    } catch (e) {
+      // Notification API not supported
+      console.log('Notifications not supported on this device')
     }
   }, [])
 
@@ -92,16 +100,23 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
 
           // Send browser notification if permission granted and not already sent
           if (notificationPermission === "granted" && !notificationSent) {
-            const notification = new Notification(t.storyReady, {
-              body: `"${data.title}" is now ready to read!`,
-              icon: "/favicon.ico",
-            })
+            try {
+              // Check if Notification constructor is supported (not on mobile)
+              if (typeof Notification !== 'undefined' && 'Notification' in window) {
+                const notification = new Notification(t.storyReady, {
+                  body: `"${data.title}" is now ready to read!`,
+                  icon: "/favicon.ico",
+                })
 
-            notification.onclick = () => {
-              window.focus()
-              router.push(`/story/${id}`)
+                notification.onclick = () => {
+                  window.focus()
+                  router.push(`/story/${id}`)
+                }
+              }
+            } catch (e) {
+              // Notification API not fully supported (mobile browsers)
+              console.log('Browser notifications not supported on this device')
             }
-
             setNotificationSent(true)
           }
 
@@ -194,7 +209,7 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
                 {canShowPreview() && (
                   <div className="w-full pt-4">
                     <Link href={`/story/${id}`}>
-                      <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white rounded-full py-6">
+                      <Button className="w-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white rounded-full py-6 font-semibold">
                         <Eye className="mr-2 h-4 w-4" />
                         {t.viewStoryInProgress}
                       </Button>

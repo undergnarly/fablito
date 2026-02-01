@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -28,7 +27,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
-    
+
     // Clear errors when user starts typing
     if (error) setError(null)
   }
@@ -69,20 +68,20 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
   }
 
   return (
-    <Card className="w-full max-w-md mx-auto border-2 border-primary/20 shadow-lg rounded-xl">
-      <CardHeader className="text-center space-y-2">
-        <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-          <LogIn className="h-6 w-6 text-primary" />
+    <div className="w-full space-y-6">
+      <div className="text-center space-y-2">
+        <div className="mx-auto w-12 h-12 bg-white/10 rounded-full flex items-center justify-center">
+          <LogIn className="h-6 w-6 text-white" />
         </div>
-        <CardTitle className="text-2xl font-bold">{t.welcomeBack}</CardTitle>
-        <CardDescription>
-          Sign in to continue creating magical stories
-        </CardDescription>
-      </CardHeader>
-      
-      <CardContent className="space-y-4">
+        <h2 className="text-2xl font-bold text-white">{t.welcomeBack}</h2>
+        <p className="text-white/60 text-sm">
+          Войдите, чтобы продолжить создавать волшебные истории
+        </p>
+      </div>
+
+      <div className="space-y-4">
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="bg-red-500/20 border-red-500/50 text-white">
             <AlertCircle className="h-4 w-4" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
@@ -90,7 +89,7 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="flex items-center gap-2">
+            <Label htmlFor="email" className="flex items-center gap-2 text-white/80">
               <Mail className="h-4 w-4" />
               {t.email}
             </Label>
@@ -103,11 +102,12 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
               onChange={handleInputChange}
               required
               disabled={isLoading}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-pink-400 focus:ring-pink-400"
             />
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="password" className="flex items-center gap-2">
+            <Label htmlFor="password" className="flex items-center gap-2 text-white/80">
               <Lock className="h-4 w-4" />
               {t.password}
             </Label>
@@ -120,12 +120,13 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
               onChange={handleInputChange}
               required
               disabled={isLoading}
+              className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-pink-400 focus:ring-pink-400"
             />
           </div>
 
-          <Button 
-            type="submit" 
-            className="w-full" 
+          <Button
+            type="submit"
+            className="w-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-semibold"
             disabled={isLoading}
           >
             {isLoading ? t.signingIn : t.signIn}
@@ -133,18 +134,18 @@ export function LoginForm({ onSuccess, onSwitchToRegister }: LoginFormProps) {
         </form>
 
         {onSwitchToRegister && (
-          <div className="text-center text-sm text-muted-foreground">
+          <div className="text-center text-sm text-white/60">
             {t.dontHaveAccount}{" "}
             <button
               type="button"
               onClick={onSwitchToRegister}
-              className="text-primary hover:underline font-medium"
+              className="text-pink-400 hover:text-pink-300 font-medium"
             >
               {t.signUp}
             </button>
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   )
 }
