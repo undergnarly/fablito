@@ -274,7 +274,7 @@ export async function updateStory(id: string, data: Partial<Story>): Promise<Sto
 
 
 /**
- * List all stories
+ * List all stories - optimized with SCAN and batch fetching
  */
 export async function listStories(limit = 100): Promise<Story[]> {
   // For local development without KV, read from file cache
@@ -316,17 +316,49 @@ export async function listStories(limit = 100): Promise<Story[]> {
   }
 
   try {
-    const storyKeys = await kv.keys("story:*")
+    // Use SCAN instead of KEYS to avoid "too many keys" error
+    const storyKeys: string[] = []
+    let cursor: string | number = "0"
+    let iterations = 0
+    const MAX_ITERATIONS = 50
 
-    if (!storyKeys || storyKeys.length === 0) {
+    do {
+      const [nextCursor, keys] = await kv.scan(cursor, { match: 'story:*', count: 100 })
+      cursor = nextCursor
+      iterations++
+
+      for (const key of keys) {
+        // Only include story keys (not story:xxx:something)
+        const parts = key.split(':')
+        if (parts.length === 2 && parts[0] === 'story') {
+          storyKeys.push(key)
+        }
+      }
+
+      // Stop if we have enough keys or too many iterations
+      if (storyKeys.length >= limit || iterations >= MAX_ITERATIONS) {
+        break
+      }
+    } while (String(cursor) !== "0")
+
+    if (storyKeys.length === 0) {
       return []
     }
 
-    const stories = await Promise.all(
-    storyKeys.slice(0, limit).map(async (key) => {
-      const storyData = await kv.hgetall(key)
+    // Limit keys to requested amount
+    const keysToFetch = storyKeys.slice(0, limit)
 
-      if (!storyData) return null
+    // Batch fetch using pipeline for better performance
+    const pipeline = kv.pipeline()
+    for (const key of keysToFetch) {
+      pipeline.hgetall(key)
+    }
+    const results = await pipeline.exec()
+
+    const stories: Story[] = []
+    for (let i = 0; i < results.length; i++) {
+      const storyData = results[i] as Record<string, any> | null
+      if (!storyData) continue
 
       // Clone the data to avoid modifying the original
       const processedData = { ...storyData }
@@ -356,17 +388,14 @@ export async function listStories(limit = 100): Promise<Story[]> {
 
       // Use safeParse instead of assuming the data is valid
       const result = StorySchema.safeParse(processedData)
-      return result.success ? result.data : processedData as Story
-    }),
-  )
+      if (result.success) {
+        stories.push(result.data)
+      } else {
+        stories.push(processedData as Story)
+      }
+    }
 
-  //return stories.filter(Boolean)
-
-  // 방법 1: 타입 서술어 사용
-  //return stories.filter((story): story is Story => story !== null);
-
-  // 방법 2: 더 간결한 방식으로 null 체크
-    return stories.filter((story): story is Story => Boolean(story));
+    return stories
   } catch (error) {
     console.error("[DB] Error listing stories:", error)
     return []
