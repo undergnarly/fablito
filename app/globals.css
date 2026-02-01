@@ -2,67 +2,78 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Custom font for logo/title */
+@font-face {
+  font-family: 'SuperJoyful';
+  src: url('/fonts/SuperJoyful.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Magic Purple Theme - Light mode */
+    --background: 275 73% 24%; /* #411369 */
+    --foreground: 0 0% 100%; /* white */
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 277 91% 54%; /* rgb(163, 28, 245) - #A31CF5 */
+    --card-foreground: 0 0% 100%; /* white */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 277 85% 45%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 280 85% 50%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 280 100% 65%; /* bright magenta */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 277 80% 60%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 275 60% 35%;
+    --muted-foreground: 0 0% 85%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 320 100% 60%; /* pink accent */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 277 70% 50%;
+    --input: 277 70% 40%;
+    --ring: 280 100% 70%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
   }
 
   .dark {
-    --background: 224 71% 4%;
-    --foreground: 213 31% 91%;
+    /* Magic Purple Theme - Dark mode (same vibrant colors) */
+    --background: 275 73% 20%; /* slightly darker purple */
+    --foreground: 0 0% 100%;
 
-    --card: 224 71% 4%;
-    --card-foreground: 213 31% 91%;
+    --card: 277 85% 45%; /* slightly darker card */
+    --card-foreground: 0 0% 100%;
 
-    --popover: 224 71% 4%;
-    --popover-foreground: 213 31% 91%;
+    --popover: 277 80% 40%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 280 75% 60%;
-    --primary-foreground: 210 20% 98%;
+    --primary: 280 100% 65%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 222 47% 11%;
-    --secondary-foreground: 210 20% 98%;
+    --secondary: 277 75% 50%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 223 47% 11%;
-    --muted-foreground: 215 20% 75%;
+    --muted: 275 50% 30%;
+    --muted-foreground: 0 0% 80%;
 
-    --accent: 216 34% 17%;
-    --accent-foreground: 210 20% 98%;
+    --accent: 320 100% 55%;
+    --accent-foreground: 0 0% 100%;
 
-    --destructive: 0 63% 31%;
-    --destructive-foreground: 210 20% 98%;
+    --destructive: 0 63% 45%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 216 34% 17%;
-    --input: 216 34% 17%;
-    --ring: 216 34% 17%;
+    --border: 277 60% 40%;
+    --input: 277 60% 35%;
+    --ring: 280 100% 65%;
   }
 }
 
@@ -72,6 +83,8 @@
   }
   body {
     @apply bg-background text-foreground;
+    background: linear-gradient(135deg, rgb(76, 24, 121) 0%, #5a1a8a 50%, #7b2cbf 100%);
+    min-height: 100vh;
   }
 }
 
@@ -82,7 +95,7 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
-  
+
   .animation-delay-2000 {
     animation-delay: 2s;
   }
@@ -115,6 +128,54 @@
 
   .animate-spin-slow {
     animation: spin-slow 10s linear infinite;
+  }
+
+  /* Glowing effects for magical feel */
+  .glow {
+    box-shadow: 0 0 20px rgba(163, 28, 245, 0.5), 0 0 40px rgba(163, 28, 245, 0.3);
+  }
+
+  .glow-text {
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.5), 0 0 20px rgba(163, 28, 245, 0.5);
+  }
+
+  /* Magical card style */
+  .magic-card {
+    background: linear-gradient(135deg, rgba(163, 28, 245, 0.9) 0%, rgba(138, 43, 226, 0.9) 100%);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    transition: box-shadow 0.3s ease, border-color 0.3s ease;
+  }
+
+  .magic-card:hover {
+    box-shadow: 0 0 30px rgba(255, 107, 157, 0.4), 0 8px 32px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 107, 157, 0.5);
+  }
+
+  /* Sparkle animation */
+  .sparkle {
+    position: relative;
+  }
+
+  .sparkle::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    background: linear-gradient(45deg, #ff00ff, #00ffff, #ff00ff, #00ffff);
+    background-size: 400% 400%;
+    border-radius: inherit;
+    z-index: -1;
+    animation: sparkle-border 3s ease infinite;
+    opacity: 0.7;
+  }
+
+  @keyframes sparkle-border {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
   }
 }
 
@@ -285,16 +346,51 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  background: linear-gradient(135deg, rgba(163, 28, 245, 0.3) 0%, rgba(138, 43, 226, 0.3) 100%);
   border-radius: 12px;
-  box-shadow: 
-    0 10px 30px rgba(0, 0, 0, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   z-index: -1;
 }
 
 .book-page {
-  background-image: 
+  background-image:
     radial-gradient(circle at 1px 1px, rgba(255,255,255,0.15) 1px, transparent 0);
   background-size: 20px 20px;
+}
+
+/* Floating stars animation */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.star {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.star:nth-child(2) { animation-delay: 0.3s; }
+.star:nth-child(3) { animation-delay: 0.6s; }
+.star:nth-child(4) { animation-delay: 0.9s; }
+.star:nth-child(5) { animation-delay: 1.2s; }
+
+/* Hide scrollbar for horizontal scroll on mobile */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hero background - responsive images */
+.hero-background {
+  background-image: url('/images/hero-mobile.png');
+}
+
+@media (min-width: 768px) {
+  .hero-background {
+    background-image: url('/images/hero-desktop.png');
+  }
 }

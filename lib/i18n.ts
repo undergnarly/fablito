@@ -218,7 +218,7 @@ export const translations: Record<Language, Translations> = {
     admin: 'Admin',
     
     // Main page
-    heroTitle: 'StoryBook',
+    heroTitle: 'Fablito',
     heroSubtitle: 'Create magical personalized stories for children using AI',
     createStoryButton: 'Create Story',
     howItWorksTitle: 'How It Works',
@@ -317,7 +317,7 @@ export const translations: Record<Language, Translations> = {
     
     // Stories page
     allStories: 'All Stories',
-    browseAllStories: 'Browse all the magical StoryBook stories',
+    browseAllStories: 'Browse all the magical Fablito stories',
     searchPlaceholder: 'Search stories...',
     backToHome: 'Back to Home',
     createNewStory: 'Create New Story',
@@ -427,7 +427,7 @@ export const translations: Record<Language, Translations> = {
     admin: 'Админ',
     
     // Main page
-    heroTitle: 'StoryBook',
+    heroTitle: 'Fablito',
     heroSubtitle: 'Создавайте волшебные персонализированные истории для детей с помощью ИИ',
     createStoryButton: 'Создать Историю',
     howItWorksTitle: 'Как Это Работает',
@@ -526,7 +526,7 @@ export const translations: Record<Language, Translations> = {
     
     // Stories page
     allStories: 'Все Истории',
-    browseAllStories: 'Просматривайте все волшебные истории StoryBook',
+    browseAllStories: 'Просматривайте все волшебные истории Fablito',
     searchPlaceholder: 'Поиск историй...',
     backToHome: 'Назад на Главную',
     createNewStory: 'Создать Новую Историю',
@@ -636,7 +636,7 @@ export const translations: Record<Language, Translations> = {
     admin: 'Админ',
     
     // Main page
-    heroTitle: 'StoryBook',
+    heroTitle: 'Fablito',
     heroSubtitle: 'Балаларға арналған жасанды интеллект арқылы сиқырлы дербес ертегілер жасаңыз',
     createStoryButton: 'Ертегі Жасау',
     howItWorksTitle: 'Қалай Жұмыс Істейді',
@@ -735,7 +735,7 @@ export const translations: Record<Language, Translations> = {
     
     // Stories page
     allStories: 'Барлық Ертегілер',
-    browseAllStories: 'StoryBook-тың барлық сиқырлы ертегілерін қараңыз',
+    browseAllStories: 'Fablito-ның барлық сиқырлы ертегілерін қараңыз',
     searchPlaceholder: 'Ертегілерді іздеу...',
     backToHome: 'Басты Бетке Қайту',
     createNewStory: 'Жаңа Ертегі Жасау',

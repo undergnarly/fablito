@@ -14,43 +14,43 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ["latin"] })
 
 // Base URL for OpenGraph image
-const baseUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://v0-story-maker.vercel.app"
+const baseUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://fablito.app"
 
 // Create the OG image URL with parameters
 const ogImageUrl = new URL(`${baseUrl}/api/og`)
-ogImageUrl.searchParams.append("title", "StoryBook")
-ogImageUrl.searchParams.append("subtitle", "Create magical alphabet stories for children with AI")
+ogImageUrl.searchParams.append("title", "Fablito")
+ogImageUrl.searchParams.append("subtitle", "Create magical personalized stories for your child with AI")
 ogImageUrl.searchParams.append("type", "home")
 
 export const metadata: Metadata = {
   title: {
-    default: "StoryBook - AI-Generated Alphabet Stories",
-    template: "%s | StoryBook",
+    default: "Fablito - Magical AI Stories for Kids",
+    template: "%s | Fablito",
   },
   description:
-    "Create magical alphabet storybooks for children with AI. Perfect for learning the alphabet in a fun, interactive way.",
-  keywords: ["alphabet", "children's stories", "ABC", "learning", "AI stories", "educational"],
-  authors: [{ name: "StoryBook Team" }],
+    "Create magical personalized storybooks for your child with AI. Beautiful illustrations and engaging stories that make your kid the hero.",
+  keywords: ["children's stories", "personalized books", "AI stories", "bedtime stories", "kids", "fairy tales", "educational"],
+  authors: [{ name: "Fablito Team" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://v0-story-maker.vercel.app",
-    title: "StoryBook - AI-Generated Alphabet Stories",
-    description: "Create magical alphabet storybooks for children with AI",
-    siteName: "StoryBook",
+    url: "https://fablito.app",
+    title: "Fablito - Magical AI Stories for Kids",
+    description: "Create magical personalized storybooks for your child with AI",
+    siteName: "Fablito",
     images: [
       {
         url: ogImageUrl.toString(),
         width: 1200,
         height: 630,
-        alt: "StoryBook",
+        alt: "Fablito - Magical Stories",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "StoryBook - AI-Generated Alphabet Stories",
-    description: "Create magical alphabet storybooks for children with AI",
+    title: "Fablito - Magical AI Stories for Kids",
+    description: "Create magical personalized storybooks for your child with AI",
     images: [ogImageUrl.toString()],
   },
 }
@@ -65,7 +65,7 @@ export default function RootLayout({
       <body
         className={cn(
           "min-h-screen font-sans antialiased",
-          "dark:bg-gradient-to-b dark:from-black dark:to-black/95", // Updated from dark:from-background dark:to-[#0a0a18]
+          "dark:bg-gradient-to-b dark:from-black dark:to-black/95",
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
@@ -83,4 +83,3 @@ export default function RootLayout({
     </html>
   )
 }
-

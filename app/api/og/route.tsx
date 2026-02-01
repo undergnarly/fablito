@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
 
     // Get params
-    const title = searchParams.get("title") || "StoryBook"
+    const title = searchParams.get("title") || "Fablito"
     const subtitle = searchParams.get("subtitle") || "AI-generated alphabet stories for children"
     const imageUrl = searchParams.get("image") || ""
     const type = searchParams.get("type") || "story" // story, home, etc.
@@ -91,7 +91,7 @@ export async function GET(request: NextRequest) {
               color: "#9333ea",
             }}
           >
-            StoryBook
+            Fablito
           </span>
         </div>
 
@@ -189,7 +189,7 @@ export async function GET(request: NextRequest) {
               margin: "0",
             }}
           >
-            v0-story-maker.vercel.app
+            fablito.app
           </p>
         </div>
       </div>,

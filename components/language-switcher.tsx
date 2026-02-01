@@ -29,11 +29,11 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-2">
+        <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-colors text-white text-sm font-semibold">
           <Globe className="h-4 w-4" />
-          <span className="hidden sm:inline">{languageFlags[language]} {languageNames[language]}</span>
+          <span className="hidden sm:inline">{languageFlags[language]}</span>
           <span className="sm:hidden">{languageFlags[language]}</span>
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         {Object.entries(languageNames).map(([lang, name]) => (

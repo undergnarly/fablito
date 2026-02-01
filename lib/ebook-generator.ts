@@ -121,7 +121,7 @@ function generateStoryHTML(story: StoryContent, images: string[] = []): string {
 
   htmlContent += `
     <div class="footer">
-      <p>Создано с помощью StoryBook AI</p>
+      <p>Создано с помощью Fablito AI</p>
       <p>Персонализированная история, созданная специально для вас</p>
     </div>
   </div>
@@ -141,7 +141,7 @@ function generateEPUBStructure(story: StoryContent, images: string[] = []) {
   // EPUB metadata
   const metadata = {
     title: story.title,
-    author: 'StoryBook AI',
+    author: 'Fablito AI',
     language: 'ru',
     identifier: `storybook-${Date.now()}`,
     date: new Date().toISOString().split('T')[0]

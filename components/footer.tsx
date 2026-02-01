@@ -15,7 +15,7 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="flex flex-col space-y-4">
             <div className="flex items-center space-x-2">
-              <span className="text-2xl font-bold">StoryBook</span>
+              <span className="text-2xl font-bold">Fablito</span>
             </div>
             <p className="text-sm text-muted-foreground">
               {t.footerDescription}

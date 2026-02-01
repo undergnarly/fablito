@@ -61,6 +61,7 @@ export const StorySchema = z.object({
   visibility: z.enum(["public", "unlisted"]).default("public"),
   storyContent: z.string().optional(), // This is a JSON string
   images: z.string().optional(), // This is a JSON string
+  characterReference: z.string().optional(), // Base64 of first image for character consistency
   createdAt: z.string(),
   completedAt: z.string().optional(),
   deletionToken: z.string(),

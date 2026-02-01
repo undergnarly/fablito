@@ -356,32 +356,48 @@ Return your response as JSON with this exact structure:
     }
     
     const maxImages = story.pages.length // Generate all images
-    console.log(`[STORY-GEN] Generating ${maxImages} illustrations...`)
+    console.log(`[STORY-GEN] Generating ${maxImages} illustrations with character consistency...`)
     const images: string[] = []
-    
+    let characterReference: string | undefined = undefined // Base64 of first image for consistency
+
     for (let i = 0; i < maxImages; i++) {
       const page = story.pages[i]
       console.log(`[STORY-GEN] Generating image ${i + 1}/${story.pages.length}: ${page.imagePrompt}`)
-      
+      console.log(`[STORY-GEN] Using character reference: ${characterReference ? 'YES' : 'NO (first image)'}`)
+
       try {
         const { generateImage } = await import("./image-generator")
-        
+
+        // Build the prompt with character consistency instructions
+        const fullPrompt = `${page.imagePrompt}. Style: ${params.style.illustration}. Character: ${params.childName} (${params.childAge} years old). CRITICAL: Consistent character appearance throughout entire story.`
+
         // Add timeout for image generation (2 minutes per image)
         const imagePromise = generateImage(
-          `${page.imagePrompt}. Style: ${params.style.illustration}. Character: ${params.childName} (${params.childAge} years old, IDENTICAL appearance and clothing as in previous images). CRITICAL: Same face, same hair, same outfit, same accessories throughout entire story. Maintain exact same illustration style and character design as previous images.`,
+          fullPrompt,
           storyId,
           i,
-          images, // Previous images for consistency
-          story.pages.slice(0, i).map(p => p.imagePrompt) // Previous prompts
+          characterReference // Pass reference image for pages 2+
         )
-        
-        const timeoutPromise = new Promise<string>((_, reject) => {
+
+        const timeoutPromise = new Promise<{ imageUrl: string; base64Data: string }>((_, reject) => {
           setTimeout(() => reject(new Error('Image generation timeout after 2 minutes')), 120000)
         })
-        
-        const imageUrl = await Promise.race([imagePromise, timeoutPromise])
-        images.push(imageUrl)
-        console.log(`[STORY-GEN] ✅ Image ${i + 1} generated: ${imageUrl}`)
+
+        const result = await Promise.race([imagePromise, timeoutPromise])
+        images.push(result.imageUrl)
+
+        // Save the first image's base64 as character reference for subsequent pages
+        if (i === 0 && result.base64Data) {
+          characterReference = result.base64Data
+          console.log(`[STORY-GEN] ✅ Character reference saved (${result.base64Data.length} chars)`)
+
+          // Also save to story for potential future use
+          await updateStory(storyId, {
+            characterReference: result.base64Data
+          })
+        }
+
+        console.log(`[STORY-GEN] ✅ Image ${i + 1} generated: ${result.imageUrl}`)
       } catch (error) {
         console.error(`[STORY-GEN] ❌ Error generating image ${i + 1}:`, error)
         // Use placeholder for failed images

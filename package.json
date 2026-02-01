@@ -1,5 +1,5 @@
 {
-  "name": "storybook-app",
+  "name": "fablito",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@ai-sdk/google": "^1.2.4",
+    "@google/genai": "^1.0.0",
     "@google/generative-ai": "^0.24.1",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-accordion": "^1.2.2",

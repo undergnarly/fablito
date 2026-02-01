@@ -85,6 +85,8 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
   const [illustrationStyle, setIllustrationStyle] = useState("watercolor")
   const [voiceStory, setVoiceStory] = useState<File | null>(null)
   const [textStory, setTextStory] = useState("")
+  const [characterPhoto, setCharacterPhoto] = useState<File | null>(null)
+  const [characterPhotoPreview, setCharacterPhotoPreview] = useState<string | null>(null)
   const [storyInputMode, setStoryInputMode] = useState<'none' | 'text' | 'voice'>('none')
   const [isRecording, setIsRecording] = useState(false)
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
@@ -260,6 +262,35 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
     setRecordingTime(0)
   }
 
+  // Handle character photo upload
+  const handleCharacterPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file')
+        return
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        alert('Image size should be less than 5MB')
+        return
+      }
+      setCharacterPhoto(file)
+      // Create preview URL
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setCharacterPhotoPreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removeCharacterPhoto = () => {
+    setCharacterPhoto(null)
+    setCharacterPhotoPreview(null)
+  }
+
   // Recording time formatting
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60)
@@ -375,7 +406,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       <div className="space-y-2">
         <Label htmlFor="childName" className="text-lg font-semibold">
           <span className="flex items-center gap-2">
-            <User className="h-5 w-5 text-primary" />
+            <User className="h-5 w-5 text-white" />
             {t.heroName}
           </span>
         </Label>
@@ -387,14 +418,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
           aria-required="true"
           aria-invalid={errors.childName ? "true" : "false"}
           aria-describedby={errors.childName ? "childName-error" : undefined}
-          className={`border-2 ${errors.childName ? "border-red-400" : "border-primary/20"} text-xl py-6 px-4 rounded-xl transition-all duration-200 focus-visible:ring-purple-400 focus-visible:border-purple-400 focus-visible:ring-offset-2`}
-          style={{ 
-            pointerEvents: 'auto', 
-            userSelect: 'text', 
-            cursor: 'text',
-            opacity: 1,
-            backgroundColor: 'white'
-          }}
+          className={`${errors.childName ? "border-red-400" : ""} text-xl py-6 px-4`}
           value={childName}
           onChange={(e) => {
             console.log("Input change:", e.target.value)
@@ -421,10 +445,63 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
           step={1}
           className="w-full"
         />
-        <div className="flex justify-between text-sm text-muted-foreground">
+        <div className="flex justify-between text-sm text-white/70">
           <span>2 {t.years}</span>
           <span>12 {t.years}</span>
         </div>
+      </div>
+
+      {/* Character Photo Upload */}
+      <div className="space-y-4">
+        <Label className="text-lg font-semibold">
+          <span className="flex items-center gap-2">
+            <Upload className="h-5 w-5 text-white" />
+            {t.characterPhoto || "Photo of your child"}
+            <span className="text-sm text-white/70 font-normal">({t.optional})</span>
+          </span>
+        </Label>
+        <p className="text-sm text-white/70">
+          {t.characterPhotoDesc || "Upload a photo to create a character that looks like your child"}
+        </p>
+
+        {!characterPhotoPreview ? (
+          <label className="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-white/30 rounded-xl cursor-pointer hover:border-white/50 hover:bg-white/5 transition-all">
+            <div className="flex flex-col items-center justify-center pt-5 pb-6">
+              <Upload className="w-10 h-10 mb-3 text-white/60" />
+              <p className="mb-2 text-sm text-white/80">
+                <span className="font-semibold">{t.clickToUpload || "Click to upload"}</span>
+              </p>
+              <p className="text-xs text-white/60">{t.imageFormats || "PNG, JPG up to 5MB"}</p>
+            </div>
+            <input
+              type="file"
+              name="characterPhoto"
+              className="hidden"
+              accept="image/*"
+              onChange={handleCharacterPhotoChange}
+            />
+          </label>
+        ) : (
+          <div className="relative w-full">
+            <div className="relative w-40 h-40 mx-auto rounded-xl overflow-hidden border-2 border-white/30 shadow-lg">
+              <img
+                src={characterPhotoPreview}
+                alt="Character preview"
+                className="w-full h-full object-cover"
+              />
+              <button
+                type="button"
+                onClick={removeCharacterPhoto}
+                className="absolute top-2 right-2 p-1.5 bg-red-500 rounded-full text-white hover:bg-red-600 transition-colors shadow-lg"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="text-center mt-3 text-sm text-white/70">
+              {t.photoUploaded || "Photo uploaded! The character will be based on this image."}
+            </p>
+          </div>
+        )}
       </div>
 
       {submitError && (
@@ -441,12 +518,12 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       <div className="space-y-2">
         <Label className="text-lg font-semibold">
           <span className="flex items-center gap-2">
-            <Sparkles className="h-5 w-5 text-primary" />
+            <Sparkles className="h-5 w-5 text-white" />
             {t.storyTheme}
           </span>
         </Label>
         <Select value={theme} onValueChange={setTheme}>
-          <SelectTrigger className={`border-2 ${errors.theme ? "border-red-400" : "border-primary/20"} rounded-xl transition-all duration-200`}>
+          <SelectTrigger className={`border-2 ${errors.theme ? "border-red-400" : "border-white/30"} rounded-xl transition-all duration-200`}>
             <SelectValue placeholder={t.selectThemePlaceholder} />
           </SelectTrigger>
           <SelectContent>
@@ -470,7 +547,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       <div className="space-y-2">
         <Label className="text-lg font-semibold">{t.storyLanguage}</Label>
         <Select value={storyLanguage} onValueChange={setStoryLanguage}>
-          <SelectTrigger className="border-2 border-primary/20 rounded-xl">
+          <SelectTrigger className="border-2 border-white/30 rounded-xl">
             <SelectValue placeholder={t.selectLanguagePlaceholder} />
           </SelectTrigger>
           <SelectContent>
@@ -485,12 +562,12 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       <div className="space-y-2">
         <Label className="text-lg font-semibold">
           <span className="flex items-center gap-2">
-            <Palette className="h-5 w-5 text-primary" />
+            <Palette className="h-5 w-5 text-white" />
             {t.illustrationStyle}
           </span>
         </Label>
         <Select value={illustrationStyle} onValueChange={setIllustrationStyle}>
-          <SelectTrigger className="border-2 border-primary/20 rounded-xl transition-all duration-200">
+          <SelectTrigger className="border-2 border-white/30 rounded-xl transition-all duration-200">
             <SelectValue placeholder={t.selectStyle} />
           </SelectTrigger>
           <SelectContent>
@@ -506,7 +583,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       {/* Story Input Options */}
       <div className="space-y-4">
         <Label className="text-lg font-semibold">
-          {t.addOwnStory} <span className="text-sm text-muted-foreground">({t.optional})</span>
+          {t.addOwnStory} <span className="text-sm text-white/70">({t.optional})</span>
         </Label>
         
         {storyInputMode === 'none' && (
@@ -514,36 +591,36 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
             <Button 
               type="button" 
               variant="outline" 
-              className="h-24 border-2 border-dashed border-primary/20 hover:border-primary/40 transition-all"
+              className="h-24 border-2 border-dashed border-white/30 hover:border-white/50 transition-all"
               onClick={enableTextMode}
             >
               <div className="flex flex-col items-center space-y-2">
-                <FileText className="h-8 w-8 text-primary" />
+                <FileText className="h-8 w-8 text-white" />
                 <span className="font-medium">{t.writeAsText}</span>
-                <span className="text-sm text-muted-foreground">{t.writeAsTextDesc}</span>
+                <span className="text-sm text-white/70">{t.writeAsTextDesc}</span>
               </div>
             </Button>
             
             <Button 
               type="button" 
               variant="outline" 
-              className="h-24 border-2 border-dashed border-primary/20 hover:border-primary/40 transition-all"
+              className="h-24 border-2 border-dashed border-white/30 hover:border-white/50 transition-all"
               onClick={enableVoiceMode}
             >
               <div className="flex flex-col items-center space-y-2">
-                <Mic className="h-8 w-8 text-primary" />
+                <Mic className="h-8 w-8 text-white" />
                 <span className="font-medium">{t.recordWithVoice}</span>
-                <span className="text-sm text-muted-foreground">{t.recordWithVoiceDesc}</span>
+                <span className="text-sm text-white/70">{t.recordWithVoiceDesc}</span>
               </div>
             </Button>
           </div>
         )}
 
         {storyInputMode === 'text' && (
-          <div className="border-2 border-primary/20 rounded-xl p-6 space-y-4">
+          <div className="border-2 border-white/30 rounded-xl p-6 space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <FileText className="h-5 w-5 text-primary" />
+                <FileText className="h-5 w-5 text-white" />
                 <span className="font-medium">{t.yourStory}</span>
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={clearStoryInput}>
@@ -570,17 +647,17 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
               className="mt-2"
             />
             
-            <div className="text-right text-sm text-muted-foreground">
+            <div className="text-right text-sm text-white/70">
               {textStory.length}/1000 {t.charactersCount}
             </div>
           </div>
         )}
 
         {storyInputMode === 'voice' && (
-          <div className="border-2 border-primary/20 rounded-xl p-6">
+          <div className="border-2 border-white/30 rounded-xl p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
-                <Mic className="h-5 w-5 text-primary" />
+                <Mic className="h-5 w-5 text-white" />
                 <span className="font-medium">{t.voiceRecording}</span>
               </div>
               <Button type="button" variant="ghost" size="sm" onClick={clearStoryInput}>
@@ -662,7 +739,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
                     {isRecording ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
                     {isRecording ? t.stopRecording : t.startRecording}
                   </Button>
-                  <div className="text-sm text-muted-foreground">
+                  <div className="text-sm text-white/70">
                     {isRecording ? t.tellYourStory : t.clickToStartRecording}
                   </div>
                 </div>
@@ -684,7 +761,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
           <Label htmlFor="visibility" className="text-base">
             {t.privateStory}
           </Label>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-xs text-white/70">
             {t.privateStoryDesc}
           </p>
         </div>
