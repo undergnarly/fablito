@@ -163,7 +163,7 @@ export default async function StoryPage({
       const isAdmin = await checkAdminAuth()
 
       return (
-        <main className="min-h-screen bg-background">
+        <main className="min-h-screen bg-background pt-16 md:pt-8">
           <div className="max-w-4xl mx-auto p-4 md:p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
@@ -252,7 +252,7 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-background p-2 md:p-4"
+        className="min-h-screen bg-background p-2 pt-16 md:p-4 md:pt-8"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
@@ -288,7 +288,7 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-background p-4 md:p-8"
+        className="min-h-screen bg-background p-4 pt-16 md:p-8 md:pt-8"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
@@ -317,7 +317,7 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-background p-4 md:p-8"
+        className="min-h-screen bg-background p-4 pt-16 md:p-8 md:pt-8"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
@@ -352,7 +352,7 @@ export default async function StoryPage({
   return (
     <main
       id="main-content"
-      className="min-h-screen bg-background p-2 md:p-4"
+      className="min-h-screen bg-background p-2 pt-16 md:p-4 md:pt-8"
     >
       <div className="max-w-4xl mx-auto">
         {isGenerating && (

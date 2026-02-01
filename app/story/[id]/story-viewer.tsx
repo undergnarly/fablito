@@ -743,30 +743,30 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
             {/* Text - full width on mobile, half on desktop */}
             <div className="w-full md:w-1/2 relative book-page bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
               <div
-                className={`p-6 md:p-10 h-full flex flex-col justify-center transition-all duration-300 ${
+                className={`p-4 md:p-8 lg:p-10 h-full flex flex-col justify-center transition-all duration-300 ${
                   pageTransition === "fade-out" ? "opacity-0" : pageTransition === "fade-in" ? "opacity-100" : ""
                 }`}
               >
                 {/* Page content */}
-                <div className="space-y-6">
-                  <p className="text-xl md:text-2xl leading-relaxed text-gray-800" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', lineHeight: '1.8' }}>
-                    <span className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 float-left mr-3 leading-none drop-shadow-sm" style={{ fontFamily: 'SuperJoyful, system-ui, sans-serif' }}>
+                <div className="space-y-4 md:space-y-6">
+                  <p className="text-base md:text-lg lg:text-xl leading-relaxed text-gray-800" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', lineHeight: '1.6' }}>
+                    <span className="text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 float-left mr-2 md:mr-3 leading-none drop-shadow-sm" style={{ fontFamily: 'SuperJoyful, system-ui, sans-serif' }}>
                       {storyContent.pages[currentPage].text.charAt(0)}
                     </span>
                     {storyContent.pages[currentPage].text.substring(1)}
                   </p>
-                  
+
                   {/* Text-to-Speech controls */}
-                  <div className="mt-4">
-                    <TextToSpeech 
+                  <div className="mt-2 md:mt-4">
+                    <TextToSpeech
                       text={storyContent.pages[currentPage].text}
                       language={storyLanguage}
                       isStoryMode={true}
                     />
                   </div>
-                  
+
                   {/* Page number */}
-                  <div className="absolute bottom-6 right-6 text-gray-500 text-sm font-medium">
+                  <div className="absolute bottom-4 right-4 md:bottom-6 md:right-6 text-gray-500 text-xs md:text-sm font-medium">
                     {currentPage + 1}
                   </div>
                 </div>
