@@ -11,28 +11,36 @@ async function checkAdminAuth() {
 
 // GET - Get all users
 export async function GET(request: NextRequest) {
+  console.log("[ADMIN API] GET /api/admin/users - Fetch users request")
+
   if (!(await checkAdminAuth())) {
+    console.log("[ADMIN API] Unauthorized - no admin session")
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
     const users = await getAllUsers()
+    console.log(`[ADMIN API] Returning ${users.length} users`)
     return NextResponse.json({ users })
   } catch (error) {
-    console.error("Error fetching users:", error)
+    console.error("[ADMIN API] Error fetching users:", error)
     return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
   }
 }
 
 // POST - Create new user
 export async function POST(request: NextRequest) {
+  console.log("[ADMIN API] POST /api/admin/users - Create user request")
+
   if (!(await checkAdminAuth())) {
+    console.log("[ADMIN API] Unauthorized - no admin session")
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   }
 
   try {
     const body = await request.json()
     const { email, name, password, coins = 500, isAnonymous = false } = body
+    console.log("[ADMIN API] Creating user:", { email, name, coins, isAnonymous })
 
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 })
@@ -42,6 +50,7 @@ export async function POST(request: NextRequest) {
     if (email) {
       const existingUser = await getUserByEmail(email)
       if (existingUser) {
+        console.log("[ADMIN API] Email already exists:", email)
         return NextResponse.json({ error: "Email already exists" }, { status: 409 })
       }
     }
@@ -55,9 +64,10 @@ export async function POST(request: NextRequest) {
       isAnonymous,
     })
 
+    console.log("[ADMIN API] User created successfully:", user.id)
     return NextResponse.json({ success: true, user })
   } catch (error) {
-    console.error("Error creating user:", error)
+    console.error("[ADMIN API] Error creating user:", error)
     return NextResponse.json({ error: "Failed to create user" }, { status: 500 })
   }
 }

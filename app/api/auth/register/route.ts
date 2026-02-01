@@ -4,12 +4,16 @@ import { getUserById, getUserByEmail, convertAnonymousToUser, createUser } from 
 import { hashPassword, isValidEmail, validatePassword } from "@/lib/auth"
 
 export async function POST(request: NextRequest) {
+  console.log("[AUTH] Registration request received")
+
   try {
     const body = await request.json()
     const { email, password, name } = body
+    console.log("[AUTH] Registration data:", { email, name, hasPassword: !!password })
 
     // Validate input
     if (!email || !password || !name) {
+      console.log("[AUTH] Missing required fields")
       return NextResponse.json(
         { error: "Email, password and name are required" },
         { status: 400 }

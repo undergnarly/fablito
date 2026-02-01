@@ -6,9 +6,9 @@ export default async function AdminPage() {
   const isAuthenticated = await checkAdminAuth()
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-black dark:via-black dark:to-black/90 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8 text-center text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600">
+        <h1 className="text-3xl font-bold mb-8 text-center text-white glow-text">
           Fablito Admin
         </h1>
 

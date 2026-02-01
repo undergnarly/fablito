@@ -437,7 +437,6 @@ export async function deleteStory(id: string): Promise<boolean> {
 }
 
 // User management functions
-export type User = z.infer<typeof UserSchema>
 
 /**
  * Create a new user
@@ -474,17 +473,22 @@ export async function createUser(userData: Omit<User, 'id' | 'createdAt' | 'upda
 
   try {
     const userKey = `user:${user.id}`
-    const emailKey = `user:email:${user.email}`
-    
-    // Check if user with this email already exists
-    const existingUser = await kv.get(emailKey)
-    if (existingUser) {
-      throw new Error('User with this email already exists')
+
+    // Only check/set email mapping if email is provided
+    if (user.email) {
+      const emailKey = `user:email:${user.email}`
+
+      // Check if user with this email already exists
+      const existingUser = await kv.get(emailKey)
+      if (existingUser) {
+        throw new Error('User with this email already exists')
+      }
+
+      await kv.set(emailKey, user.id)
     }
-    
+
     await kv.set(userKey, user)
-    await kv.set(emailKey, user.id)
-    console.log(`[DB] ✅ User ${user.id} created successfully`)
+    console.log(`[DB] ✅ User ${user.id} created successfully (email: ${user.email || 'none'})`)
     return user
   } catch (error) {
     console.error(`[DB] Error creating user:`, error)
@@ -626,10 +630,12 @@ export async function getAllUsers(): Promise<User[]> {
       const usersCacheDir = path.join(process.cwd(), '.users-cache')
 
       if (!fs.existsSync(usersCacheDir)) {
+        console.log('[DB] Users cache directory does not exist')
         return []
       }
 
       const files = fs.readdirSync(usersCacheDir).filter((f: string) => f.endsWith('.json'))
+      console.log(`[DB] Found ${files.length} user files in cache`)
       const users: User[] = []
 
       for (const file of files) {
@@ -637,7 +643,7 @@ export async function getAllUsers(): Promise<User[]> {
           const userData = JSON.parse(fs.readFileSync(path.join(usersCacheDir, file), 'utf8'))
           users.push(userData)
         } catch (e) {
-          // Skip invalid files
+          console.error(`[DB] Error reading user file ${file}:`, e)
         }
       }
 
@@ -649,16 +655,27 @@ export async function getAllUsers(): Promise<User[]> {
   }
 
   try {
-    const keys = await kv.keys('user:*')
+    const allKeys = await kv.keys('user:*')
+    console.log(`[DB] Found ${allKeys.length} total user-related keys`)
+
+    // Filter out email mapping keys (user:email:*) - they contain IDs, not user objects
+    const userKeys = allKeys.filter(key => !key.includes(':email:'))
+    console.log(`[DB] Filtered to ${userKeys.length} actual user keys`)
+
     const users: User[] = []
 
-    for (const key of keys) {
-      const user = await kv.get(key) as User
-      if (user) {
-        users.push(user)
+    for (const key of userKeys) {
+      try {
+        const user = await kv.get(key) as User
+        if (user && user.id && user.name) {
+          users.push(user)
+        }
+      } catch (e) {
+        console.error(`[DB] Error getting user for key ${key}:`, e)
       }
     }
 
+    console.log(`[DB] Successfully loaded ${users.length} users`)
     return users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   } catch (error) {
     console.error(`[DB] Error getting all users:`, error)
@@ -679,8 +696,10 @@ export async function deleteUser(id: string): Promise<boolean> {
 
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath)
+        console.log(`[DB] ✅ User ${id} deleted from file cache`)
         return true
       }
+      console.log(`[DB] User ${id} not found in file cache`)
       return false
     } catch (error) {
       console.error(`[DB] Error deleting user from file cache:`, error)
@@ -689,8 +708,23 @@ export async function deleteUser(id: string): Promise<boolean> {
   }
 
   try {
+    // Get user first to find email for cleanup
+    const user = await getUserById(id)
+    if (!user) {
+      console.log(`[DB] User ${id} not found`)
+      return false
+    }
+
     const userKey = `user:${id}`
     await kv.del(userKey)
+
+    // Also delete email mapping if exists
+    if (user.email) {
+      const emailKey = `user:email:${user.email}`
+      await kv.del(emailKey)
+    }
+
+    console.log(`[DB] ✅ User ${id} deleted successfully`)
     return true
   } catch (error) {
     console.error(`[DB] Error deleting user:`, error)
