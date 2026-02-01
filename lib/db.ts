@@ -275,49 +275,35 @@ export async function updateStory(id: string, data: Partial<Story>): Promise<Sto
 export async function listStories(limit = 100): Promise<Story[]> {
   // For local development without KV, read from file cache
   if (!isKvAvailable) {
-    console.log("[DB] KV not available - reading stories from file cache")
     try {
       const fs = require('fs')
       const path = require('path')
       const storiesCacheDir = path.join(process.cwd(), '.stories-cache')
-      
+
       if (!fs.existsSync(storiesCacheDir)) {
-        console.log("[DB] Stories cache directory not found")
         return []
       }
-      
+
       const files = fs.readdirSync(storiesCacheDir).filter((file: string) => file.endsWith('.json'))
-      console.log(`[DB] Found ${files.length} stories in cache`)
-      
+
       const stories = files.slice(0, limit).map((file: string) => {
         try {
           const filePath = path.join(storiesCacheDir, file)
           const storyData = JSON.parse(fs.readFileSync(filePath, 'utf-8'))
-          
+
           // Ensure backward compatibility - add style field if missing
           if (!storyData.style) {
             const detectedLanguage = detectLanguageFromStory(storyData)
             storyData.style = { language: detectedLanguage }
           }
-          
-          // Debug logging for images
-          console.log(`[DB] Story ${storyData.id} (${storyData.title}):`, {
-            hasImages: !!storyData.images,
-            imagesType: typeof storyData.images,
-            imagesValue: storyData.images ? storyData.images.substring(0, 100) + '...' : null
-          })
-          
+
           return storyData
         } catch (error) {
-          console.error(`[DB] Error reading story file ${file}:`, error)
           return null
         }
       }).filter(Boolean)
-      
-      // Сортируем по дате создания (новые сначала)
+
       stories.sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-      
-      console.log(`[DB] Successfully loaded ${stories.length} stories from cache`)
       return stories
     } catch (error) {
       console.error("[DB] Error reading stories from file cache:", error)
@@ -346,7 +332,6 @@ export async function listStories(limit = 100): Promise<Story[]> {
         try {
           processedData.storyContent = JSON.stringify(processedData.storyContent)
         } catch (e) {
-          console.error(`[DB] Error stringifying storyContent:`, e)
           processedData.storyContent = "{}"
         }
       }
@@ -355,7 +340,6 @@ export async function listStories(limit = 100): Promise<Story[]> {
         try {
           processedData.images = JSON.stringify(processedData.images)
         } catch (e) {
-          console.error(`[DB] Error stringifying images:`, e)
           processedData.images = "[]"
         }
       }
@@ -368,13 +352,7 @@ export async function listStories(limit = 100): Promise<Story[]> {
 
       // Use safeParse instead of assuming the data is valid
       const result = StorySchema.safeParse(processedData)
-
-      if (result.success) {
-        return result.data
-      } else {
-        console.error(`[DB] Story validation failed for ${key}:`, result.error)
-        return processedData as Story
-      }
+      return result.success ? result.data : processedData as Story
     }),
   )
 
@@ -656,7 +634,6 @@ export async function getAllUsers(): Promise<User[]> {
 
   try {
     const allKeys = await kv.keys('user:*')
-    console.log(`[DB] Found ${allKeys.length} total user-related keys:`, allKeys)
 
     // Filter to only include actual user keys (user:uuid format)
     // Exclude: user:email:*, user:uuid:transactions, etc.
@@ -665,22 +642,21 @@ export async function getAllUsers(): Promise<User[]> {
       // Valid user key has exactly 2 parts: "user" and "uuid"
       return parts.length === 2 && parts[0] === 'user'
     })
-    console.log(`[DB] Filtered to ${userKeys.length} actual user keys:`, userKeys)
 
-    const users: User[] = []
-
-    for (const key of userKeys) {
-      try {
-        const user = await kv.get(key) as User
-        if (user && user.id && user.name) {
-          users.push(user)
+    // Fetch all users in parallel for better performance
+    const userResults = await Promise.all(
+      userKeys.map(async (key) => {
+        try {
+          return await kv.get(key) as User
+        } catch (e) {
+          console.error(`[DB] Error getting user for key ${key}:`, e)
+          return null
         }
-      } catch (e) {
-        console.error(`[DB] Error getting user for key ${key}:`, e)
-      }
-    }
+      })
+    )
 
-    console.log(`[DB] Successfully loaded ${users.length} users`)
+    const users = userResults.filter((user): user is User => user !== null && !!user.id && !!user.name)
+
     return users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   } catch (error) {
     console.error(`[DB] Error getting all users:`, error)
