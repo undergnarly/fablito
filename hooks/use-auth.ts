@@ -1,15 +1,15 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
 
 export interface User {
   id: string
-  email: string
+  email?: string
   name: string
+  coins: number
+  isAnonymous: boolean
   createdAt: string
-  updatedAt: string
-  isActive: boolean
 }
 
 export function useAuth() {
@@ -98,6 +98,28 @@ export function useAuth() {
     }
   }
 
+  // Refresh user data (useful after coin transactions)
+  const refreshUser = useCallback(async () => {
+    try {
+      const response = await fetch('/api/auth/me')
+      if (response.ok) {
+        const data = await response.json()
+        setUser(data.user)
+        return data.user
+      }
+    } catch (error) {
+      console.error('Failed to refresh user:', error)
+    }
+    return null
+  }, [])
+
+  // Check if user can afford a generation
+  const canAfford = useCallback((pageCount: number) => {
+    if (!user) return false
+    const cost = pageCount * 10 // 10 coins per page
+    return user.coins >= cost
+  }, [user])
+
   return {
     user,
     isLoading,
@@ -105,7 +127,10 @@ export function useAuth() {
     register,
     logout,
     checkAuth,
-    isAuthenticated: !!user
+    refreshUser,
+    canAfford,
+    isAuthenticated: !!user && !user.isAnonymous,
+    isAnonymous: user?.isAnonymous ?? true
   }
 }
 

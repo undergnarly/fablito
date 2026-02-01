@@ -114,7 +114,7 @@ export default function StoriesPage() {
       <div className="max-w-6xl mx-auto px-4 py-12 md:px-8">
         {/* Title Section */}
         <div className="flex flex-col items-center justify-center text-center mb-8">
-          <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-6" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
+          <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-6 font-[var(--font-lobster)]">
             {t.allStories}
           </h1>
           <Link href="/#create-story">

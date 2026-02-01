@@ -32,13 +32,30 @@ export const StyleOptionsSchema = z.object({
 // User schema
 export const UserSchema = z.object({
   id: z.string().uuid(),
-  email: z.string().email(),
+  email: z.string().email().optional(), // Optional for anonymous users
   name: z.string().min(2).max(50),
-  passwordHash: z.string(),
+  passwordHash: z.string().optional(), // Optional for anonymous users
   createdAt: z.string(),
   updatedAt: z.string(),
   isActive: z.boolean().default(true),
+  // Monetization fields
+  coins: z.number().default(0), // Монетки для генерации
+  isAnonymous: z.boolean().default(false), // Анонимный пользователь (гость)
 })
+
+export type User = z.infer<typeof UserSchema>
+
+// Transaction schema for coin history
+export const TransactionSchema = z.object({
+  id: z.string().uuid(),
+  userId: z.string().uuid(),
+  amount: z.number(), // +50, -100, +3000, etc.
+  type: z.enum(["welcome", "registration", "generation", "subscription", "refund"]),
+  description: z.string().optional(),
+  createdAt: z.string(),
+})
+
+export type Transaction = z.infer<typeof TransactionSchema>
 
 // Story schema with new fields
 export const StorySchema = z.object({
@@ -556,6 +573,313 @@ export async function getUserById(id: string): Promise<User | null> {
   } catch (error) {
     console.error(`[DB] Error getting user by ID:`, error)
     return null
+  }
+}
+
+/**
+ * Update user data
+ */
+export async function updateUser(id: string, updates: Partial<User>): Promise<User | null> {
+  const user = await getUserById(id)
+  if (!user) return null
+
+  const updatedUser: User = {
+    ...user,
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  }
+
+  if (!isKvAvailable) {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      const usersCacheDir = path.join(process.cwd(), '.users-cache')
+      const filePath = path.join(usersCacheDir, `${id}.json`)
+      fs.writeFileSync(filePath, JSON.stringify(updatedUser, null, 2))
+      console.log(`[DB] ✅ User ${id} updated in file cache`)
+      return updatedUser
+    } catch (error) {
+      console.error(`[DB] Error updating user in file cache:`, error)
+      return null
+    }
+  }
+
+  try {
+    const userKey = `user:${id}`
+    await kv.set(userKey, updatedUser)
+    console.log(`[DB] ✅ User ${id} updated successfully`)
+    return updatedUser
+  } catch (error) {
+    console.error(`[DB] Error updating user:`, error)
+    return null
+  }
+}
+
+/**
+ * Create anonymous user with welcome coins
+ */
+export async function createAnonymousUser(): Promise<User> {
+  const WELCOME_COINS = 50
+
+  const user: User = {
+    id: crypto.randomUUID(),
+    name: "Гость",
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+    isActive: true,
+    coins: WELCOME_COINS,
+    isAnonymous: true,
+  }
+
+  if (!isKvAvailable) {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      const usersCacheDir = path.join(process.cwd(), '.users-cache')
+
+      if (!fs.existsSync(usersCacheDir)) {
+        fs.mkdirSync(usersCacheDir, { recursive: true })
+      }
+
+      const filePath = path.join(usersCacheDir, `${user.id}.json`)
+      fs.writeFileSync(filePath, JSON.stringify(user, null, 2))
+      console.log(`[DB] ✅ Anonymous user ${user.id} created with ${WELCOME_COINS} coins`)
+
+      // Add welcome transaction
+      await addTransaction(user.id, WELCOME_COINS, "welcome", "Приветственный бонус")
+
+      return user
+    } catch (error) {
+      console.error(`[DB] Error creating anonymous user:`, error)
+      throw error
+    }
+  }
+
+  try {
+    const userKey = `user:${user.id}`
+    await kv.set(userKey, user)
+    console.log(`[DB] ✅ Anonymous user ${user.id} created with ${WELCOME_COINS} coins`)
+
+    // Add welcome transaction
+    await addTransaction(user.id, WELCOME_COINS, "welcome", "Приветственный бонус")
+
+    return user
+  } catch (error) {
+    console.error(`[DB] Error creating anonymous user:`, error)
+    throw error
+  }
+}
+
+/**
+ * Convert anonymous user to registered user
+ */
+export async function convertAnonymousToUser(
+  userId: string,
+  email: string,
+  name: string,
+  passwordHash: string
+): Promise<User | null> {
+  const REGISTRATION_BONUS = 50
+
+  const user = await getUserById(userId)
+  if (!user || !user.isAnonymous) {
+    console.error(`[DB] User ${userId} not found or not anonymous`)
+    return null
+  }
+
+  // Check if email already exists
+  const existingUser = await getUserByEmail(email)
+  if (existingUser) {
+    console.error(`[DB] Email ${email} already exists`)
+    return null
+  }
+
+  const updatedUser: User = {
+    ...user,
+    email,
+    name,
+    passwordHash,
+    isAnonymous: false,
+    coins: user.coins + REGISTRATION_BONUS,
+    updatedAt: new Date().toISOString(),
+  }
+
+  if (!isKvAvailable) {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      const usersCacheDir = path.join(process.cwd(), '.users-cache')
+      const filePath = path.join(usersCacheDir, `${userId}.json`)
+      fs.writeFileSync(filePath, JSON.stringify(updatedUser, null, 2))
+
+      // Add registration bonus transaction
+      await addTransaction(userId, REGISTRATION_BONUS, "registration", "Бонус за регистрацию")
+
+      console.log(`[DB] ✅ Anonymous user ${userId} converted to registered user`)
+      return updatedUser
+    } catch (error) {
+      console.error(`[DB] Error converting anonymous user:`, error)
+      return null
+    }
+  }
+
+  try {
+    const userKey = `user:${userId}`
+    const emailKey = `user:email:${email}`
+
+    await kv.set(userKey, updatedUser)
+    await kv.set(emailKey, userId)
+
+    // Add registration bonus transaction
+    await addTransaction(userId, REGISTRATION_BONUS, "registration", "Бонус за регистрацию")
+
+    console.log(`[DB] ✅ Anonymous user ${userId} converted to registered user`)
+    return updatedUser
+  } catch (error) {
+    console.error(`[DB] Error converting anonymous user:`, error)
+    return null
+  }
+}
+
+/**
+ * Update user coins (add or subtract)
+ */
+export async function updateUserCoins(
+  userId: string,
+  amount: number,
+  type: Transaction["type"],
+  description?: string
+): Promise<{ success: boolean; newBalance: number; error?: string }> {
+  const user = await getUserById(userId)
+  if (!user) {
+    return { success: false, newBalance: 0, error: "User not found" }
+  }
+
+  const newBalance = user.coins + amount
+
+  // Check if user has enough coins for negative amounts
+  if (newBalance < 0) {
+    return { success: false, newBalance: user.coins, error: "Недостаточно монеток" }
+  }
+
+  const updated = await updateUser(userId, { coins: newBalance })
+  if (!updated) {
+    return { success: false, newBalance: user.coins, error: "Failed to update user" }
+  }
+
+  // Add transaction record
+  await addTransaction(userId, amount, type, description)
+
+  console.log(`[DB] ✅ User ${userId} coins updated: ${user.coins} -> ${newBalance} (${amount > 0 ? '+' : ''}${amount})`)
+  return { success: true, newBalance }
+}
+
+/**
+ * Add transaction record
+ */
+export async function addTransaction(
+  userId: string,
+  amount: number,
+  type: Transaction["type"],
+  description?: string
+): Promise<Transaction> {
+  const transaction: Transaction = {
+    id: crypto.randomUUID(),
+    userId,
+    amount,
+    type,
+    description,
+    createdAt: new Date().toISOString(),
+  }
+
+  if (!isKvAvailable) {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      const transactionsCacheDir = path.join(process.cwd(), '.transactions-cache')
+
+      if (!fs.existsSync(transactionsCacheDir)) {
+        fs.mkdirSync(transactionsCacheDir, { recursive: true })
+      }
+
+      const filePath = path.join(transactionsCacheDir, `${transaction.id}.json`)
+      fs.writeFileSync(filePath, JSON.stringify(transaction, null, 2))
+      return transaction
+    } catch (error) {
+      console.error(`[DB] Error saving transaction:`, error)
+      throw error
+    }
+  }
+
+  try {
+    const transactionKey = `transaction:${transaction.id}`
+    const userTransactionsKey = `user:${userId}:transactions`
+
+    await kv.set(transactionKey, transaction)
+    await kv.lpush(userTransactionsKey, transaction.id)
+
+    return transaction
+  } catch (error) {
+    console.error(`[DB] Error adding transaction:`, error)
+    throw error
+  }
+}
+
+/**
+ * Get user transactions
+ */
+export async function getUserTransactions(userId: string, limit = 50): Promise<Transaction[]> {
+  if (!isKvAvailable) {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      const transactionsCacheDir = path.join(process.cwd(), '.transactions-cache')
+
+      if (!fs.existsSync(transactionsCacheDir)) {
+        return []
+      }
+
+      const files = fs.readdirSync(transactionsCacheDir)
+        .filter((file: string) => file.endsWith('.json'))
+
+      const transactions: Transaction[] = []
+      for (const file of files) {
+        const filePath = path.join(transactionsCacheDir, file)
+        const data = JSON.parse(fs.readFileSync(filePath, 'utf8'))
+        if (data.userId === userId) {
+          transactions.push(data)
+        }
+      }
+
+      return transactions
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, limit)
+    } catch (error) {
+      console.error(`[DB] Error reading transactions:`, error)
+      return []
+    }
+  }
+
+  try {
+    const userTransactionsKey = `user:${userId}:transactions`
+    const transactionIds = await kv.lrange(userTransactionsKey, 0, limit - 1) as string[]
+
+    if (!transactionIds || transactionIds.length === 0) {
+      return []
+    }
+
+    const transactions: Transaction[] = []
+    for (const id of transactionIds) {
+      const transaction = await kv.get(`transaction:${id}`) as Transaction
+      if (transaction) {
+        transactions.push(transaction)
+      }
+    }
+
+    return transactions
+  } catch (error) {
+    console.error(`[DB] Error getting user transactions:`, error)
+    return []
   }
 }
 

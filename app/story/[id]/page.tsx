@@ -12,6 +12,10 @@ import { ExportButtons } from "@/components/export-buttons"
 import { DeleteStoryButton } from "@/components/delete-story-button"
 import { checkAdminAuth } from "@/app/admin/actions"
 import { isKvAvailable } from "@/lib/settings"
+import { translations } from "@/lib/i18n"
+
+// Use Russian as default for server component
+const t = translations.ru
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   
@@ -163,7 +167,7 @@ export default async function StoryPage({
       const isAdmin = await checkAdminAuth()
 
       return (
-        <main className="min-h-screen bg-background pt-16 md:pt-8">
+        <main className="min-h-screen bg-background pt-20">
           <div className="max-w-4xl mx-auto p-4 md:p-8">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
@@ -194,7 +198,7 @@ export default async function StoryPage({
 
             {/* Story Header */}
             <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-4" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
+              <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-4 font-[var(--font-lobster)]">
                 {storyData.title}
               </h1>
               <p className="text-lg text-white/70">
@@ -252,14 +256,14 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-background p-2 pt-16 md:p-4 md:pt-8"
+        className="min-h-screen bg-background p-2 pt-20 md:p-4 md:pt-20"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <Link href="/stories">
               <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="font-medium">Назад к историям</span>
+                <span className="font-medium">{t.backToStories}</span>
               </Button>
             </Link>
           </div>
@@ -269,11 +273,11 @@ export default async function StoryPage({
               <div className="flex justify-center mb-6">
                 <Loader2 className="h-12 w-12 text-white animate-spin" />
               </div>
-              <h2 className="text-xl font-bold mb-2 text-white">История создаётся...</h2>
-              <p className="mb-6 text-white/70">Волшебная история ещё готовится. Скоро всё будет готово!</p>
+              <h2 className="text-xl font-bold mb-2 text-white">{t.creatingYourStory}</h2>
+              <p className="mb-6 text-white/70">{t.generationTakesTime}</p>
               <Link href={`/generating/${params.id}`}>
                 <Button className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 transition-all duration-300 text-white font-semibold">
-                  Смотреть прогресс
+                  {t.viewStoryInProgress}
                 </Button>
               </Link>
             </div>
@@ -288,23 +292,23 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-background p-4 pt-16 md:p-8 md:pt-8"
+        className="min-h-screen bg-background p-4 pt-20 md:p-8 md:pt-20"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <Link href="/stories">
               <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="font-medium">Назад к историям</span>
+                <span className="font-medium">{t.backToStories}</span>
               </Button>
             </Link>
           </div>
 
           <Card className="magic-card border-0 rounded-xl">
             <div className="p-6 text-center">
-              <h2 className="text-xl font-bold mb-2 text-red-300">Ошибка генерации</h2>
-              <p className="text-white/70">К сожалению, не удалось создать эту историю. Попробуйте создать новую.</p>
-              {storyData.error && <p className="mt-2 text-sm bg-red-500/20 p-2 rounded text-red-300">Ошибка: {storyData.error}</p>}
+              <h2 className="text-xl font-bold mb-2 text-red-300">{t.somethingWentWrong}</h2>
+              <p className="text-white/70">{t.createFirstStory}</p>
+              {storyData.error && <p className="mt-2 text-sm bg-red-500/20 p-2 rounded text-red-300">{t.error}: {storyData.error}</p>}
             </div>
           </Card>
         </div>
@@ -317,22 +321,22 @@ export default async function StoryPage({
     return (
       <main
         id="main-content"
-        className="min-h-screen bg-background p-4 pt-16 md:p-8 md:pt-8"
+        className="min-h-screen bg-background p-4 pt-20 md:p-8 md:pt-20"
       >
         <div className="max-w-4xl mx-auto">
           <div className="mb-4">
             <Link href="/stories">
               <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="font-medium">Назад к историям</span>
+                <span className="font-medium">{t.backToStories}</span>
               </Button>
             </Link>
           </div>
 
           <Card className="magic-card border-0 rounded-xl">
             <div className="p-6 text-center">
-              <h2 className="text-xl font-bold mb-2 text-red-300">Ошибка данных истории</h2>
-              <p className="text-white/70">Произошла проблема с данными истории. Попробуйте создать новую.</p>
+              <h2 className="text-xl font-bold mb-2 text-red-300">{t.somethingWentWrong}</h2>
+              <p className="text-white/70">{t.createFirstStory}</p>
             </div>
           </Card>
         </div>
@@ -352,7 +356,7 @@ export default async function StoryPage({
   return (
     <main
       id="main-content"
-      className="min-h-screen bg-background p-2 pt-16 md:p-4 md:pt-8"
+      className="min-h-screen bg-background p-2 pt-20 md:p-4 md:pt-20"
     >
       <div className="max-w-4xl mx-auto">
         {isGenerating && (
@@ -360,9 +364,9 @@ export default async function StoryPage({
             <div className="p-4 text-center text-yellow-300 flex items-center justify-center">
               <Loader2 className="h-5 w-5 mr-2 animate-spin" />
               <p>
-                История ещё создаётся. Некоторые изображения могут отсутствовать.{" "}
+                {t.storyStillGenerating}{" "}
                 <Link href={`/generating/${params.id}`} className="underline font-medium text-pink-400 hover:text-pink-300">
-                  Смотреть прогресс
+                  {t.viewStoryInProgress}
                 </Link>
               </p>
             </div>
@@ -379,7 +383,7 @@ export default async function StoryPage({
               style={storyData.style}
             />
           </div>
-          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white glow-text mb-2" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white glow-text mb-2 font-[var(--font-lobster)]">
             {storyContent.title}
           </h1>
           <p className="text-white/60 text-sm md:text-base">История для возраста {storyData.age}</p>
@@ -398,7 +402,7 @@ export default async function StoryPage({
           <Link href="/">
             <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
               <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="font-medium">На главную</span>
+              <span className="font-medium">{t.backToHome}</span>
             </Button>
           </Link>
         </div>

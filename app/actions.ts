@@ -1,11 +1,15 @@
 "use server"
 
 import { redirect } from "next/navigation"
-import { createStory, updateStory } from "@/lib/db"
+import { createStory, updateStory, getUserById, updateUserCoins } from "@/lib/db"
 import { generateStoryInBackground } from "@/lib/story-generator"
 import crypto from "crypto"
 import { after } from "next/server"
+import { cookies } from "next/headers"
 import { getSetting, isKvAvailable } from "@/lib/settings"
+
+// Cost per page in coins
+const COINS_PER_PAGE = 10
 
 // Helper to check if error is a Next.js redirect
 function isRedirectError(error: unknown): boolean {
@@ -42,6 +46,19 @@ export async function createStoryAction(formData: FormData) {
       throw new Error("Story submissions are temporarily halted due to high demand. Please try again later.")
     }
 
+    // Get user from cookies and check coin balance
+    const cookieStore = await cookies()
+    const userId = cookieStore.get("user_id")?.value
+
+    if (!userId) {
+      throw new Error("Пожалуйста, обновите страницу для создания истории")
+    }
+
+    const user = await getUserById(userId)
+    if (!user) {
+      throw new Error("Пользователь не найден. Пожалуйста, обновите страницу")
+    }
+
     // Extract new form data
     const childName = formData.get("childName") as string
     const childGender = (formData.get("childGender") as string) || "boy"
@@ -69,6 +86,29 @@ export async function createStoryAction(formData: FormData) {
     if (childAge < 2 || childAge > 12) {
       throw new Error("Age must be between 2 and 12 years")
     }
+
+    // Check coin balance
+    const generationCost = pageCount * COINS_PER_PAGE
+    console.log(`[ACTIONS] Generation cost: ${generationCost} coins (${pageCount} pages x ${COINS_PER_PAGE})`)
+    console.log(`[ACTIONS] User ${userId} has ${user.coins} coins`)
+
+    if (user.coins < generationCost) {
+      throw new Error(`Недостаточно монеток. Нужно ${generationCost}, у вас ${user.coins}. Купите подписку для пополнения баланса.`)
+    }
+
+    // Deduct coins before generation
+    const coinResult = await updateUserCoins(
+      userId,
+      -generationCost,
+      "generation",
+      `Генерация истории (${pageCount} страниц)`
+    )
+
+    if (!coinResult.success) {
+      throw new Error(coinResult.error || "Не удалось списать монетки")
+    }
+
+    console.log(`[ACTIONS] Coins deducted. New balance: ${coinResult.newBalance}`)
 
     // Default age range if not provided
     const ageRange = age || "3-8"

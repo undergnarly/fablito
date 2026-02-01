@@ -1,12 +1,13 @@
 "use client"
 
-import { LogIn, LogOut, User, BookOpen } from "lucide-react"
+import { LogIn, LogOut, User, BookOpen, Coins } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { LanguageSwitcher } from "@/components/language-switcher"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/hooks/use-auth"
 import { Button } from "@/components/ui/button"
+import { CoinBalance } from "@/components/coin-balance"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -26,7 +27,7 @@ export function Header() {
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-background focus:z-50"
       >
-        Skip to main content
+        {t.skipToContent}
       </a>
       <div className="container flex h-14 md:h-16 items-center justify-between px-4">
         {/* Logo */}
@@ -35,9 +36,8 @@ export function Header() {
           className="flex items-center hover:opacity-80 transition-opacity"
         >
           <span
-            className="text-2xl md:text-3xl text-white"
+            className="text-2xl md:text-3xl text-white font-[var(--font-lobster)]"
             style={{
-              fontFamily: 'SuperJoyful, cursive',
               textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 4px 12px rgba(0,0,0,0.6), 0 0 30px rgba(163,28,245,0.5)'
             }}
           >
@@ -47,6 +47,9 @@ export function Header() {
 
         {/* Right side controls */}
         <div className="flex items-center gap-2">
+          {/* Coin balance - shown for all users */}
+          <CoinBalance compact showBuyButton={false} />
+
           <LanguageSwitcher />
 
           {/* Auth section */}
@@ -63,11 +66,21 @@ export function Header() {
                       <User className="h-5 w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
+                  <DropdownMenuContent align="end" className="w-56">
                     <div className="px-2 py-1.5 text-sm font-medium text-foreground">
                       {user?.name}
                     </div>
+                    <div className="px-2 py-1 flex items-center gap-2 text-yellow-600">
+                      <Coins className="h-4 w-4" />
+                      <span className="text-sm font-medium">{user?.coins} {t.coinsLabel}</span>
+                    </div>
                     <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/subscription" className="flex items-center gap-2 cursor-pointer text-yellow-600">
+                        <Coins className="h-4 w-4" />
+                        {t.buyCoins}
+                      </Link>
+                    </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link href="/user/profile" className="flex items-center gap-2 cursor-pointer">
                         <User className="h-4 w-4" />

@@ -393,16 +393,20 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
       try {
         const { generateImage } = await import("./image-generator")
 
-        // Build the prompt with character consistency instructions
-        const fullPrompt = `${page.imagePrompt}. Style: ${params.style.illustration}. Character: ${params.childName} (${params.childAge} years old). CRITICAL: Consistent character appearance throughout entire story.`
-
-        // Add timeout for image generation (2 minutes per image)
-        const imagePromise = generateImage(
-          fullPrompt,
+        // Use the new comprehensive image generation API
+        // Passes all character details, style, and reference image for consistency
+        const imagePromise = generateImage({
+          sceneDescription: page.imagePrompt,
+          character: {
+            name: params.childName,
+            gender: params.childGender || "boy",
+            age: params.childAge
+          },
+          style: params.style.illustration,
           storyId,
-          i,
-          characterReference // Pass reference image for pages 2+
-        )
+          pageIndex: i,
+          referenceImage: characterReference // Pass reference image for pages 2+
+        })
 
         const timeoutPromise = new Promise<{ imageUrl: string; base64Data: string }>((_, reject) => {
           setTimeout(() => reject(new Error('Image generation timeout after 2 minutes')), 120000)

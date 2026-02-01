@@ -45,7 +45,7 @@ export function ExportButtons({ storyId, storyTitle }: ExportButtonsProps) {
       }
     } catch (error) {
       console.error(`[EXPORT] Error exporting story:`, error)
-      alert(`Ошибка при экспорте: ${error instanceof Error ? error.message : 'Неизвестная ошибка'}`)
+      alert(`${t.exportError}: ${error instanceof Error ? error.message : 'Unknown error'}`)
     }
   }
 
@@ -54,31 +54,31 @@ export function ExportButtons({ storyId, storyTitle }: ExportButtonsProps) {
       <DropdownMenuTrigger asChild>
         <Button variant="outline" size="sm" className="gap-2">
           <Download className="w-4 h-4" />
-          Экспорт
+          {t.export}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-56">
         <DropdownMenuItem onClick={() => handleExport('html')} className="gap-2">
           <FileText className="w-4 h-4" />
           <div className="flex flex-col">
-            <span>Веб-страница (HTML)</span>
-            <span className="text-xs text-muted-foreground">Открыть в браузере</span>
+            <span>{t.webpageHtml}</span>
+            <span className="text-xs text-muted-foreground">{t.openInBrowser}</span>
           </div>
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={() => handleExport('pdf')} className="gap-2">
           <Printer className="w-4 h-4" />
           <div className="flex flex-col">
-            <span>PDF для печати</span>
-            <span className="text-xs text-muted-foreground">Готово к печати</span>
+            <span>{t.pdfForPrint}</span>
+            <span className="text-xs text-muted-foreground">{t.readyToPrint}</span>
           </div>
         </DropdownMenuItem>
-        
+
         <DropdownMenuItem onClick={() => handleExport('epub')} className="gap-2">
           <Book className="w-4 h-4" />
           <div className="flex flex-col">
-            <span>Электронная книга (EPUB)</span>
-            <span className="text-xs text-muted-foreground">Структура для e-reader</span>
+            <span>{t.ebookEpub}</span>
+            <span className="text-xs text-muted-foreground">{t.ereaderFormat}</span>
           </div>
         </DropdownMenuItem>
       </DropdownMenuContent>

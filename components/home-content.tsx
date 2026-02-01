@@ -80,11 +80,10 @@ export function HomeContent({ stories }: HomeContentProps) {
         {/* Hero content - centered */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
           <div className="text-center space-y-4 md:space-y-6">
-            {/* Title with custom font */}
+            {/* Title with Lobster font */}
             <h1
-              className="text-6xl md:text-8xl lg:text-9xl text-white"
+              className="text-6xl md:text-8xl lg:text-9xl text-white font-[var(--font-lobster)]"
               style={{
-                fontFamily: 'SuperJoyful, cursive',
                 textShadow: '0 4px 8px rgba(0,0,0,0.8), 0 8px 25px rgba(0,0,0,0.6), 0 12px 50px rgba(0,0,0,0.4), 0 0 80px rgba(163,28,245,0.5)'
               }}
             >
@@ -281,7 +280,7 @@ export function HomeContent({ stories }: HomeContentProps) {
                               size="sm"
                               className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-full text-sm px-4 py-2 active:scale-95 transition-all"
                             >
-                              Read
+                              {t.read}
                               <ChevronRight className="ml-1 h-4 w-4" />
                             </Button>
                           </Link>
@@ -299,7 +298,7 @@ export function HomeContent({ stories }: HomeContentProps) {
                       variant="outline"
                       className="px-8 md:px-10 py-5 md:py-6 text-base md:text-lg bg-white/10 border-white/30 text-white hover:bg-white/20 rounded-full active:scale-95 transition-all"
                     >
-                      View All Stories
+                      {t.viewAllStories}
                       <ChevronRight className="ml-2 h-5 w-5" />
                     </Button>
                   </Link>

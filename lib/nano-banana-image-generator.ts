@@ -1,24 +1,44 @@
 import { GoogleGenAI, Modality } from "@google/genai"
 import { uploadImageToBlob } from "./blob-storage"
+import {
+  buildImagePrompt,
+  buildReferenceImagePrompt,
+  type CharacterParams,
+  type ImagePromptParams
+} from "./image-prompt-utils"
 
 /**
- * Generate an image using Nano Banana Pro (Google Gemini 3 Pro Image)
- * Supports reference images for character consistency
+ * Parameters for image generation
+ */
+export interface ImageGenerationParams {
+  sceneDescription: string
+  character: CharacterParams
+  style: string
+  storyId: string
+  pageIndex: number
+  referenceImage?: string
+}
+
+/**
+ * Generate an image using Nano Banana Pro (Google Gemini)
  *
- * @param prompt The image prompt
- * @param storyId The ID of the story
- * @param pageIndex The index of the page in the story
- * @param referenceImage Optional base64 reference image for character consistency
+ * Best practices implemented:
+ * - Narrative descriptions instead of keyword lists
+ * - Detailed style specifications for each illustration type
+ * - Character consistency through detailed descriptions
+ * - Reference image support for maintaining character appearance
+ *
+ * @param params Image generation parameters
  * @returns Object with image URL and base64 data (for use as reference)
  */
 export async function generateImageWithNanoBanana(
-  prompt: string,
-  storyId: string,
-  pageIndex: number,
-  referenceImage?: string,
+  params: ImageGenerationParams
 ): Promise<{ imageUrl: string; base64Data: string }> {
+  const { sceneDescription, character, style, storyId, pageIndex, referenceImage } = params
+
   console.log(`[NANO-BANANA] Starting image generation for story ${storyId}, page ${pageIndex}`)
-  console.log(`[NANO-BANANA] Prompt: ${prompt}`)
+  console.log(`[NANO-BANANA] Character: ${character.name}, ${character.age}yo ${character.gender}`)
+  console.log(`[NANO-BANANA] Style: ${style}`)
   console.log(`[NANO-BANANA] Has reference image: ${!!referenceImage}`)
 
   const apiKey = process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
@@ -26,7 +46,7 @@ export async function generateImageWithNanoBanana(
   if (!apiKey) {
     console.log(`[NANO-BANANA] No API key found - returning placeholder`)
     return {
-      imageUrl: `/api/placeholder?height=400&width=600&text=${encodeURIComponent(prompt.substring(0, 30))}`,
+      imageUrl: `/api/placeholder?height=400&width=600&text=${encodeURIComponent(sceneDescription.substring(0, 30))}`,
       base64Data: ""
     }
   }
@@ -39,11 +59,19 @@ export async function generateImageWithNanoBanana(
     // Build the content array
     const contents: Array<string | { inlineData: { mimeType: string; data: string } }> = []
 
-    // If we have a reference image, add it first for character consistency
+    // Build prompt parameters
+    const promptParams: ImagePromptParams = {
+      sceneDescription,
+      character,
+      style,
+      isFirstImage: !referenceImage
+    }
+
     if (referenceImage) {
       // Clean the base64 data (remove data URL prefix if present)
       const cleanBase64 = referenceImage.replace(/^data:image\/[a-z]+;base64,/, '')
 
+      // Add reference image first
       contents.push({
         inlineData: {
           mimeType: "image/png",
@@ -51,21 +79,18 @@ export async function generateImageWithNanoBanana(
         }
       })
 
-      // Add instruction to maintain character consistency
-      contents.push(
-        `Using the character from the reference image above, create a new illustration: ${prompt}. ` +
-        `CRITICAL: The main character must look EXACTLY the same as in the reference image - ` +
-        `same face, same hair, same clothing, same accessories. Only change the scene and action.`
-      )
+      // Build reference-based prompt
+      const prompt = buildReferenceImagePrompt(promptParams)
+      contents.push(prompt)
+      console.log(`[NANO-BANANA] Reference prompt (first 500 chars): ${prompt.substring(0, 500)}...`)
     } else {
-      // First image - just use the prompt with character consistency instructions
-      contents.push(
-        `${prompt}. Style: colorful, vibrant, child-friendly, high quality illustration. ` +
-        `Create a memorable, distinctive character design that can be consistently reproduced.`
-      )
+      // First image - build comprehensive prompt
+      const prompt = buildImagePrompt(promptParams)
+      contents.push(prompt)
+      console.log(`[NANO-BANANA] First image prompt (first 500 chars): ${prompt.substring(0, 500)}...`)
     }
 
-    // Generate image using Gemini 3 Pro Image (Nano Banana Pro)
+    // Generate image using Gemini
     const response = await client.models.generateContent({
       model: "gemini-2.0-flash-exp-image-generation",
       contents: contents,
@@ -124,8 +149,34 @@ export async function generateImageWithNanoBanana(
 
     // Return placeholder on error
     return {
-      imageUrl: `/api/placeholder?height=400&width=600&text=${encodeURIComponent(prompt.substring(0, 30))}`,
+      imageUrl: `/api/placeholder?height=400&width=600&text=${encodeURIComponent(sceneDescription.substring(0, 30))}`,
       base64Data: ""
     }
   }
+}
+
+/**
+ * Legacy function signature for backward compatibility
+ * @deprecated Use generateImageWithNanoBanana with ImageGenerationParams instead
+ */
+export async function generateImageWithNanoBananaLegacy(
+  prompt: string,
+  storyId: string,
+  pageIndex: number,
+  referenceImage?: string,
+): Promise<{ imageUrl: string; base64Data: string }> {
+  // Extract character info from prompt if possible (legacy support)
+  // This is a fallback - new code should use the proper params interface
+  return generateImageWithNanoBanana({
+    sceneDescription: prompt,
+    character: {
+      name: "Child",
+      gender: "boy",
+      age: 6
+    },
+    style: "watercolor",
+    storyId,
+    pageIndex,
+    referenceImage
+  })
 }

@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import type React from "react"
 import "./globals.css"
-import { Inter } from "next/font/google"
+import { Inter, Lobster } from "next/font/google"
 import { ThemeProvider } from "@/components/theme-provider"
 import { LanguageProvider } from "@/lib/language-context"
 import { Footer } from "@/components/footer"
@@ -12,6 +12,11 @@ import { Toaster } from "@/components/ui/toaster"
 
 
 const inter = Inter({ subsets: ["latin"] })
+const lobster = Lobster({
+  weight: "400",
+  subsets: ["latin", "cyrillic"],
+  variable: "--font-lobster"
+})
 
 // Base URL for OpenGraph image
 const baseUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://fablito.app"
@@ -66,6 +71,7 @@ export default function RootLayout({
         className={cn(
           "min-h-screen font-sans antialiased",
           "dark:bg-gradient-to-b dark:from-black dark:to-black/95",
+          lobster.variable
         )}
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>

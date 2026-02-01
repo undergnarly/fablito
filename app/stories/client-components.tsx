@@ -6,6 +6,7 @@ import { useEffect } from "react"
 import { SearchStories } from "@/components/search-stories"
 import { Button } from "@/components/ui/button"
 import { Filter } from "lucide-react"
+import { useLanguage } from "@/lib/language-context"
 
 type KeyboardHandlerProps = {}
 
@@ -67,6 +68,8 @@ export function SearchSection({
   searchTerm?: string
   storiesCount: number
 }) {
+  const { t } = useLanguage()
+
   return (
     <div className={`bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 mb-8 shadow-md ${className}`}>
       <div className="flex flex-col md:flex-row md:items-center gap-4">
@@ -75,15 +78,15 @@ export function SearchSection({
           {searchTerm && (
             <p className="mt-2 text-sm text-muted-foreground">
               {storiesCount === 0
-                ? `No stories found for "${searchTerm}"`
-                : `Found ${storiesCount} ${storiesCount === 1 ? "story" : "stories"} for "${searchTerm}"`}
+                ? `${t.noStoriesFoundFor} "${searchTerm}"`
+                : `${t.foundStories} ${storiesCount} ${storiesCount === 1 ? t.story : t.storiesPlural} ${t.forSearch} "${searchTerm}"`}
             </p>
           )}
         </div>
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" className="flex items-center gap-2">
             <Filter className="h-4 w-4" />
-            Filter
+            {t.filter}
           </Button>
         </div>
       </div>

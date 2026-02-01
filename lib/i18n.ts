@@ -215,6 +215,82 @@ export interface Translations {
   loading: string
   optional: string
   years: string
+
+  // Coins and subscription
+  coins: string
+  coinsLabel: string
+  buyCoins: string
+  buyButton: string
+  generationCost: string
+  pagesMultiplier: string
+  needMoreCoins: string
+  insufficientCoins: string
+  notEnoughCoins: string
+  youHave: string
+  needed: string
+
+  // Subscription page
+  subscriptionTitle: string
+  subscriptionSubtitle: string
+  monthlyPlan: string
+  monthlyPlanDesc: string
+  coinsPerMonth: string
+  pagesPerMonth: string
+  booksPerMonth: string
+  subscribe: string
+  subscribing: string
+  currentBalance: string
+  freeCoinsInfo: string
+  welcomeBonus: string
+  registrationBonus: string
+  perPage: string
+
+  // Submissions halted
+  submissionsHalted: string
+  submissionsHaltedDesc: string
+  whileYouWait: string
+  browseExistingStories: string
+
+  // Voice recording
+  microphoneError: string
+  microphonePermission: string
+  recording: string
+  recognizingSpeech: string
+  recognizedText: string
+  useAsStoryText: string
+
+  // Image upload
+  uploadImageFile: string
+  imageSizeLimit: string
+
+  // Export
+  export: string
+  webpageHtml: string
+  openInBrowser: string
+  pdfForPrint: string
+  readyToPrint: string
+  ebookEpub: string
+  ereaderFormat: string
+  exportError: string
+
+  // Search
+  noStoriesFoundFor: string
+  foundStories: string
+  story: string
+  storiesPlural: string
+  forSearch: string
+
+  // Skip to content
+  skipToContent: string
+
+  // Read button
+  read: string
+  viewAllStories: string
+
+  // Languages
+  russian: string
+  english: string
+  kazakh: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -432,9 +508,85 @@ export const translations: Record<Language, Translations> = {
     back: 'Back',
     loading: 'Loading...',
     optional: 'optional',
-    years: 'years'
+    years: 'years',
+
+    // Coins and subscription
+    coins: 'coins',
+    coinsLabel: 'coins',
+    buyCoins: 'Buy Coins',
+    buyButton: 'Buy',
+    generationCost: 'Cost',
+    pagesMultiplier: 'pages × 10 coins',
+    needMoreCoins: 'Need more',
+    insufficientCoins: 'Insufficient coins',
+    notEnoughCoins: 'Not enough coins. You need',
+    youHave: 'you have',
+    needed: 'needed',
+
+    // Subscription page
+    subscriptionTitle: 'Get More Coins',
+    subscriptionSubtitle: 'Create unlimited magical stories for your children',
+    monthlyPlan: 'Monthly Plan',
+    monthlyPlanDesc: 'Create up to 30 illustrated stories per month',
+    coinsPerMonth: 'coins per month',
+    pagesPerMonth: 'pages per month',
+    booksPerMonth: 'books per month',
+    subscribe: 'Subscribe for $9.99/month',
+    subscribing: 'Processing...',
+    currentBalance: 'Current Balance',
+    freeCoinsInfo: 'Get free coins to start',
+    welcomeBonus: 'Welcome bonus',
+    registrationBonus: 'Registration bonus',
+    perPage: 'per page',
+
+    // Submissions halted
+    submissionsHalted: 'Submissions Temporarily Halted',
+    submissionsHaltedDesc: 'Due to high demand, we\'ve temporarily paused new story submissions. Please check back later!',
+    whileYouWait: 'While you wait...',
+    browseExistingStories: 'You can still browse and enjoy existing stories in our library!',
+
+    // Voice recording
+    microphoneError: 'Microphone access error',
+    microphonePermission: 'Could not access microphone. Please check permissions.',
+    recording: 'Recording...',
+    recognizingSpeech: 'Recognizing speech...',
+    recognizedText: 'Recognized text',
+    useAsStoryText: 'Use as story text',
+
+    // Image upload
+    uploadImageFile: 'Please upload an image file',
+    imageSizeLimit: 'Image size should be less than 5MB',
+
+    // Export
+    export: 'Export',
+    webpageHtml: 'Webpage (HTML)',
+    openInBrowser: 'Open in browser',
+    pdfForPrint: 'PDF for print',
+    readyToPrint: 'Ready to print',
+    ebookEpub: 'E-book (EPUB)',
+    ereaderFormat: 'E-reader format',
+    exportError: 'Export error',
+
+    // Search
+    noStoriesFoundFor: 'No stories found for',
+    foundStories: 'Found',
+    story: 'story',
+    storiesPlural: 'stories',
+    forSearch: 'for',
+
+    // Skip to content
+    skipToContent: 'Skip to main content',
+
+    // Read button
+    read: 'Read',
+    viewAllStories: 'View All Stories',
+
+    // Languages
+    russian: 'Russian',
+    english: 'English',
+    kazakh: 'Kazakh'
   },
-  
+
   ru: {
     // Header
     home: 'Главная',
@@ -649,9 +801,85 @@ export const translations: Record<Language, Translations> = {
     back: 'Назад',
     loading: 'Загрузка...',
     optional: 'необязательно',
-    years: 'лет'
+    years: 'лет',
+
+    // Coins and subscription
+    coins: 'монеток',
+    coinsLabel: 'монеток',
+    buyCoins: 'Купить монетки',
+    buyButton: 'Купить',
+    generationCost: 'Стоимость',
+    pagesMultiplier: 'страниц × 10 монеток',
+    needMoreCoins: 'Нужно ещё',
+    insufficientCoins: 'Недостаточно монеток',
+    notEnoughCoins: 'Недостаточно монеток. Нужно',
+    youHave: 'у вас',
+    needed: 'нужно',
+
+    // Subscription page
+    subscriptionTitle: 'Получить больше монеток',
+    subscriptionSubtitle: 'Создавайте неограниченное количество волшебных историй для ваших детей',
+    monthlyPlan: 'Месячный план',
+    monthlyPlanDesc: 'Создавайте до 30 иллюстрированных историй в месяц',
+    coinsPerMonth: 'монеток в месяц',
+    pagesPerMonth: 'страниц в месяц',
+    booksPerMonth: 'книг в месяц',
+    subscribe: 'Подписаться за $9.99/месяц',
+    subscribing: 'Обработка...',
+    currentBalance: 'Текущий баланс',
+    freeCoinsInfo: 'Получите бесплатные монетки для начала',
+    welcomeBonus: 'Приветственный бонус',
+    registrationBonus: 'Бонус за регистрацию',
+    perPage: 'за страницу',
+
+    // Submissions halted
+    submissionsHalted: 'Создание историй временно приостановлено',
+    submissionsHaltedDesc: 'Из-за высокой нагрузки мы временно приостановили создание новых историй. Пожалуйста, попробуйте позже!',
+    whileYouWait: 'Пока вы ждёте...',
+    browseExistingStories: 'Вы можете просматривать существующие истории в нашей библиотеке!',
+
+    // Voice recording
+    microphoneError: 'Ошибка доступа к микрофону',
+    microphonePermission: 'Не удалось получить доступ к микрофону. Проверьте разрешения.',
+    recording: 'Запись...',
+    recognizingSpeech: 'Распознавание речи...',
+    recognizedText: 'Распознанный текст',
+    useAsStoryText: 'Использовать как текст истории',
+
+    // Image upload
+    uploadImageFile: 'Пожалуйста, загрузите изображение',
+    imageSizeLimit: 'Размер изображения должен быть меньше 5МБ',
+
+    // Export
+    export: 'Экспорт',
+    webpageHtml: 'Веб-страница (HTML)',
+    openInBrowser: 'Открыть в браузере',
+    pdfForPrint: 'PDF для печати',
+    readyToPrint: 'Готово к печати',
+    ebookEpub: 'Электронная книга (EPUB)',
+    ereaderFormat: 'Формат для e-reader',
+    exportError: 'Ошибка при экспорте',
+
+    // Search
+    noStoriesFoundFor: 'Истории не найдены для',
+    foundStories: 'Найдено',
+    story: 'история',
+    storiesPlural: 'историй',
+    forSearch: 'для',
+
+    // Skip to content
+    skipToContent: 'Перейти к содержимому',
+
+    // Read button
+    read: 'Читать',
+    viewAllStories: 'Смотреть все истории',
+
+    // Languages
+    russian: 'Русский',
+    english: 'English',
+    kazakh: 'Қазақша'
   },
-  
+
   kz: {
     // Header
     home: 'Басты бет',
@@ -866,7 +1094,83 @@ export const translations: Record<Language, Translations> = {
     back: 'Артқа',
     loading: 'Жүктелуде...',
     optional: 'міндетті емес',
-    years: 'жас'
+    years: 'жас',
+
+    // Coins and subscription
+    coins: 'монета',
+    coinsLabel: 'монета',
+    buyCoins: 'Монета сатып алу',
+    buyButton: 'Сатып алу',
+    generationCost: 'Құны',
+    pagesMultiplier: 'бет × 10 монета',
+    needMoreCoins: 'Тағы қажет',
+    insufficientCoins: 'Монета жеткіліксіз',
+    notEnoughCoins: 'Монета жеткіліксіз. Қажет',
+    youHave: 'сізде',
+    needed: 'қажет',
+
+    // Subscription page
+    subscriptionTitle: 'Көбірек монета алу',
+    subscriptionSubtitle: 'Балаларыңызға шексіз сиқырлы әңгімелер жасаңыз',
+    monthlyPlan: 'Айлық жоспар',
+    monthlyPlanDesc: 'Айына 30-ға дейін суретті әңгіме жасаңыз',
+    coinsPerMonth: 'айына монета',
+    pagesPerMonth: 'айына бет',
+    booksPerMonth: 'айына кітап',
+    subscribe: '$9.99/айына жазылу',
+    subscribing: 'Өңделуде...',
+    currentBalance: 'Ағымдағы баланс',
+    freeCoinsInfo: 'Бастау үшін тегін монеталар алыңыз',
+    welcomeBonus: 'Қош келдіңіз бонусы',
+    registrationBonus: 'Тіркелу бонусы',
+    perPage: 'бір бет үшін',
+
+    // Submissions halted
+    submissionsHalted: 'Әңгімелер жасау уақытша тоқтатылды',
+    submissionsHaltedDesc: 'Жоғары жүктеме салдарынан жаңа әңгімелер жасауды уақытша тоқтаттық. Кейінірек қайталап көріңіз!',
+    whileYouWait: 'Сіз күткен кезде...',
+    browseExistingStories: 'Біздің кітапханадағы бар әңгімелерді қарауға болады!',
+
+    // Voice recording
+    microphoneError: 'Микрофонға қол жеткізу қатесі',
+    microphonePermission: 'Микрофонға қол жеткізу мүмкін болмады. Рұқсаттарды тексеріңіз.',
+    recording: 'Жазылуда...',
+    recognizingSpeech: 'Сөйлеуді тану...',
+    recognizedText: 'Танылған мәтін',
+    useAsStoryText: 'Әңгіме мәтіні ретінде пайдалану',
+
+    // Image upload
+    uploadImageFile: 'Сурет жүктеңіз',
+    imageSizeLimit: 'Сурет өлшемі 5МБ-тан аз болуы керек',
+
+    // Export
+    export: 'Экспорт',
+    webpageHtml: 'Веб-бет (HTML)',
+    openInBrowser: 'Браузерде ашу',
+    pdfForPrint: 'Басып шығару үшін PDF',
+    readyToPrint: 'Басып шығаруға дайын',
+    ebookEpub: 'Электрондық кітап (EPUB)',
+    ereaderFormat: 'E-reader пішімі',
+    exportError: 'Экспорт қатесі',
+
+    // Search
+    noStoriesFoundFor: 'Әңгімелер табылмады',
+    foundStories: 'Табылды',
+    story: 'әңгіме',
+    storiesPlural: 'әңгіме',
+    forSearch: 'үшін',
+
+    // Skip to content
+    skipToContent: 'Мазмұнға өту',
+
+    // Read button
+    read: 'Оқу',
+    viewAllStories: 'Барлық әңгімелерді көру',
+
+    // Languages
+    russian: 'Орысша',
+    english: 'Ағылшынша',
+    kazakh: 'Қазақша'
   }
 }
 

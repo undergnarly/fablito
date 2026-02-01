@@ -12,6 +12,8 @@ import { createStoryAction } from "./actions"
 import { useFormStatus, useActionState } from "react-dom"
 import { useState, useEffect, useRef, useTransition } from "react"
 import { useLanguage } from "@/lib/language-context"
+import { useAuth } from "@/hooks/use-auth"
+import { GenerationCost } from "@/components/coin-balance"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -71,7 +73,8 @@ const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 export default function CreateStoryForm({ submissionsHalted = false }: CreateStoryFormProps) {
   const { t, language } = useLanguage()
-  
+  const { user, canAfford } = useAuth()
+
   console.log("CreateStoryForm mounted/rendered. submissionsHalted:", submissionsHalted)
   
   // New form state
@@ -196,8 +199,8 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       }, 1000)
 
     } catch (error) {
-      console.error('Ошибка доступа к микрофону:', error)
-      setSubmitError('Не удалось получить доступ к микрофону. Проверьте разрешения.')
+      console.error(t.microphoneError, error)
+      setSubmitError(t.microphonePermission)
     }
   }
 
@@ -267,12 +270,12 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
     if (file) {
       // Validate file type
       if (!file.type.startsWith('image/')) {
-        alert('Please upload an image file')
+        alert(t.uploadImageFile)
         return
       }
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        alert('Image size should be less than 5MB')
+        alert(t.imageSizeLimit)
         return
       }
       setCharacterPhoto(file)
@@ -386,17 +389,17 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       <div className="space-y-6">
         <Alert variant="destructive" className="border-2 border-destructive">
           <AlertTriangle className="h-5 w-5" />
-          <AlertTitle>Submissions Temporarily Halted</AlertTitle>
+          <AlertTitle>{t.submissionsHalted}</AlertTitle>
           <AlertDescription>
-            Due to high demand, we've temporarily paused new story submissions. Please check back later!
+            {t.submissionsHaltedDesc}
           </AlertDescription>
         </Alert>
 
         <div className="p-6 border-2 border-muted rounded-xl bg-muted/30">
-          <h3 className="text-lg font-medium mb-4">While you wait...</h3>
-          <p className="mb-4">You can still browse and enjoy existing stories in our library!</p>
+          <h3 className="text-lg font-medium mb-4">{t.whileYouWait}</h3>
+          <p className="mb-4">{t.browseExistingStories}</p>
           <Button asChild className="w-full">
-            <a href="/stories">Browse Stories</a>
+            <a href="/stories">{t.browseStories}</a>
           </Button>
         </div>
       </div>
@@ -606,9 +609,9 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
             <SelectValue placeholder={t.selectLanguagePlaceholder} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ru">Русский</SelectItem>
-            <SelectItem value="en">English</SelectItem>
-            <SelectItem value="kz">Қазақша</SelectItem>
+            <SelectItem value="ru">{t.russian}</SelectItem>
+            <SelectItem value="en">{t.english}</SelectItem>
+            <SelectItem value="kz">{t.kazakh}</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -734,7 +737,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
                   </div>
                   <audio controls className="w-full max-w-sm mx-auto">
                     <source src={URL.createObjectURL(voiceStory)} type="audio/wav" />
-                    Ваш браузер не поддерживает воспроизведение аудио.
+                    {t.audioNotSupported}
                   </audio>
                   
                   {/* Display recognized text */}
@@ -742,7 +745,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
                     <div className="mt-4 p-3 bg-muted rounded-md w-full">
                       <div className="flex items-center gap-2 mb-2">
                         <Volume2 className="h-4 w-4" />
-                        <span className="text-sm font-medium">Распознанный текст:</span>
+                        <span className="text-sm font-medium">{t.recognizedText}:</span>
                       </div>
                       <p className="text-sm">{recognizedText}</p>
                       <div className="flex gap-2 mt-2">
@@ -755,7 +758,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
                             setStoryInputMode('text')
                           }}
                         >
-                          Использовать как текст истории
+                          {t.useAsStoryText}
                         </Button>
                         <Button
                           type="button"
@@ -774,12 +777,12 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
                   {isRecording && (
                     <div className="text-center space-y-2">
                       <div className="text-lg font-medium text-red-600 animate-pulse">
-                        🔴 Запись... {formatTime(recordingTime)}
+                        🔴 {t.recording} {formatTime(recordingTime)}
                       </div>
                       {isRecognizing && (
                         <div className="text-sm text-blue-600 flex items-center justify-center gap-2">
                           <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
-                          Распознавание речи...
+                          {t.recognizingSpeech}
                         </div>
                       )}
                     </div>
@@ -825,7 +828,10 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
         <Switch id="visibility" name="visibility" value="unlisted" aria-label="Make story private" />
       </div>
 
-      <SubmitButton disabled={submissionsHalted} createText={t.createStory} creatingText={t.creatingStory} />
+      {/* Generation cost display */}
+      <GenerationCost pageCount={pageCount} userCoins={user?.coins} />
+
+      <SubmitButton disabled={submissionsHalted || !canAfford(pageCount)} createText={t.createStory} creatingText={t.creatingStory} />
     </form>
   )
 }
