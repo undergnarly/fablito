@@ -13,6 +13,13 @@ async function checkAdminAuth() {
 export async function GET(request: NextRequest) {
   console.log("[ADMIN API] GET /api/admin/users - Fetch users request")
 
+  // Check KV availability
+  const isKvAvailable = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN &&
+    process.env.KV_REST_API_URL !== "your_kv_rest_api_url_here" &&
+    process.env.KV_REST_API_TOKEN !== "your_kv_rest_api_token_here"
+
+  console.log("[ADMIN API] KV available:", isKvAvailable)
+
   if (!(await checkAdminAuth())) {
     console.log("[ADMIN API] Unauthorized - no admin session")
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -21,10 +28,16 @@ export async function GET(request: NextRequest) {
   try {
     const users = await getAllUsers()
     console.log(`[ADMIN API] Returning ${users.length} users`)
-    return NextResponse.json({ users })
+    return NextResponse.json({
+      users,
+      _debug: {
+        kvAvailable: isKvAvailable,
+        userCount: users.length
+      }
+    })
   } catch (error) {
     console.error("[ADMIN API] Error fetching users:", error)
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 })
+    return NextResponse.json({ error: "Failed to fetch users", _debug: { kvAvailable: isKvAvailable } }, { status: 500 })
   }
 }
 
