@@ -616,6 +616,89 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<Us
 }
 
 /**
+ * Get all users (for admin panel)
+ */
+export async function getAllUsers(): Promise<User[]> {
+  if (!isKvAvailable) {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      const usersCacheDir = path.join(process.cwd(), '.users-cache')
+
+      if (!fs.existsSync(usersCacheDir)) {
+        return []
+      }
+
+      const files = fs.readdirSync(usersCacheDir).filter((f: string) => f.endsWith('.json'))
+      const users: User[] = []
+
+      for (const file of files) {
+        try {
+          const userData = JSON.parse(fs.readFileSync(path.join(usersCacheDir, file), 'utf8'))
+          users.push(userData)
+        } catch (e) {
+          // Skip invalid files
+        }
+      }
+
+      return users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    } catch (error) {
+      console.error(`[DB] Error getting all users from file cache:`, error)
+      return []
+    }
+  }
+
+  try {
+    const keys = await kv.keys('user:*')
+    const users: User[] = []
+
+    for (const key of keys) {
+      const user = await kv.get(key) as User
+      if (user) {
+        users.push(user)
+      }
+    }
+
+    return users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  } catch (error) {
+    console.error(`[DB] Error getting all users:`, error)
+    return []
+  }
+}
+
+/**
+ * Delete user by ID
+ */
+export async function deleteUser(id: string): Promise<boolean> {
+  if (!isKvAvailable) {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      const usersCacheDir = path.join(process.cwd(), '.users-cache')
+      const filePath = path.join(usersCacheDir, `${id}.json`)
+
+      if (fs.existsSync(filePath)) {
+        fs.unlinkSync(filePath)
+        return true
+      }
+      return false
+    } catch (error) {
+      console.error(`[DB] Error deleting user from file cache:`, error)
+      return false
+    }
+  }
+
+  try {
+    const userKey = `user:${id}`
+    await kv.del(userKey)
+    return true
+  } catch (error) {
+    console.error(`[DB] Error deleting user:`, error)
+    return false
+  }
+}
+
+/**
  * Create anonymous user with welcome coins
  */
 export async function createAnonymousUser(): Promise<User> {

@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     const passwordValidation = validatePassword(password)
     if (!passwordValidation.isValid) {
       return NextResponse.json(
-        { error: passwordValidation.message },
+        { error: passwordValidation.errors.join('. ') },
         { status: 400 }
       )
     }

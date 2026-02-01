@@ -22,6 +22,7 @@ import Image from "next/image"
 import { LanguageFlag } from "@/components/language-flag"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SettingsPanel from "./settings-panel"
+import UsersPanel from "./users-panel"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface Story {
@@ -269,6 +270,7 @@ export default function AdminDashboard() {
       <Tabs defaultValue="stories" className="w-full">
         <TabsList className="mb-4">
           <TabsTrigger value="stories">Stories</TabsTrigger>
+          <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="settings">Settings</TabsTrigger>
         </TabsList>
 
@@ -415,6 +417,10 @@ export default function AdminDashboard() {
               ))}
             </div>
           )}
+        </TabsContent>
+
+        <TabsContent value="users">
+          <UsersPanel />
         </TabsContent>
 
         <TabsContent value="settings">
