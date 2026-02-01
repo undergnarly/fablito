@@ -1,16 +1,21 @@
 "use client"
 
-import { useState } from "react"
+import { useState, Suspense } from "react"
+import { useSearchParams } from "next/navigation"
 import { RegisterForm } from "@/components/auth/register-form"
 import { LoginForm } from "@/components/auth/login-form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useLanguage } from "@/lib/language-context"
 import Link from "next/link"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Gift } from "lucide-react"
 
-export default function AuthPage() {
+function AuthContent() {
   const { t } = useLanguage()
-  const [activeTab, setActiveTab] = useState("login")
+  const searchParams = useSearchParams()
+  const referralCode = searchParams.get("ref")
+
+  // If there's a referral code, default to register tab
+  const [activeTab, setActiveTab] = useState(referralCode ? "register" : "login")
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -21,6 +26,19 @@ export default function AuthPage() {
             Fablito
           </h1>
         </div>
+
+        {/* Referral banner */}
+        {referralCode && (
+          <div className="mb-4 p-4 bg-gradient-to-r from-green-500/20 to-emerald-500/20 rounded-xl border border-green-500/30">
+            <div className="flex items-center gap-3">
+              <Gift className="h-6 w-6 text-green-400" />
+              <div>
+                <p className="text-white font-medium">{t.referralWelcome || "You've been invited!"}</p>
+                <p className="text-sm text-white/70">{t.referralBonusInfo || "Register now and get bonus coins!"}</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="magic-card rounded-2xl p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -44,7 +62,7 @@ export default function AuthPage() {
             </TabsContent>
 
             <TabsContent value="register" className="mt-6">
-              <RegisterForm />
+              <RegisterForm referralCode={referralCode || undefined} />
             </TabsContent>
           </Tabs>
         </div>
@@ -60,5 +78,17 @@ export default function AuthPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function AuthPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-white">Loading...</div>
+      </div>
+    }>
+      <AuthContent />
+    </Suspense>
   )
 }

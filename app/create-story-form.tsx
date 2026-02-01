@@ -14,6 +14,7 @@ import { useState, useEffect, useRef, useTransition } from "react"
 import { useLanguage } from "@/lib/language-context"
 import { useAuth } from "@/hooks/use-auth"
 import { GenerationCost } from "@/components/coin-balance"
+import { UpsellModal } from "@/components/upsell-modal"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
@@ -73,14 +74,19 @@ const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 export default function CreateStoryForm({ submissionsHalted = false }: CreateStoryFormProps) {
   const { t, language } = useLanguage()
-  const { user, canAfford } = useAuth()
+  const { user, canAfford, isAnonymous } = useAuth()
 
-  
+  // For anonymous users, fix page count at 5 (50 coins = exactly 1 story)
+  const ANONYMOUS_PAGE_COUNT = 5
+
+  // Upsell modal state
+  const [showUpsellModal, setShowUpsellModal] = useState(false)
+
   // New form state
   const [childName, setChildName] = useState("")
   const [childGender, setChildGender] = useState<"boy" | "girl">("boy")
   const [childAge, setChildAge] = useState(5)
-  const [pageCount, setPageCount] = useState(10)
+  const [pageCount, setPageCount] = useState(isAnonymous ? ANONYMOUS_PAGE_COUNT : 10)
   const [theme, setTheme] = useState("")
   const [storyLanguage, setStoryLanguage] = useState("en")
   const [illustrationStyle, setIllustrationStyle] = useState("watercolor")
@@ -102,6 +108,13 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
   useEffect(() => {
     setStoryLanguage(language)
   }, [language])
+
+  // Set page count for anonymous users
+  useEffect(() => {
+    if (isAnonymous) {
+      setPageCount(ANONYMOUS_PAGE_COUNT)
+    }
+  }, [isAnonymous])
 
   // Initialize speech recognition
   useEffect(() => {
@@ -332,11 +345,21 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
 
   const [isPending, startTransition] = useTransition()
 
+  // Get actual page count (fixed for anonymous users)
+  const actualPageCount = isAnonymous ? ANONYMOUS_PAGE_COUNT : pageCount
+  const generationCost = actualPageCount * 10
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     // Don't submit if submissions are halted
     if (submissionsHalted) {
+      return
+    }
+
+    // Check if user can afford the generation
+    if (!canAfford(actualPageCount)) {
+      setShowUpsellModal(true)
       return
     }
 
@@ -473,24 +496,26 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
         </div>
       </div>
 
-      {/* Page Count */}
-      <div className="space-y-4">
-        <Label className="text-lg font-semibold">
-          {t.pageCount || "Number of pages"}: {pageCount}
-        </Label>
-        <Slider
-          value={[pageCount]}
-          onValueChange={(value) => setPageCount(value[0])}
-          max={10}
-          min={1}
-          step={1}
-          className="w-full"
-        />
-        <div className="flex justify-between text-sm text-white/70">
-          <span>1</span>
-          <span>10</span>
+      {/* Page Count - Only shown for registered users */}
+      {!isAnonymous && (
+        <div className="space-y-4">
+          <Label className="text-lg font-semibold">
+            {t.pageCount || "Number of pages"}: {pageCount}
+          </Label>
+          <Slider
+            value={[pageCount]}
+            onValueChange={(value) => setPageCount(value[0])}
+            max={10}
+            min={1}
+            step={1}
+            className="w-full"
+          />
+          <div className="flex justify-between text-sm text-white/70">
+            <span>1</span>
+            <span>10</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Character Photo Upload */}
       <div className="space-y-4">
@@ -503,6 +528,10 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
         </Label>
         <p className="text-sm text-white/70">
           {t.characterPhotoDesc || "Upload a photo to create a character that looks like your child"}
+        </p>
+        <p className="text-xs text-white/50 flex items-center gap-1">
+          <span>🔒</span>
+          {t.photoPrivacyNotice || "All photos are stored privately and securely. No one has access to them."}
         </p>
 
         {!characterPhotoPreview ? (
@@ -790,7 +819,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       {/* Hidden fields for form data */}
       <input type="hidden" name="childAge" value={childAge} />
       <input type="hidden" name="childGender" value={childGender} />
-      <input type="hidden" name="pageCount" value={pageCount} />
+      <input type="hidden" name="pageCount" value={actualPageCount} />
       <input type="hidden" name="theme" value={theme} />
       <input type="hidden" name="language" value={storyLanguage} />
       <input type="hidden" name="illustrationStyle" value={illustrationStyle} />
@@ -809,9 +838,17 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       </div>
 
       {/* Generation cost display */}
-      <GenerationCost pageCount={pageCount} userCoins={user?.coins} />
+      <GenerationCost pageCount={actualPageCount} userCoins={user?.coins} />
 
-      <SubmitButton disabled={submissionsHalted || !canAfford(pageCount)} createText={t.createStory} creatingText={t.creatingStory} />
+      <SubmitButton disabled={submissionsHalted} createText={t.createStory} creatingText={t.creatingStory} />
+
+      {/* Upsell modal for insufficient coins */}
+      <UpsellModal
+        open={showUpsellModal}
+        onOpenChange={setShowUpsellModal}
+        requiredCoins={generationCost}
+        userCoins={user?.coins || 0}
+      />
     </form>
   )
 }

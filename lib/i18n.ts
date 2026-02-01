@@ -291,6 +291,25 @@ export interface Translations {
   russian: string
   english: string
   kazakh: string
+
+  // Upsell modal
+  notEnoughCoinsTitle: string
+  notEnoughCoinsDesc: string
+  registerForBonus: string
+  getRegistrationBonus: string
+  getSubscription: string
+  unlimitedStories: string
+  inviteFriends: string
+  referralDescription: string
+  copyLink: string
+  linkCopied: string
+
+  // Referral
+  referralWelcome: string
+  referralBonusInfo: string
+
+  // Privacy
+  photoPrivacyNotice: string
 }
 
 export const translations: Record<Language, Translations> = {
@@ -584,7 +603,26 @@ export const translations: Record<Language, Translations> = {
     // Languages
     russian: 'Russian',
     english: 'English',
-    kazakh: 'Kazakh'
+    kazakh: 'Kazakh',
+
+    // Upsell modal
+    notEnoughCoinsTitle: 'Not Enough Coins',
+    notEnoughCoinsDesc: 'You need more coins to create this story. Here\'s how to get them:',
+    registerForBonus: 'Register for free',
+    getRegistrationBonus: 'Get +50 bonus coins',
+    getSubscription: 'Get a subscription',
+    unlimitedStories: 'Create unlimited stories',
+    inviteFriends: 'Invite friends',
+    referralDescription: 'Get 100 coins for each friend who registers with your link!',
+    copyLink: 'Copy link',
+    linkCopied: 'Link copied!',
+
+    // Referral
+    referralWelcome: 'You\'ve been invited!',
+    referralBonusInfo: 'Register now and get bonus coins!',
+
+    // Privacy
+    photoPrivacyNotice: 'All photos are stored privately and securely. No one has access to them.'
   },
 
   ru: {
@@ -877,7 +915,26 @@ export const translations: Record<Language, Translations> = {
     // Languages
     russian: 'Русский',
     english: 'English',
-    kazakh: 'Қазақша'
+    kazakh: 'Қазақша',
+
+    // Upsell modal
+    notEnoughCoinsTitle: 'Недостаточно монеток',
+    notEnoughCoinsDesc: 'Вам нужно больше монеток для создания истории. Вот как их получить:',
+    registerForBonus: 'Зарегистрируйтесь бесплатно',
+    getRegistrationBonus: 'Получите +50 бонусных монеток',
+    getSubscription: 'Оформить подписку',
+    unlimitedStories: 'Создавайте неограниченное количество историй',
+    inviteFriends: 'Пригласите друзей',
+    referralDescription: 'Получите 100 монеток за каждого друга, который зарегистрируется по вашей ссылке!',
+    copyLink: 'Копировать ссылку',
+    linkCopied: 'Ссылка скопирована!',
+
+    // Referral
+    referralWelcome: 'Вас пригласили!',
+    referralBonusInfo: 'Зарегистрируйтесь и получите бонусные монетки!',
+
+    // Privacy
+    photoPrivacyNotice: 'Все фото хранятся приватно и безопасно. Никто не имеет к ним доступа.'
   },
 
   kz: {
@@ -1170,7 +1227,26 @@ export const translations: Record<Language, Translations> = {
     // Languages
     russian: 'Орысша',
     english: 'Ағылшынша',
-    kazakh: 'Қазақша'
+    kazakh: 'Қазақша',
+
+    // Upsell modal
+    notEnoughCoinsTitle: 'Монета жеткіліксіз',
+    notEnoughCoinsDesc: 'Әңгіме жасау үшін көбірек монета қажет. Міне, оларды қалай алуға болады:',
+    registerForBonus: 'Тегін тіркеліңіз',
+    getRegistrationBonus: '+50 бонус монета алыңыз',
+    getSubscription: 'Жазылу рәсімдеу',
+    unlimitedStories: 'Шексіз әңгімелер жасаңыз',
+    inviteFriends: 'Достарыңызды шақырыңыз',
+    referralDescription: 'Сіздің сілтемеңіз арқылы тіркелген әр дос үшін 100 монета алыңыз!',
+    copyLink: 'Сілтемені көшіру',
+    linkCopied: 'Сілтеме көшірілді!',
+
+    // Referral
+    referralWelcome: 'Сізді шақырды!',
+    referralBonusInfo: 'Тіркеліңіз және бонус монеталар алыңыз!',
+
+    // Privacy
+    photoPrivacyNotice: 'Барлық фотосуреттер құпия және қауіпсіз сақталады. Оларға ешкімнің қол жеткізуі жоқ.'
   }
 }
 

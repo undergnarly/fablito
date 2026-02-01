@@ -8,8 +8,8 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json()
-    const { email, password, name } = body
-    console.log("[AUTH] Registration data:", { email, name, hasPassword: !!password })
+    const { email, password, name, referralCode } = body
+    console.log("[AUTH] Registration data:", { email, name, hasPassword: !!password, hasReferral: !!referralCode })
 
     // Validate input
     if (!email || !password || !name) {
@@ -66,7 +66,8 @@ export async function POST(request: NextRequest) {
 
       if (existingAnonymousUser?.isAnonymous) {
         // Convert anonymous user - this adds +50 bonus coins
-        user = await convertAnonymousToUser(existingUserId, email, name, passwordHash)
+        // Also pass referral code if provided
+        user = await convertAnonymousToUser(existingUserId, email, name, passwordHash, referralCode)
 
         if (!user) {
           return NextResponse.json(
@@ -79,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     // If no anonymous user to convert, create new user
     if (!user) {
-      const REGISTRATION_COINS = 500 // Welcome bonus
+      const REGISTRATION_COINS = 100 // Welcome bonus for new users (not anonymous)
 
       user = await createUser({
         email,
@@ -88,7 +89,7 @@ export async function POST(request: NextRequest) {
         isActive: true,
         coins: REGISTRATION_COINS,
         isAnonymous: false,
-      })
+      }, referralCode)
     }
 
     // Set session cookie
@@ -100,6 +101,8 @@ export async function POST(request: NextRequest) {
         email: user.email,
         coins: user.coins,
         isAnonymous: user.isAnonymous,
+        referralCode: user.referralCode,
+        referredBy: user.referredBy,
       }
     })
 

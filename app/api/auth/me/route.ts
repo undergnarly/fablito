@@ -71,6 +71,8 @@ export async function GET(request: NextRequest) {
         coins: user.coins,
         isAnonymous: user.isAnonymous,
         createdAt: user.createdAt,
+        referralCode: user.referralCode,
+        referredBy: user.referredBy,
       }
     })
   } catch (error) {

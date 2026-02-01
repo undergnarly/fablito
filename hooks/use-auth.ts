@@ -10,6 +10,8 @@ export interface User {
   coins: number
   isAnonymous: boolean
   createdAt: string
+  referralCode?: string
+  referredBy?: string
 }
 
 export function useAuth() {
@@ -61,14 +63,14 @@ export function useAuth() {
     }
   }
 
-  const register = async (name: string, email: string, password: string) => {
+  const register = async (name: string, email: string, password: string, referralCode?: string) => {
     try {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, referralCode }),
       })
 
       const data = await response.json()
@@ -77,10 +79,10 @@ export function useAuth() {
         setUser(data.user)
         return { success: true }
       } else {
-        return { 
-          success: false, 
+        return {
+          success: false,
           error: data.error,
-          details: data.details 
+          details: data.details
         }
       }
     } catch (error) {

@@ -41,6 +41,9 @@ export const UserSchema = z.object({
   // Monetization fields
   coins: z.number().default(0), // Монетки для генерации
   isAnonymous: z.boolean().default(false), // Анонимный пользователь (гость)
+  // Referral system
+  referralCode: z.string().optional(), // Unique referral code for this user
+  referredBy: z.string().optional(), // ID of user who referred this user
 })
 
 export type User = z.infer<typeof UserSchema>
@@ -50,7 +53,7 @@ export const TransactionSchema = z.object({
   id: z.string().uuid(),
   userId: z.string().uuid(),
   amount: z.number(), // +50, -100, +3000, etc.
-  type: z.enum(["welcome", "registration", "generation", "subscription", "refund"]),
+  type: z.enum(["welcome", "registration", "generation", "subscription", "refund", "referral"]),
   description: z.string().optional(),
   createdAt: z.string(),
 })
@@ -419,12 +422,31 @@ export async function deleteStory(id: string): Promise<boolean> {
 /**
  * Create a new user
  */
-export async function createUser(userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>): Promise<User> {
+export async function createUser(
+  userData: Omit<User, 'id' | 'createdAt' | 'updatedAt'>,
+  referralCodeUsed?: string
+): Promise<User> {
+  const REFERRAL_BONUS = 100
+
+  // Generate referral code for new user (only for non-anonymous users)
+  const newUserReferralCode = !userData.isAnonymous ? generateReferralCode() : undefined
+
+  // Find referrer if referral code provided
+  let referrer: User | null = null
+  if (referralCodeUsed && !userData.isAnonymous) {
+    referrer = await getUserByReferralCode(referralCodeUsed)
+    if (referrer) {
+      console.log(`[DB] Found referrer: ${referrer.id} for new user`)
+    }
+  }
+
   const user: User = {
     ...userData,
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    referralCode: newUserReferralCode,
+    referredBy: referrer?.id,
   }
 
   if (!isKvAvailable) {
@@ -434,14 +456,21 @@ export async function createUser(userData: Omit<User, 'id' | 'createdAt' | 'upda
       const fs = require('fs')
       const path = require('path')
       const usersCacheDir = path.join(process.cwd(), '.users-cache')
-      
+
       if (!fs.existsSync(usersCacheDir)) {
         fs.mkdirSync(usersCacheDir, { recursive: true })
       }
-      
+
       const filePath = path.join(usersCacheDir, `${user.id}.json`)
       fs.writeFileSync(filePath, JSON.stringify(user, null, 2))
       console.log(`[DB] ✅ User ${user.id} saved to file cache`)
+
+      // Award referral bonus to referrer
+      if (referrer) {
+        await updateUserCoins(referrer.id, REFERRAL_BONUS, "referral", `Реферальный бонус за приглашение ${user.name}`)
+        console.log(`[DB] ✅ Awarded ${REFERRAL_BONUS} coins to referrer ${referrer.id}`)
+      }
+
       return user
     } catch (error) {
       console.error(`[DB] Error saving user to file cache:`, error)
@@ -465,8 +494,20 @@ export async function createUser(userData: Omit<User, 'id' | 'createdAt' | 'upda
       await kv.set(emailKey, user.id)
     }
 
+    // Store referral code mapping
+    if (newUserReferralCode) {
+      await kv.set(`referral:${newUserReferralCode}`, user.id)
+    }
+
     await kv.set(userKey, user)
     console.log(`[DB] ✅ User ${user.id} created successfully (email: ${user.email || 'none'})`)
+
+    // Award referral bonus to referrer
+    if (referrer) {
+      await updateUserCoins(referrer.id, REFERRAL_BONUS, "referral", `Реферальный бонус за приглашение ${user.name}`)
+      console.log(`[DB] ✅ Awarded ${REFERRAL_BONUS} coins to referrer ${referrer.id}`)
+    }
+
     return user
   } catch (error) {
     console.error(`[DB] Error creating user:`, error)
@@ -714,10 +755,22 @@ export async function deleteUser(id: string): Promise<boolean> {
 }
 
 /**
+ * Generate a unique referral code
+ */
+function generateReferralCode(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let code = ''
+  for (let i = 0; i < 8; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length))
+  }
+  return code
+}
+
+/**
  * Create anonymous user with welcome coins
  */
 export async function createAnonymousUser(): Promise<User> {
-  const WELCOME_COINS = 500
+  const WELCOME_COINS = 50 // Enough for exactly one 5-page story
 
   const user: User = {
     id: crypto.randomUUID(),
@@ -769,15 +822,60 @@ export async function createAnonymousUser(): Promise<User> {
 }
 
 /**
+ * Get user by referral code
+ */
+export async function getUserByReferralCode(referralCode: string): Promise<User | null> {
+  if (!isKvAvailable) {
+    try {
+      const fs = require('fs')
+      const path = require('path')
+      const usersCacheDir = path.join(process.cwd(), '.users-cache')
+
+      if (!fs.existsSync(usersCacheDir)) {
+        return null
+      }
+
+      const files = fs.readdirSync(usersCacheDir)
+      for (const file of files) {
+        if (file.endsWith('.json')) {
+          const filePath = path.join(usersCacheDir, file)
+          const data = fs.readFileSync(filePath, 'utf-8')
+          const user = JSON.parse(data)
+          if (user.referralCode === referralCode) {
+            return user
+          }
+        }
+      }
+      return null
+    } catch (error) {
+      console.error(`[DB] Error finding user by referral code:`, error)
+      return null
+    }
+  }
+
+  try {
+    // Get referral code -> user id mapping
+    const userId = await kv.get<string>(`referral:${referralCode}`)
+    if (!userId) return null
+    return getUserById(userId)
+  } catch (error) {
+    console.error(`[DB] Error finding user by referral code:`, error)
+    return null
+  }
+}
+
+/**
  * Convert anonymous user to registered user
  */
 export async function convertAnonymousToUser(
   userId: string,
   email: string,
   name: string,
-  passwordHash: string
+  passwordHash: string,
+  referralCode?: string // Optional referral code from someone who invited this user
 ): Promise<User | null> {
   const REGISTRATION_BONUS = 50
+  const REFERRAL_BONUS = 100
 
   const user = await getUserById(userId)
   if (!user || !user.isAnonymous) {
@@ -792,6 +890,18 @@ export async function convertAnonymousToUser(
     return null
   }
 
+  // Find referrer if referral code provided
+  let referrer: User | null = null
+  if (referralCode) {
+    referrer = await getUserByReferralCode(referralCode)
+    if (referrer) {
+      console.log(`[DB] Found referrer: ${referrer.id} for new user ${userId}`)
+    }
+  }
+
+  // Generate unique referral code for new user
+  const newUserReferralCode = generateReferralCode()
+
   const updatedUser: User = {
     ...user,
     email,
@@ -800,6 +910,8 @@ export async function convertAnonymousToUser(
     isAnonymous: false,
     coins: user.coins + REGISTRATION_BONUS,
     updatedAt: new Date().toISOString(),
+    referralCode: newUserReferralCode,
+    referredBy: referrer?.id,
   }
 
   if (!isKvAvailable) {
@@ -813,6 +925,12 @@ export async function convertAnonymousToUser(
       // Add registration bonus transaction
       await addTransaction(userId, REGISTRATION_BONUS, "registration", "Бонус за регистрацию")
 
+      // Award referral bonus to referrer
+      if (referrer) {
+        await updateUserCoins(referrer.id, REFERRAL_BONUS, "referral", `Реферальный бонус за приглашение ${name}`)
+        console.log(`[DB] ✅ Awarded ${REFERRAL_BONUS} coins to referrer ${referrer.id}`)
+      }
+
       console.log(`[DB] ✅ Anonymous user ${userId} converted to registered user`)
       return updatedUser
     } catch (error) {
@@ -824,12 +942,20 @@ export async function convertAnonymousToUser(
   try {
     const userKey = `user:${userId}`
     const emailKey = `user:email:${email}`
+    const referralKey = `referral:${newUserReferralCode}`
 
     await kv.set(userKey, updatedUser)
     await kv.set(emailKey, userId)
+    await kv.set(referralKey, userId) // Map referral code to user id
 
     // Add registration bonus transaction
     await addTransaction(userId, REGISTRATION_BONUS, "registration", "Бонус за регистрацию")
+
+    // Award referral bonus to referrer
+    if (referrer) {
+      await updateUserCoins(referrer.id, REFERRAL_BONUS, "referral", `Реферальный бонус за приглашение ${name}`)
+      console.log(`[DB] ✅ Awarded ${REFERRAL_BONUS} coins to referrer ${referrer.id}`)
+    }
 
     console.log(`[DB] ✅ Anonymous user ${userId} converted to registered user`)
     return updatedUser

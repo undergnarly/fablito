@@ -12,9 +12,10 @@ import { useLanguage } from "@/lib/language-context"
 interface RegisterFormProps {
   onSuccess?: () => void
   onSwitchToLogin?: () => void
+  referralCode?: string
 }
 
-export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) {
+export function RegisterForm({ onSuccess, onSwitchToLogin, referralCode }: RegisterFormProps) {
   const { t } = useLanguage()
   const router = useRouter()
   const [formData, setFormData] = useState({
@@ -83,6 +84,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFormProps) 
           name: formData.name.trim(),
           email: formData.email.trim(),
           password: formData.password,
+          referralCode: referralCode,
         }),
       })
 
