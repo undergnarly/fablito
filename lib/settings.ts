@@ -4,6 +4,9 @@ import { kv } from "@vercel/kv"
 const DEFAULT_SETTINGS = {
   ALPHABET_LETTERS_COUNT: 2, // Ограничиваем до 2 страниц для быстрого тестирования
   SUBMISSIONS_HALTED: false,
+  REGISTRATION_CODE: "", // Кодовое слово для регистрации (пустое = регистрация открыта)
+  ANONYMOUS_COINS: 50, // Монеты для анонимных пользователей
+  REGISTRATION_COINS: 100, // Монеты при регистрации
 }
 
 // Type for app settings

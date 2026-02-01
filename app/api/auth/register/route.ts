@@ -2,14 +2,26 @@ import { NextRequest, NextResponse } from "next/server"
 import { cookies } from "next/headers"
 import { getUserById, getUserByEmail, convertAnonymousToUser, createUser } from "@/lib/db"
 import { hashPassword, isValidEmail, validatePassword } from "@/lib/auth"
+import { getSetting } from "@/lib/settings"
 
 export async function POST(request: NextRequest) {
   console.log("[AUTH] Registration request received")
 
   try {
     const body = await request.json()
-    const { email, password, name, referralCode } = body
-    console.log("[AUTH] Registration data:", { email, name, hasPassword: !!password, hasReferral: !!referralCode })
+    const { email, password, name, referralCode, registrationCode } = body
+    console.log("[AUTH] Registration data:", { email, name, hasPassword: !!password, hasReferral: !!referralCode, hasCode: !!registrationCode })
+
+    // Check registration code if set
+    const requiredCode = await getSetting("REGISTRATION_CODE")
+    if (requiredCode && requiredCode.trim() !== "") {
+      if (!registrationCode || registrationCode.trim() !== requiredCode.trim()) {
+        return NextResponse.json(
+          { error: "Invalid registration code" },
+          { status: 403 }
+        )
+      }
+    }
 
     // Validate input
     if (!email || !password || !name) {
@@ -80,14 +92,14 @@ export async function POST(request: NextRequest) {
 
     // If no anonymous user to convert, create new user
     if (!user) {
-      const REGISTRATION_COINS = 100 // Welcome bonus for new users (not anonymous)
+      const registrationCoins = await getSetting("REGISTRATION_COINS")
 
       user = await createUser({
         email,
         name,
         passwordHash,
         isActive: true,
-        coins: REGISTRATION_COINS,
+        coins: registrationCoins,
         isAnonymous: false,
       }, referralCode)
     }

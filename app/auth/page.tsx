@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, Suspense } from "react"
+import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { RegisterForm } from "@/components/auth/register-form"
 import { LoginForm } from "@/components/auth/login-form"
@@ -16,6 +16,14 @@ function AuthContent() {
 
   // If there's a referral code, default to register tab
   const [activeTab, setActiveTab] = useState(referralCode ? "register" : "login")
+  const [requireCode, setRequireCode] = useState(false)
+
+  useEffect(() => {
+    fetch("/api/auth/registration-config")
+      .then(res => res.json())
+      .then(data => setRequireCode(data.requireCode))
+      .catch(() => setRequireCode(false))
+  }, [])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -62,7 +70,7 @@ function AuthContent() {
             </TabsContent>
 
             <TabsContent value="register" className="mt-6">
-              <RegisterForm referralCode={referralCode || undefined} />
+              <RegisterForm referralCode={referralCode || undefined} requireCode={requireCode} />
             </TabsContent>
           </Tabs>
         </div>

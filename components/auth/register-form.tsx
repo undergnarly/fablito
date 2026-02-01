@@ -6,23 +6,25 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { UserPlus, Mail, Lock, User, AlertCircle, Loader2 } from "lucide-react"
+import { UserPlus, Mail, Lock, User, AlertCircle, Loader2, Key } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 interface RegisterFormProps {
   onSuccess?: () => void
   onSwitchToLogin?: () => void
   referralCode?: string
+  requireCode?: boolean
 }
 
-export function RegisterForm({ onSuccess, onSwitchToLogin, referralCode }: RegisterFormProps) {
+export function RegisterForm({ onSuccess, onSwitchToLogin, referralCode, requireCode }: RegisterFormProps) {
   const { t } = useLanguage()
   const router = useRouter()
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
-    confirmPassword: ""
+    confirmPassword: "",
+    registrationCode: ""
   })
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -85,6 +87,7 @@ export function RegisterForm({ onSuccess, onSwitchToLogin, referralCode }: Regis
           email: formData.email.trim(),
           password: formData.password,
           referralCode: referralCode,
+          registrationCode: formData.registrationCode.trim(),
         }),
       })
 
@@ -218,6 +221,26 @@ export function RegisterForm({ onSuccess, onSwitchToLogin, referralCode }: Regis
               className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-pink-400 focus:ring-pink-400"
             />
           </div>
+
+          {requireCode && (
+            <div className="space-y-2">
+              <Label htmlFor="registrationCode" className="flex items-center gap-2 text-white/80">
+                <Key className="h-4 w-4" />
+                {t.registrationCode || "Registration Code"}
+              </Label>
+              <Input
+                id="registrationCode"
+                name="registrationCode"
+                type="text"
+                placeholder={t.enterRegistrationCode || "Enter registration code"}
+                value={formData.registrationCode}
+                onChange={handleInputChange}
+                required
+                disabled={isLoading}
+                className="bg-white/10 border-white/20 text-white placeholder:text-white/40 focus:border-pink-400 focus:ring-pink-400"
+              />
+            </div>
+          )}
 
           <Button
             type="submit"

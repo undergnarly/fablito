@@ -3,6 +3,7 @@ import { kv } from "@vercel/kv"
 import { z } from "zod"
 import crypto from "crypto"
 import { detectLanguageFromStory } from "./language-detector"
+import { getSetting } from "./settings"
 
 // Check if KV is available for local development
 const isKvAvailable = process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN && 
@@ -800,7 +801,8 @@ function generateReferralCode(): string {
  * Create anonymous user with welcome coins
  */
 export async function createAnonymousUser(): Promise<User> {
-  const WELCOME_COINS = 50 // Enough for exactly one 5-page story
+  // Get coins from settings (default 50)
+  const welcomeCoins = await getSetting("ANONYMOUS_COINS")
 
   const user: User = {
     id: crypto.randomUUID(),
@@ -808,7 +810,7 @@ export async function createAnonymousUser(): Promise<User> {
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
     isActive: true,
-    coins: WELCOME_COINS,
+    coins: welcomeCoins,
     isAnonymous: true,
   }
 
@@ -824,10 +826,10 @@ export async function createAnonymousUser(): Promise<User> {
 
       const filePath = path.join(usersCacheDir, `${user.id}.json`)
       fs.writeFileSync(filePath, JSON.stringify(user, null, 2))
-      console.log(`[DB] ✅ Anonymous user ${user.id} created with ${WELCOME_COINS} coins`)
+      console.log(`[DB] ✅ Anonymous user ${user.id} created with ${welcomeCoins} coins`)
 
       // Add welcome transaction
-      await addTransaction(user.id, WELCOME_COINS, "welcome", "Приветственный бонус")
+      await addTransaction(user.id, welcomeCoins, "welcome", "Приветственный бонус")
 
       return user
     } catch (error) {
@@ -839,10 +841,10 @@ export async function createAnonymousUser(): Promise<User> {
   try {
     const userKey = `user:${user.id}`
     await kv.set(userKey, user)
-    console.log(`[DB] ✅ Anonymous user ${user.id} created with ${WELCOME_COINS} coins`)
+    console.log(`[DB] ✅ Anonymous user ${user.id} created with ${welcomeCoins} coins`)
 
     // Add welcome transaction
-    await addTransaction(user.id, WELCOME_COINS, "welcome", "Приветственный бонус")
+    await addTransaction(user.id, welcomeCoins, "welcome", "Приветственный бонус")
 
     return user
   } catch (error) {
