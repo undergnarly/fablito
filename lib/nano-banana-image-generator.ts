@@ -34,7 +34,7 @@ export interface ImageGenerationParams {
  * @returns Object with image URL and base64 data (for use as reference)
  */
 // Model selection based on quality
-const GEMINI_MODELS = {
+const GEMINI_MODELS: Record<"standard" | "premium", string> = {
   standard: "gemini-2.5-flash-image",    // Fast, cheaper
   premium: "gemini-3-pro-image-preview"   // Better quality, more expensive
 }
