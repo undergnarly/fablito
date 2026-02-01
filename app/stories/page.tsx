@@ -134,17 +134,10 @@ export default function StoriesPage() {
         </div>
 
         {/* Title Section */}
-        <div className="flex flex-col items-center justify-center text-center mb-12">
-          <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-orange-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
-            <div className="magic-card p-4 rounded-full mb-6 relative z-10">
-              <BookOpen size={48} className="text-white" />
-            </div>
-          </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-4" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
+        <div className="flex flex-col items-center justify-center text-center mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold text-white glow-text" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
             {t.allStories}
           </h1>
-          <p className="text-lg text-white/70 max-w-2xl">{t.browseAllStories}</p>
         </div>
 
         {/* Search and Filter Section */}
@@ -274,10 +267,10 @@ export default function StoriesPage() {
           </Card>
         ) : !loading && !error && stories.length > 0 && (
           <Tabs defaultValue="all" className="w-full">
-            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
-              <TabsTrigger value="all">{t.allStories}</TabsTrigger>
-              <TabsTrigger value="recent">{t.recent}</TabsTrigger>
-              <TabsTrigger value="popular">{t.popular}</TabsTrigger>
+            <TabsList className="grid w-full max-w-md mx-auto grid-cols-3 mb-8 bg-white/10 border border-white/20 rounded-xl">
+              <TabsTrigger value="all" className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 rounded-lg">{t.allStories}</TabsTrigger>
+              <TabsTrigger value="recent" className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 rounded-lg">{t.recent}</TabsTrigger>
+              <TabsTrigger value="popular" className="data-[state=active]:bg-white/20 data-[state=active]:text-white text-white/70 rounded-lg">{t.popular}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="all" className="mt-0">
