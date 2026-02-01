@@ -398,7 +398,7 @@ export default async function StoryPage({
           <Link href="/">
             <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
               <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="font-medium">{t.backToHome}</span>
+              <span className="font-medium">На главную</span>
             </Button>
           </Link>
         </div>
