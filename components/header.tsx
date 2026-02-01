@@ -61,7 +61,7 @@ export function Header() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 text-white"
+                      className="h-9 w-9 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm text-white"
                     >
                       <User className="h-5 w-5" />
                     </Button>
@@ -107,7 +107,7 @@ export function Header() {
                 <Button
                   size="sm"
                   asChild
-                  className="bg-white/20 hover:bg-white/30 text-white border-0 rounded-full px-4"
+                  className="bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white border-0 rounded-full px-4"
                 >
                   <Link href="/auth" className="flex items-center gap-2">
                     <User className="h-4 w-4" />

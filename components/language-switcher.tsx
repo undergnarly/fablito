@@ -29,7 +29,7 @@ export function LanguageSwitcher() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-colors text-white text-sm font-semibold">
+        <button className="flex items-center gap-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm px-3 py-1.5 rounded-full transition-colors text-white text-sm font-semibold">
           <Globe className="h-4 w-4" />
           <span className="hidden sm:inline">{languageFlags[language]}</span>
           <span className="sm:hidden">{languageFlags[language]}</span>

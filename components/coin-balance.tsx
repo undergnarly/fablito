@@ -30,7 +30,7 @@ export function CoinBalance({ showBuyButton = true, compact = false }: CoinBalan
 
   if (compact) {
     return (
-      <div className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 px-3 py-1.5 rounded-full border border-yellow-500/30">
+      <div className="flex items-center gap-1.5 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm px-3 py-1.5 rounded-full border border-yellow-500/30">
         <Coins className="h-4 w-4 text-yellow-400" />
         <span className="text-sm font-medium text-yellow-300">{user.coins}</span>
       </div>
@@ -39,7 +39,7 @@ export function CoinBalance({ showBuyButton = true, compact = false }: CoinBalan
 
   return (
     <div className="flex items-center gap-3">
-      <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 px-4 py-2 rounded-xl border border-yellow-500/30">
+      <div className="flex items-center gap-2 bg-gradient-to-r from-yellow-500/20 to-orange-500/20 backdrop-blur-sm px-4 py-2 rounded-xl border border-yellow-500/30">
         <Coins className="h-5 w-5 text-yellow-400" />
         <div className="flex flex-col">
           <span className="text-lg font-bold text-yellow-300">{user.coins}</span>
