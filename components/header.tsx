@@ -36,12 +36,12 @@ export function Header() {
           className="flex items-center hover:opacity-80 transition-opacity"
         >
           <span
-            className="text-2xl md:text-3xl text-white font-lobster"
+            className="text-2xl md:text-3xl text-white font-logo"
             style={{
               textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 4px 12px rgba(0,0,0,0.6), 0 0 30px rgba(163,28,245,0.5)'
             }}
           >
-            fablito
+            Fablito
           </span>
         </Link>
 
