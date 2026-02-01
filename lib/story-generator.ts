@@ -375,15 +375,29 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
     console.log(`[STORY-GEN] story object:`, story)
     console.log(`[STORY-GEN] story.pages:`, story.pages)
     console.log(`[STORY-GEN] story.pages type:`, typeof story.pages)
-    
+
     if (!story.pages || !Array.isArray(story.pages)) {
       console.error(`[STORY-GEN] ❌ story.pages is not a valid array:`, story.pages)
       throw new Error("Story pages is not a valid array")
     }
-    
+
     const maxImages = story.pages.length // Generate all images
     console.log(`[STORY-GEN] Generating ${maxImages} illustrations with character consistency...`)
     const images: string[] = []
+
+    // Generate FIXED character appearance that will be used for ALL pages
+    // This ensures the character looks identical throughout the story
+    const { generateRandomAppearance } = await import("./image-prompt-utils")
+    const characterAppearance = generateRandomAppearance(
+      params.childGender || "boy",
+      params.childAge
+    )
+    console.log(`[STORY-GEN] 🎨 Generated character appearance for ${params.childName}:`)
+    console.log(`[STORY-GEN]   Hair: ${characterAppearance.hairColor} ${characterAppearance.hairStyle}`)
+    console.log(`[STORY-GEN]   Eyes: ${characterAppearance.eyeColor}`)
+    console.log(`[STORY-GEN]   Skin: ${characterAppearance.skinTone}`)
+    console.log(`[STORY-GEN]   Outfit: ${characterAppearance.clothing}`)
+    console.log(`[STORY-GEN]   Accessories: ${characterAppearance.accessories || 'none'}`)
 
     // Use uploaded child photo as initial reference, or build from first generated image
     let characterReference: string | undefined = params.childPhotoBase64
@@ -415,7 +429,8 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
           character: {
             name: params.childName,
             gender: params.childGender || "boy",
-            age: params.childAge
+            age: params.childAge,
+            appearance: characterAppearance // FIXED appearance for ALL pages
           },
           style: params.style.illustration,
           storyId,

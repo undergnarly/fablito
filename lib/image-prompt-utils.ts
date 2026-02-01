@@ -16,6 +16,22 @@ export interface CharacterParams {
   name: string
   gender: "boy" | "girl"
   age: number
+  // Fixed character appearance - same across ALL pages
+  appearance?: CharacterAppearance
+}
+
+/**
+ * Fixed character appearance that MUST remain identical across all story pages
+ * This is generated once for the first page and reused for all subsequent pages
+ */
+export interface CharacterAppearance {
+  hairColor: string      // e.g., "golden blonde", "dark brown", "bright red"
+  hairStyle: string      // e.g., "short curly", "long straight with bangs", "messy spiky"
+  eyeColor: string       // e.g., "bright blue", "warm brown", "green"
+  skinTone: string       // e.g., "fair with rosy cheeks", "warm tan", "dark brown"
+  clothing: string       // e.g., "red hoodie with white stripes and blue jeans"
+  accessories?: string   // e.g., "small backpack, baseball cap"
+  distinctiveFeatures?: string  // e.g., "freckles on nose, missing front tooth"
 }
 
 export interface ImagePromptParams {
@@ -81,55 +97,115 @@ export const ILLUSTRATION_STYLES: Record<string, {
 }
 
 /**
- * Generate age-appropriate character description
+ * Generate random but consistent character appearance
+ * This creates specific, memorable features that will be used across ALL pages
+ */
+export function generateRandomAppearance(gender: "boy" | "girl", age: number): CharacterAppearance {
+  const hairColors = ["golden blonde", "dark brown", "light brown", "black", "auburn red", "strawberry blonde"]
+  const boyHairStyles = ["short messy", "short neat with side part", "curly short", "spiky", "wavy medium-length"]
+  const girlHairStyles = ["long straight", "shoulder-length wavy", "two braids", "ponytail with bangs", "short bob", "curly long"]
+  const eyeColors = ["bright blue", "warm brown", "hazel green", "dark brown", "light gray-blue"]
+  const skinTones = ["fair with rosy cheeks", "light with freckles", "warm olive", "tan", "medium brown", "dark brown"]
+
+  const boyClothing = [
+    "bright red t-shirt with a yellow star and blue jeans",
+    "green hoodie with orange stripes and gray shorts",
+    "blue and white striped shirt with brown pants",
+    "yellow sweater with a dinosaur print and dark jeans",
+    "purple t-shirt with white sneakers and khaki shorts"
+  ]
+  const girlClothing = [
+    "pink dress with white polka dots and white shoes",
+    "blue denim overalls over a yellow t-shirt",
+    "purple sweater with a rainbow and pink leggings",
+    "red cardigan over a white dress with flower patterns",
+    "teal t-shirt with a unicorn and purple skirt"
+  ]
+
+  const boyAccessories = ["small blue backpack", "red baseball cap", "green wristband", ""]
+  const girlAccessories = ["pink hair bow", "small yellow backpack", "butterfly hair clips", "flower bracelet", ""]
+
+  const distinctiveFeatures = [
+    "small dimples when smiling",
+    "a few light freckles on the nose",
+    "slightly chubby cheeks",
+    "a warm, bright smile",
+    ""
+  ]
+
+  const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)]
+
+  return {
+    hairColor: pick(hairColors),
+    hairStyle: gender === "girl" ? pick(girlHairStyles) : pick(boyHairStyles),
+    eyeColor: pick(eyeColors),
+    skinTone: pick(skinTones),
+    clothing: gender === "girl" ? pick(girlClothing) : pick(boyClothing),
+    accessories: gender === "girl" ? pick(girlAccessories) : pick(boyAccessories),
+    distinctiveFeatures: pick(distinctiveFeatures)
+  }
+}
+
+/**
+ * Generate age-appropriate character description with FIXED appearance details
  * Children's proportions and features change significantly by age
  */
 export function getCharacterDescription(character: CharacterParams): string {
-  const { name, gender, age } = character
+  const { name, gender, age, appearance } = character
 
-  const genderDetails = gender === "girl"
-    ? {
-        pronoun: "she",
-        possessive: "her",
-        features: "soft, friendly facial features",
-        defaultHair: "medium-length hair",
-        defaultClothing: "colorful comfortable clothes"
-      }
-    : {
-        pronoun: "he",
-        possessive: "his",
-        features: "friendly, expressive facial features",
-        defaultHair: "short neat hair",
-        defaultClothing: "comfortable casual clothes"
-      }
+  const genderWord = gender === "girl" ? "girl" : "boy"
+  const pronoun = gender === "girl" ? "she" : "he"
+  const possessive = gender === "girl" ? "her" : "his"
 
   // Age-based physical characteristics
-  let ageDescription: string
   let proportions: string
   let expression: string
 
   if (age >= 2 && age <= 4) {
     proportions = "toddler proportions with a large head relative to body, chubby cheeks, short limbs"
-    ageDescription = `a ${age}-year-old toddler`
-    expression = "wide curious eyes, innocent expression, rosy cheeks"
+    expression = "wide curious eyes, innocent expression"
   } else if (age >= 5 && age <= 7) {
     proportions = "young child proportions, slightly oversized head, small stature, soft rounded features"
-    ageDescription = `a ${age}-year-old young child`
-    expression = "bright expressive eyes, cheerful smile, animated expressions"
+    expression = "bright expressive eyes, cheerful smile"
   } else if (age >= 8 && age <= 10) {
     proportions = "school-age child proportions, more balanced head-to-body ratio, slender build"
-    ageDescription = `a ${age}-year-old child`
-    expression = "confident eyes, friendly smile, thoughtful expressions"
+    expression = "confident eyes, friendly smile"
   } else {
     proportions = "pre-teen proportions, longer limbs, more defined features"
-    ageDescription = `a ${age}-year-old pre-teen`
-    expression = "expressive eyes showing emotion, natural smile"
+    expression = "expressive eyes, natural smile"
   }
 
-  return `${name} is ${ageDescription} ${gender === "girl" ? "girl" : "boy"} with ${proportions}. ` +
-    `${genderDetails.features.charAt(0).toUpperCase() + genderDetails.features.slice(1)}, ${expression}. ` +
-    `${name} has ${genderDetails.defaultHair} and wears ${genderDetails.defaultClothing}. ` +
-    `${genderDetails.pronoun.charAt(0).toUpperCase() + genderDetails.pronoun.slice(1)} appears friendly, relatable, and age-appropriate.`
+  // If we have fixed appearance, use it for exact consistency
+  if (appearance) {
+    const parts = [
+      `${name} is a ${age}-year-old ${genderWord} with ${proportions}.`,
+      ``,
+      `EXACT APPEARANCE (MUST BE IDENTICAL IN EVERY IMAGE):`,
+      `- Hair: ${appearance.hairColor} ${appearance.hairStyle}`,
+      `- Eyes: ${appearance.eyeColor}`,
+      `- Skin: ${appearance.skinTone}`,
+      `- Outfit: ${appearance.clothing}`,
+    ]
+
+    if (appearance.accessories) {
+      parts.push(`- Accessories: ${appearance.accessories}`)
+    }
+    if (appearance.distinctiveFeatures) {
+      parts.push(`- Distinctive features: ${appearance.distinctiveFeatures}`)
+    }
+
+    parts.push(``, `${name} has ${expression}. ${pronoun.charAt(0).toUpperCase() + pronoun.slice(1)} is the main character and must be instantly recognizable in every scene.`)
+
+    return parts.join("\n")
+  }
+
+  // Fallback for legacy calls without appearance
+  const defaultHair = gender === "girl" ? "medium-length hair" : "short neat hair"
+  const defaultClothing = gender === "girl" ? "colorful comfortable clothes" : "comfortable casual clothes"
+
+  return `${name} is a ${age}-year-old ${genderWord} with ${proportions}. ` +
+    `${name} has ${defaultHair} and wears ${defaultClothing}. ` +
+    `${expression}. ${pronoun.charAt(0).toUpperCase() + pronoun.slice(1)} appears friendly, relatable, and age-appropriate.`
 }
 
 /**
@@ -146,39 +222,54 @@ export function buildImagePrompt(params: ImagePromptParams): string {
   const parts: string[] = []
 
   // 1. Style and technique (set the visual context first)
-  parts.push(`Create a ${styleConfig.name} illustration.`)
+  parts.push(`Create a ${styleConfig.name} children's book illustration.`)
   parts.push(styleConfig.description)
 
   // 2. Character description (critical for consistency)
-  parts.push(`\n\nMAIN CHARACTER: ${characterDesc}`)
+  parts.push(`\n\n=== MAIN CHARACTER (MUST BE EXACTLY AS DESCRIBED) ===`)
+  parts.push(characterDesc)
 
-  if (isFirstImage) {
+  if (isFirstImage && character.appearance) {
     parts.push(
-      `This is the first illustration - establish ${character.name}'s distinctive appearance that will remain EXACTLY consistent throughout all story pages. ` +
-      `Design memorable, recognizable features: specific hairstyle, clothing colors and patterns, and any accessories.`
+      `\n\nFIRST IMAGE REQUIREMENTS:`,
+      `This is the FIRST illustration establishing ${character.name}'s appearance.`,
+      `The character design you create here will be the REFERENCE for all subsequent pages.`,
+      `Make ${character.name} visually memorable and distinctive.`,
+      `IMPORTANT: Use EXACTLY the appearance details listed above - do not change or improvise any features.`
     )
-  } else {
+  } else if (!isFirstImage && character.appearance) {
     parts.push(
-      `CRITICAL: ${character.name} must appear EXACTLY as established in previous illustrations - ` +
-      `identical face, hairstyle, clothing, colors, and all visual details. Only the pose and scene changes.`
+      `\n\n⚠️ CRITICAL CHARACTER CONSISTENCY:`,
+      `${character.name} MUST look EXACTLY identical to previous illustrations:`,
+      `- Same hair: ${character.appearance.hairColor} ${character.appearance.hairStyle}`,
+      `- Same eyes: ${character.appearance.eyeColor}`,
+      `- Same skin tone: ${character.appearance.skinTone}`,
+      `- Same outfit: ${character.appearance.clothing}`,
+      character.appearance.accessories ? `- Same accessories: ${character.appearance.accessories}` : '',
+      `DO NOT change ANY aspect of ${character.name}'s appearance. Only pose and expression change.`
     )
   }
 
   // 3. Scene description (the specific content for this page)
-  parts.push(`\n\nSCENE: ${sceneDescription}`)
+  parts.push(`\n\n=== SCENE TO ILLUSTRATE ===`)
+  parts.push(sceneDescription)
+  parts.push(`\nShow ${character.name} as the main focus of this scene.`)
 
   // 4. Technical requirements
-  parts.push(`\n\nVISUAL STYLE REQUIREMENTS:`)
-  parts.push(`- Color palette: ${styleConfig.colorPalette}`)
-  parts.push(`- Technique: ${styleConfig.technique}`)
-  parts.push(`- Mood: ${styleConfig.mood}`)
-  parts.push(`- Lighting: ${styleConfig.lighting}`)
+  parts.push(`\n\n=== ART STYLE REQUIREMENTS ===`)
+  parts.push(`Color palette: ${styleConfig.colorPalette}`)
+  parts.push(`Technique: ${styleConfig.technique}`)
+  parts.push(`Mood: ${styleConfig.mood}`)
+  parts.push(`Lighting: ${styleConfig.lighting}`)
 
   // 5. Quality and safety
-  parts.push(`\n\nQUALITY: High-quality children's book illustration, safe and appropriate for young children, ` +
-    `professional polish, engaging composition that draws the eye to ${character.name}.`)
+  parts.push(`\n\n=== QUALITY REQUIREMENTS ===`)
+  parts.push(`- High-quality professional children's book illustration`)
+  parts.push(`- Safe and appropriate for young children`)
+  parts.push(`- ${character.name} must be clearly visible and recognizable as the hero`)
+  parts.push(`- Engaging composition with ${character.name} as the focal point`)
 
-  return parts.join(" ")
+  return parts.filter(p => p).join("\n")
 }
 
 /**
@@ -215,24 +306,48 @@ ART STYLE:
 Create a beautiful children's book illustration where ${character.name} (the child from the photo) is the hero of this scene. The character must be recognizable as the same child throughout the story.`
   }
 
+  // Build detailed character reminder from appearance
+  let characterReminder = ""
+  if (character.appearance) {
+    characterReminder = `
+EXACT CHARACTER APPEARANCE (DO NOT DEVIATE):
+- Hair: ${character.appearance.hairColor} ${character.appearance.hairStyle}
+- Eyes: ${character.appearance.eyeColor}
+- Skin: ${character.appearance.skinTone}
+- Outfit: ${character.appearance.clothing}
+${character.appearance.accessories ? `- Accessories: ${character.appearance.accessories}` : ''}
+${character.appearance.distinctiveFeatures ? `- Distinctive features: ${character.appearance.distinctiveFeatures}` : ''}`
+  }
+
   // Standard prompt for generated image reference
-  return `Using the character from the reference image above, create a new ${styleConfig.name} illustration.
+  return `Look at the reference image above showing ${character.name}. Create a new ${styleConfig.name} illustration with ${character.name} in a NEW SCENE.
 
-CRITICAL CHARACTER CONSISTENCY:
-- ${character.name} must look EXACTLY identical to the reference image
-- Same face shape, eye color, hair style and color
-- Same clothing colors, patterns, and accessories
-- Same body proportions and overall appearance
-- ONLY the pose, expression, and scene should change
+⚠️ CRITICAL - CHARACTER MUST BE IDENTICAL TO REFERENCE IMAGE:
+${character.name} must look EXACTLY the same as in the reference image:
+- SAME face shape and features - no changes
+- SAME eye color and shape - no changes
+- SAME hair color and style - no changes
+- SAME clothing and colors - no changes (${character.appearance?.clothing || 'same outfit'})
+- SAME accessories - no changes
+- SAME skin tone - no changes
+${characterReminder}
 
-NEW SCENE TO ILLUSTRATE:
+The ONLY things that change are:
+- Pose and body position (for the new scene)
+- Facial expression (to match the scene emotion)
+- Camera angle and composition
+- Background and environment
+
+=== NEW SCENE TO ILLUSTRATE ===
 ${sceneDescription}
 
-MAINTAIN STYLE:
+Show ${character.name} as the hero of this scene. ${character.name} must be instantly recognizable as the SAME character from the reference image.
+
+ART STYLE (maintain consistency):
 - ${styleConfig.technique}
 - ${styleConfig.colorPalette}
 - ${styleConfig.lighting}
 - ${styleConfig.mood}
 
-Create a cohesive illustration that seamlessly continues the visual story while preserving perfect character consistency.`
+Create a cohesive illustration where ${character.name} looks EXACTLY like the reference - same child, new adventure.`
 }
