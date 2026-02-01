@@ -23,7 +23,7 @@ export default function AuthPage() {
               <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
             </div>
           </div>
-          <h1 className="text-3xl font-bold text-white glow-text font-[var(--font-lobster)]">
+          <h1 className="text-3xl font-bold text-white glow-text font-lobster">
             Fablito
           </h1>
           <p className="text-white/60 mt-2">Волшебные истории для детей</p>

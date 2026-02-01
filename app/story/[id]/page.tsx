@@ -198,7 +198,7 @@ export default async function StoryPage({
 
             {/* Story Header */}
             <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-4 font-[var(--font-lobster)]">
+              <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-4">
                 {storyData.title}
               </h1>
               <p className="text-lg text-white/70">
@@ -383,7 +383,7 @@ export default async function StoryPage({
               style={storyData.style}
             />
           </div>
-          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white glow-text mb-2 font-[var(--font-lobster)]">
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white glow-text mb-2">
             {storyContent.title}
           </h1>
           <p className="text-white/60 text-sm md:text-base">История для возраста {storyData.age}</p>

@@ -82,7 +82,7 @@ export function HomeContent({ stories }: HomeContentProps) {
           <div className="text-center space-y-4 md:space-y-6">
             {/* Title with Lobster font */}
             <h1
-              className="text-6xl md:text-8xl lg:text-9xl text-white font-[var(--font-lobster)]"
+              className="text-6xl md:text-8xl lg:text-9xl text-white font-lobster"
               style={{
                 textShadow: '0 4px 8px rgba(0,0,0,0.8), 0 8px 25px rgba(0,0,0,0.6), 0 12px 50px rgba(0,0,0,0.4), 0 0 80px rgba(163,28,245,0.5)'
               }}
