@@ -75,7 +75,6 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
   const { t, language } = useLanguage()
   const { user, canAfford } = useAuth()
 
-  console.log("CreateStoryForm mounted/rendered. submissionsHalted:", submissionsHalted)
   
   // New form state
   const [childName, setChildName] = useState("")
@@ -240,7 +239,6 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
   }
 
   const enableTextMode = () => {
-    console.log("Enabling text mode")
     setStoryInputMode('text')
     // Clear voice recording if it exists
     if (voiceStory) {
@@ -336,15 +334,11 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    console.log("Form submit started")
 
     // Don't submit if submissions are halted
     if (submissionsHalted) {
-      console.log("Submissions halted, aborting")
       return
     }
-
-    console.log("Form data:", { childName, theme, storyLanguage })
 
     // Validate form
     const newErrors = {
@@ -352,34 +346,26 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       theme: theme.trim() === "" ? t.storyThemeRequired : "",
     }
 
-    console.log("Validation errors:", newErrors)
     setErrors(newErrors)
 
     // If no errors, submit the form
     if (Object.values(newErrors).every((error) => error === "")) {
-      console.log("Validation passed, creating form data")
       const formData = new FormData(e.currentTarget)
-
-      // Log form data for debugging
-      console.log("FormData contents:")
-      for (let [key, value] of formData.entries()) {
-        console.log(`${key}: ${value}`)
-      }
-
       setSubmitError("") // Clear previous errors
 
-      console.log("Calling createStoryAction...")
       startTransition(async () => {
         try {
           await createStoryAction(formData)
-          // Redirect happens in server action - no need to handle here
-        } catch (error) {
+          // Redirect happens in server action
+        } catch (error: any) {
+          // NEXT_REDIRECT is expected - it's how Next.js handles redirects in server actions
+          if (error?.digest?.includes('NEXT_REDIRECT')) {
+            return
+          }
           console.error("Error creating story:", error)
           setSubmitError(error instanceof Error ? error.message : "Failed to create story. Please try again.")
         }
       })
-    } else {
-      console.log("Validation failed, not submitting")
     }
   }
 
@@ -426,10 +412,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
           aria-describedby={errors.childName ? "childName-error" : undefined}
           className={`${errors.childName ? "border-red-400" : ""} text-xl py-6 px-4`}
           value={childName}
-          onChange={(e) => {
-            console.log("Input change:", e.target.value)
-            setChildName(e.target.value)
-          }}
+          onChange={(e) => setChildName(e.target.value)}
         />
         {errors.childName && (
           <p id="childName-error" className="text-red-500 text-sm mt-1">
@@ -688,10 +671,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
             <Textarea
               placeholder={t.yourStoryPlaceholder}
               value={textStory}
-              onChange={(e) => {
-                console.log("Text story change:", e.target.value)
-                setTextStory(e.target.value)
-              }}
+              onChange={(e) => setTextStory(e.target.value)}
               className="min-h-32 resize-none"
               maxLength={1000}
             />
