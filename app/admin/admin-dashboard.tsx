@@ -355,8 +355,9 @@ export default function AdminDashboard() {
           </div>
 
           {loading ? (
-            <div className="flex justify-center py-12">
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
               <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Loading stories...</p>
             </div>
           ) : stories.length === 0 ? (
             <Card className="border-2 border-primary/20 shadow-lg rounded-xl">
@@ -518,8 +519,9 @@ export default function AdminDashboard() {
 
         <TabsContent value="settings">
           {loadingSettings ? (
-            <div className="flex justify-center py-12">
+            <div className="flex flex-col items-center justify-center py-12 gap-3">
               <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+              <p className="text-sm text-muted-foreground">Loading settings...</p>
             </div>
           ) : (
             <SettingsPanel

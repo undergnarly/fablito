@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { UserPlus, Mail, Lock, User, AlertCircle } from "lucide-react"
+import { UserPlus, Mail, Lock, User, AlertCircle, Loader2 } from "lucide-react"
 import { useLanguage } from "@/lib/language-context"
 
 interface RegisterFormProps {
@@ -224,7 +224,14 @@ export function RegisterForm({ onSuccess, onSwitchToLogin, referralCode }: Regis
             className="w-full bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white font-semibold"
             disabled={isLoading}
           >
-            {isLoading ? t.creatingAccount : t.createAccount}
+            {isLoading ? (
+              <span className="flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                {t.creatingAccount}
+              </span>
+            ) : (
+              t.createAccount
+            )}
           </Button>
         </form>
 

@@ -259,8 +259,9 @@ export default function UsersPanel() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-12">
+        <div className="flex flex-col items-center justify-center py-12 gap-3">
           <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+          <p className="text-sm text-muted-foreground">Loading users...</p>
         </div>
       ) : users.length === 0 ? (
         <Card>
