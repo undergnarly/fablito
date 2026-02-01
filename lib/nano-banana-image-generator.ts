@@ -94,7 +94,7 @@ export async function generateImageWithNanoBanana(
 
     // Generate image using Gemini
     const response = await client.models.generateContent({
-      model: "gemini-2.0-flash-exp-image-generation",
+      model: "gemini-3-pro-image-preview",
       contents: contents,
       config: {
         responseModalities: [Modality.TEXT, Modality.IMAGE],

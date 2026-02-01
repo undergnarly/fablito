@@ -155,7 +155,7 @@ export async function generateStoryInBackground(storyId: string, params: StoryPa
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-5.2',
           messages: [{
             role: 'user',
             content: `CRITICAL: Create a story with EXACTLY ${pageCount} pages. Not more, not less. The "pages" array must contain exactly ${pageCount} items.
