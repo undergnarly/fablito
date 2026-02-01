@@ -21,6 +21,7 @@ const storySchema = z.object({
 interface StoryParams {
   childName: string
   childAge: number
+  pageCount?: number
   theme: string
   style: {
     language: "ru" | "en" | "kz"
@@ -109,8 +110,9 @@ export function getAgeAppropriateGuidelines(age: number): string {
  * This function is called after the response is sent to the client
  */
 export async function generateStoryInBackground(storyId: string, params: StoryParams) {
+  const pageCount = params.pageCount || 10
   console.log(`[STORY-GEN] Starting story generation for ID: ${storyId}`)
-  console.log(`[STORY-GEN] Child: ${params.childName}, Age: ${params.childAge}`)
+  console.log(`[STORY-GEN] Child: ${params.childName}, Age: ${params.childAge}, Pages: ${pageCount}`)
   console.log(`[STORY-GEN] Theme: ${params.theme}`)
     console.log(`[STORY-GEN] Language: ${params.style.language}`)
   console.log(`[STORY-GEN] KV Available: ${isKvAvailable}`)
@@ -165,11 +167,18 @@ ${params.textStory ? `- Parent's Story Idea: ${params.textStory}` : ''}
 AGE-APPROPRIATE COMPLEXITY:
 ${getAgeAppropriateGuidelines(params.childAge)}
 
-STORY STRUCTURE (10 pages):
-1. INTRODUCTION (2 pages): Meet ${params.childName} and the problem/adventure
-2. ADVENTURE/CHALLENGES (6 pages): ${params.childName} faces multiple challenges or experiences
-3. RESOLUTION (1 page): Problem solved, lesson learned
-4. MORAL CONCLUSION (1 page): Clear moral message about "${params.theme}"
+STORY STRUCTURE (${pageCount} pages):
+${pageCount <= 3 ?
+`1. INTRODUCTION (1 page): Meet ${params.childName} and the adventure
+2. ADVENTURE (${pageCount - 2} pages): ${params.childName}'s journey
+3. CONCLUSION (1 page): Lesson learned and moral` :
+pageCount <= 5 ?
+`1. INTRODUCTION (1 page): Meet ${params.childName} and the problem
+2. ADVENTURE (${pageCount - 2} pages): ${params.childName} faces challenges
+3. CONCLUSION (1 page): Problem solved with moral lesson` :
+`1. INTRODUCTION (2 pages): Meet ${params.childName} and the problem/adventure
+2. ADVENTURE/CHALLENGES (${pageCount - 3} pages): ${params.childName} faces multiple challenges or experiences
+3. RESOLUTION (1 page): Problem solved, lesson learned`}
 
 STORY REQUIREMENTS:
 - Feature ${params.childName} as the main character in EVERY scene

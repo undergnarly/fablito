@@ -80,6 +80,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
   // New form state
   const [childName, setChildName] = useState("")
   const [childAge, setChildAge] = useState(5)
+  const [pageCount, setPageCount] = useState(10)
   const [theme, setTheme] = useState("")
   const [storyLanguage, setStoryLanguage] = useState("en")
   const [illustrationStyle, setIllustrationStyle] = useState("watercolor")
@@ -451,6 +452,25 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
         </div>
       </div>
 
+      {/* Page Count */}
+      <div className="space-y-4">
+        <Label className="text-lg font-semibold">
+          {t.pageCount || "Number of pages"}: {pageCount}
+        </Label>
+        <Slider
+          value={[pageCount]}
+          onValueChange={(value) => setPageCount(value[0])}
+          max={10}
+          min={1}
+          step={1}
+          className="w-full"
+        />
+        <div className="flex justify-between text-sm text-white/70">
+          <span>1</span>
+          <span>10</span>
+        </div>
+      </div>
+
       {/* Character Photo Upload */}
       <div className="space-y-4">
         <Label className="text-lg font-semibold">
@@ -751,6 +771,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
 
       {/* Hidden fields for form data */}
       <input type="hidden" name="childAge" value={childAge} />
+      <input type="hidden" name="pageCount" value={pageCount} />
       <input type="hidden" name="theme" value={theme} />
       <input type="hidden" name="language" value={storyLanguage} />
       <input type="hidden" name="illustrationStyle" value={illustrationStyle} />

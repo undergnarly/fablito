@@ -34,6 +34,7 @@ export async function createStoryAction(formData: FormData) {
     // Extract new form data
     const childName = formData.get("childName") as string
     const childAge = parseInt(formData.get("childAge") as string) || 5
+    const pageCount = parseInt(formData.get("pageCount") as string) || 10
     const theme = formData.get("theme") as string
     const language = formData.get("language") as string
     const illustrationStyle = formData.get("illustrationStyle") as string
@@ -44,7 +45,7 @@ export async function createStoryAction(formData: FormData) {
     const prompt = theme || "A fun alphabet adventure for children"
     const age = `${childAge}`
 
-    console.log(`[ACTIONS] Form data - Child: ${childName}, Age: ${childAge}, Theme: ${theme}, Language: ${language}, Style: ${illustrationStyle}`)
+    console.log(`[ACTIONS] Form data - Child: ${childName}, Age: ${childAge}, Pages: ${pageCount}, Theme: ${theme}, Language: ${language}, Style: ${illustrationStyle}`)
 
     // Validation
     if (!childName) {
@@ -104,6 +105,7 @@ export async function createStoryAction(formData: FormData) {
         await generateStoryInBackground(storyId, {
           childName,
           childAge,
+          pageCount,
           theme,
           style: {
             language: language as "ru" | "en" | "kz",
@@ -120,6 +122,7 @@ export async function createStoryAction(formData: FormData) {
         await generateStoryInBackground(storyId, {
           childName,
           childAge,
+          pageCount,
           theme,
           style: {
             language: language as "ru" | "en" | "kz",

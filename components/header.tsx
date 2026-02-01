@@ -32,10 +32,17 @@ export function Header() {
         {/* Logo */}
         <Link
           href="/"
-          className="flex items-center gap-2 bg-white/20 hover:bg-white/30 px-3 py-1.5 rounded-full transition-colors"
+          className="flex items-center hover:opacity-80 transition-opacity"
         >
-          <BookOpen className="h-4 w-4 text-white" />
-          <span className="font-semibold text-white text-sm">Fablito</span>
+          <span
+            className="text-2xl md:text-3xl text-white"
+            style={{
+              fontFamily: 'SuperJoyful, cursive',
+              textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 4px 12px rgba(0,0,0,0.6), 0 0 30px rgba(163,28,245,0.5)'
+            }}
+          >
+            fablito
+          </span>
         </Link>
 
         {/* Right side controls */}

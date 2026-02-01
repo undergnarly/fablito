@@ -48,6 +48,29 @@ export function HomeContent({ stories }: HomeContentProps) {
             background: 'linear-gradient(to bottom, transparent 0%, transparent 70%, rgba(65, 19, 105, 0.8) 90%, rgb(65, 19, 105) 100%)'
           }}
         />
+        {/* Magic dust particles */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 10, 20, 30, 40, 50, 60, 70, 80, 90, 3, 12, 28, 42, 58, 72, 88].map((left, i) => {
+            const sizes = ['small', 'medium', 'large']
+            const size = sizes[i % 3]
+            const driftX = (i % 2 === 0 ? 1 : -1) * (20 + (i % 5) * 10)
+            return (
+              <div
+                key={i}
+                className={`magic-particle ${size}`}
+                style={{
+                  left: `${left}%`,
+                  bottom: `${(i * 1.2) % 25}%`,
+                  animationDelay: `${i * 0.3}s`,
+                  '--float-duration': `${7 + (i % 5)}s`,
+                  '--twinkle-duration': `${1.5 + (i % 3) * 0.5}s`,
+                  '--sway-duration': `${2 + (i % 4)}s`,
+                  '--drift-x': `${driftX}px`,
+                } as React.CSSProperties}
+              />
+            )
+          })}
+        </div>
 
         {/* Hero content - centered */}
         <div className="absolute inset-0 flex flex-col items-center justify-center px-4">
@@ -74,7 +97,7 @@ export function HomeContent({ stories }: HomeContentProps) {
                 <ShimmerButton
                   background="linear-gradient(135deg, #ff6b35 0%, #e63946 100%)"
                   shimmerColor="rgba(255, 255, 255, 0.6)"
-                  className="w-full h-14 md:h-16 text-base md:text-lg px-8 font-bold shadow-2xl active:scale-95 transition-transform"
+                  className="w-full h-14 md:h-16 text-base md:text-lg px-8 font-bold shadow-2xl active:scale-95 transition-transform animate-pulse-glow"
                 >
                   <Sparkles className="mr-2 h-5 w-5" />
                   {t.createStoryButton}
@@ -120,30 +143,60 @@ export function HomeContent({ stories }: HomeContentProps) {
           {/* Horizontal scroll on mobile, grid on desktop */}
           <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-4 md:gap-8 snap-x snap-mandatory md:snap-none scrollbar-hide">
             {/* Step 1 */}
-            <div className="flex-shrink-0 w-[280px] md:w-auto snap-center magic-card rounded-2xl p-6 md:p-8 text-center">
-              <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto">
-                <Wand2 className="h-8 w-8 md:h-10 md:w-10 text-white" />
+            <div
+              className="flex-shrink-0 w-[280px] md:w-auto snap-center rounded-2xl p-6 md:p-8 text-center relative overflow-hidden border border-white/20"
+              style={{
+                backgroundImage: 'url(/images/step-1.webp)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div className="absolute inset-0 bg-black/50" />
+              <div className="relative z-10">
+                <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto backdrop-blur-sm">
+                  <Wand2 className="h-8 w-8 md:h-10 md:w-10 text-white" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep1Title}</h3>
+                <p className="text-white/90 text-sm md:text-base">{t.howItWorksStep1Desc}</p>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep1Title}</h3>
-              <p className="text-white/80 text-sm md:text-base">{t.howItWorksStep1Desc}</p>
             </div>
 
             {/* Step 2 */}
-            <div className="flex-shrink-0 w-[280px] md:w-auto snap-center magic-card rounded-2xl p-6 md:p-8 text-center">
-              <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto">
-                <Sparkles className="h-8 w-8 md:h-10 md:w-10 text-white" />
+            <div
+              className="flex-shrink-0 w-[280px] md:w-auto snap-center rounded-2xl p-6 md:p-8 text-center relative overflow-hidden border border-white/20"
+              style={{
+                backgroundImage: 'url(/images/step-2.webp)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div className="absolute inset-0 bg-black/50" />
+              <div className="relative z-10">
+                <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto backdrop-blur-sm">
+                  <Sparkles className="h-8 w-8 md:h-10 md:w-10 text-white" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep2Title}</h3>
+                <p className="text-white/90 text-sm md:text-base">{t.howItWorksStep2Desc}</p>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep2Title}</h3>
-              <p className="text-white/80 text-sm md:text-base">{t.howItWorksStep2Desc}</p>
             </div>
 
             {/* Step 3 */}
-            <div className="flex-shrink-0 w-[280px] md:w-auto snap-center magic-card rounded-2xl p-6 md:p-8 text-center">
-              <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto">
-                <BookOpen className="h-8 w-8 md:h-10 md:w-10 text-white" />
+            <div
+              className="flex-shrink-0 w-[280px] md:w-auto snap-center rounded-2xl p-6 md:p-8 text-center relative overflow-hidden border border-white/20"
+              style={{
+                backgroundImage: 'url(/images/step-3.webp)',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center'
+              }}
+            >
+              <div className="absolute inset-0 bg-black/50" />
+              <div className="relative z-10">
+                <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto backdrop-blur-sm">
+                  <BookOpen className="h-8 w-8 md:h-10 md:w-10 text-white" />
+                </div>
+                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep3Title}</h3>
+                <p className="text-white/90 text-sm md:text-base">{t.howItWorksStep3Desc}</p>
               </div>
-              <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep3Title}</h3>
-              <p className="text-white/80 text-sm md:text-base">{t.howItWorksStep3Desc}</p>
             </div>
           </div>
         </div>

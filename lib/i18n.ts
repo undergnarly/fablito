@@ -35,6 +35,7 @@ export interface Translations {
   childAge: string
   childAgeYears: string
   childAgeRange: string
+  pageCount: string
   heroPhoto: string
   heroPhotoOptional: string
   clickToUpload: string
@@ -245,6 +246,7 @@ export const translations: Record<Language, Translations> = {
     childAge: "Child's Age",
     childAgeYears: 'years old',
     childAgeRange: 'years',
+    pageCount: 'Number of pages',
     heroPhoto: 'Hero Photo',
     heroPhotoOptional: 'optional',
     clickToUpload: 'Click to upload hero photo',
@@ -454,6 +456,7 @@ export const translations: Record<Language, Translations> = {
     childAge: 'Возраст Ребёнка',
     childAgeYears: 'лет',
     childAgeRange: 'года',
+    pageCount: 'Количество страниц',
     heroPhoto: 'Фото Героя',
     heroPhotoOptional: 'необязательно',
     clickToUpload: 'Нажмите для загрузки фото героя',
@@ -663,6 +666,7 @@ export const translations: Record<Language, Translations> = {
     childAge: 'Бала Жасы',
     childAgeYears: 'жаста',
     childAgeRange: 'жас',
+    pageCount: 'Беттер саны',
     heroPhoto: 'Батыр Суреті',
     heroPhotoOptional: 'міндетті емес',
     clickToUpload: 'Батыр суретін жүктеу үшін басыңыз',
