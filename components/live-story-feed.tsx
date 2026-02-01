@@ -57,31 +57,48 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
     return `${minutes}m ago`
   }, [language])
 
-  // Initialize with first 2-3 stories
+  // Initialize with first few stories
   useEffect(() => {
     if (stories.length === 0) return
 
-    const initialStories = stories.slice(0, 3).map((story, index) => ({
+    const initialCount = Math.min(5, stories.length)
+    const initialStories = stories.slice(0, initialCount).map((story, index) => ({
       ...story,
-      displayTime: 30 + index * 15, // Stagger initial times
+      displayTime: 20 + index * 10, // Stagger initial times
       isNew: false
     }))
     setVisibleStories(initialStories)
-    setCurrentIndex(3)
+    setCurrentIndex(initialCount)
   }, [stories])
 
-  // Add new story every 3-7 seconds
+  // Add new story every 5-15 seconds
   useEffect(() => {
     if (stories.length === 0) return
 
+    const maxVisible = 20
+
     const addNewStory = () => {
+      setCurrentIndex(prev => {
+        const nextIndex = prev + 1
+        // Reset when we've shown all stories
+        if (nextIndex >= stories.length) {
+          // Reset visible stories and start over
+          setVisibleStories([{
+            ...stories[0],
+            displayTime: 0,
+            isNew: true
+          }])
+          return 1
+        }
+        return nextIndex
+      })
+
       setVisibleStories(prev => {
         const storyToAdd = stories[currentIndex % stories.length]
 
         // Check if this story is already visible
         const alreadyVisible = prev.some(s => s.id === storyToAdd.id)
         if (alreadyVisible) {
-          // Just update times and remove oldest if needed
           return prev.map(s => ({ ...s, isNew: false }))
         }
 
@@ -91,16 +108,14 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
           isNew: true
         }
 
-        // Keep max 8 stories visible, remove oldest
+        // Keep max 20 stories visible, remove oldest
         const updated = [newStory, ...prev.map(s => ({ ...s, isNew: false }))]
-        return updated.slice(0, 8)
+        return updated.slice(0, maxVisible)
       })
-
-      setCurrentIndex(prev => prev + 1)
     }
 
-    // Random interval between 3-7 seconds
-    const getRandomInterval = () => Math.floor(Math.random() * 4000) + 3000
+    // Random interval between 5-15 seconds
+    const getRandomInterval = () => Math.floor(Math.random() * 10000) + 5000
 
     let timeoutId: NodeJS.Timeout
 
