@@ -119,7 +119,15 @@ export async function createStory(storyData: Partial<Story>): Promise<Story> {
     }
   }
 
-  await kv.hset(`story:${storyData.id}`, storyData)
+  // Remove null/undefined values - Upstash Redis doesn't support null
+  const cleanedData: Record<string, any> = {}
+  for (const [key, value] of Object.entries(storyData)) {
+    if (value !== null && value !== undefined) {
+      cleanedData[key] = value
+    }
+  }
+
+  await kv.hset(`story:${storyData.id}`, cleanedData)
 
   return storyData as Story
 }
@@ -230,7 +238,15 @@ export async function updateStory(id: string, data: Partial<Story>): Promise<Sto
     }
   }
 
-  await kv.hset(`story:${id}`, updatedData)
+  // Remove null/undefined values - Upstash Redis doesn't support null
+  const cleanedData: Record<string, any> = {}
+  for (const [key, value] of Object.entries(updatedData)) {
+    if (value !== null && value !== undefined) {
+      cleanedData[key] = value
+    }
+  }
+
+  await kv.hset(`story:${id}`, cleanedData)
 
   return getStory(id)
 }
