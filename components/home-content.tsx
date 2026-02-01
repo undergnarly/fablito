@@ -7,6 +7,7 @@ import { Sparkles, Wand2, ChevronRight, BookOpen } from "lucide-react"
 import { ShimmerButton } from "@/components/magicui/shimmer-button"
 import { useLanguage } from "@/lib/language-context"
 import { LanguageFlag } from "@/components/language-flag"
+import { LiveStoryFeed } from "@/components/live-story-feed"
 
 interface Story {
   id: string
@@ -118,10 +119,15 @@ export function HomeContent({ stories }: HomeContentProps) {
                 </Button>
               </Link>
             </div>
+
+            {/* Live Story Feed - social proof */}
+            <div className="mt-8 md:mt-10">
+              <LiveStoryFeed stories={stories} />
+            </div>
           </div>
 
           {/* Scroll indicator */}
-          <div className="absolute bottom-8 md:bottom-12 left-1/2 -translate-x-1/2 animate-bounce">
+          <div className="absolute bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
             <ChevronRight className="h-6 w-6 text-white/50 rotate-90" />
           </div>
         </div>

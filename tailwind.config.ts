@@ -20,7 +20,7 @@ const config = {
     },
     extend: {
       fontFamily: {
-        lobster: ['var(--font-lobster)', 'cursive'],
+        lobster: ['"Lobster"', 'cursive'],
       },
       colors: {
         border: "hsl(var(--border))",
