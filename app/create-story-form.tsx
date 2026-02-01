@@ -76,6 +76,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
   
   // New form state
   const [childName, setChildName] = useState("")
+  const [childGender, setChildGender] = useState<"boy" | "girl">("boy")
   const [childAge, setChildAge] = useState(5)
   const [pageCount, setPageCount] = useState(10)
   const [theme, setTheme] = useState("")
@@ -434,6 +435,39 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
         )}
       </div>
 
+      {/* Child Gender */}
+      <div className="space-y-2">
+        <Label className="text-lg font-semibold">
+          {t.childGender || "Пол ребёнка"}
+        </Label>
+        <div className="flex gap-4">
+          <Button
+            type="button"
+            variant={childGender === "boy" ? "default" : "outline"}
+            onClick={() => setChildGender("boy")}
+            className={`flex-1 py-6 rounded-xl transition-all ${
+              childGender === "boy"
+                ? "bg-blue-500 hover:bg-blue-600 text-white"
+                : "bg-white/10 border-white/30 text-white hover:bg-white/20"
+            }`}
+          >
+            {t.boy || "Мальчик"}
+          </Button>
+          <Button
+            type="button"
+            variant={childGender === "girl" ? "default" : "outline"}
+            onClick={() => setChildGender("girl")}
+            className={`flex-1 py-6 rounded-xl transition-all ${
+              childGender === "girl"
+                ? "bg-pink-500 hover:bg-pink-600 text-white"
+                : "bg-white/10 border-white/30 text-white hover:bg-white/20"
+            }`}
+          >
+            {t.girl || "Девочка"}
+          </Button>
+        </div>
+      </div>
+
       {/* Child Age */}
       <div className="space-y-4">
         <Label className="text-lg font-semibold">
@@ -772,6 +806,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
 
       {/* Hidden fields for form data */}
       <input type="hidden" name="childAge" value={childAge} />
+      <input type="hidden" name="childGender" value={childGender} />
       <input type="hidden" name="pageCount" value={pageCount} />
       <input type="hidden" name="theme" value={theme} />
       <input type="hidden" name="language" value={storyLanguage} />

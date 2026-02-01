@@ -20,6 +20,7 @@ const storySchema = z.object({
 // New story parameters interface
 interface StoryParams {
   childName: string
+  childGender?: "boy" | "girl"
   childAge: number
   pageCount?: number
   theme: string
@@ -157,11 +158,11 @@ export async function generateStoryInBackground(storyId: string, params: StoryPa
             role: 'user',
             content: `CRITICAL: Create a story with EXACTLY ${pageCount} pages. Not more, not less. The "pages" array must contain exactly ${pageCount} items.
 
-Create a personalized children's story for ${params.childName}, a ${params.childAge}-year-old child.
+Create a personalized children's story for ${params.childName}, a ${params.childAge}-year-old ${params.childGender === 'girl' ? 'girl' : 'boy'}.
 
 STORY PARAMETERS:
 - NUMBER OF PAGES: EXACTLY ${pageCount} pages (this is mandatory!)
-- Main Character: ${params.childName} (${params.childAge} years old)
+- Main Character: ${params.childName} (${params.childAge} years old ${params.childGender === 'girl' ? 'girl' : 'boy'})
 - Theme/Moral: ${getThemeDescription(params.theme, params.style.language)}
 - Story Type: High-quality children's fairy tale with adventure and moral lesson
 - Language: ${params.style.language === 'ru' ? 'Russian' : params.style.language === 'en' ? 'English' : 'Kazakh'}
@@ -214,8 +215,10 @@ Illustration Style: ${params.style.illustration}
 Each page should include both compelling text and a vivid image description that matches the ${params.style.illustration} style.
 
 CHARACTER CONSISTENCY REQUIREMENTS:
+- ${params.childName} is a ${params.childGender === 'girl' ? 'girl' : 'boy'}, ${params.childAge} years old
 - ${params.childName} must look EXACTLY the same in every single image (same age, face, hair, clothing, accessories)
 - ${params.childName} must wear the SAME outfit throughout the entire story - do not change clothing between pages
+- Use ${params.childGender === 'girl' ? 'she/her' : 'he/him'} pronouns for ${params.childName}
 - Maintain consistent ${params.style.illustration} art style throughout all illustrations
 - Describe ${params.childName}'s EXACT physical appearance and clothing in detail for each image prompt
 - CRITICAL: The character's appearance, clothing, and style must be identical across all ${pageCount} pages

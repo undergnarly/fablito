@@ -355,15 +355,6 @@ export default async function StoryPage({
       className="min-h-screen bg-background p-2 md:p-4"
     >
       <div className="max-w-4xl mx-auto">
-        <div className="mb-4">
-          <Link href="/stories">
-            <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
-              <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="font-medium">Назад к историям</span>
-            </Button>
-          </Link>
-        </div>
-
         {isGenerating && (
           <Card className="magic-card border-0 rounded-xl mb-4">
             <div className="p-4 text-center text-yellow-300 flex items-center justify-center">
@@ -378,7 +369,7 @@ export default async function StoryPage({
           </Card>
         )}
 
-        <div className="text-center mb-6 relative">
+        <div className="text-center mb-4 relative">
           <div className="absolute right-0 top-0">
             <FavoriteButton
               storyId={params.id}
@@ -388,10 +379,10 @@ export default async function StoryPage({
               style={storyData.style}
             />
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-3" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
+          <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white glow-text mb-2" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
             {storyContent.title}
           </h1>
-          <p className="text-white/60 mt-2">История для возраста {storyData.age}</p>
+          <p className="text-white/60 text-sm md:text-base">История для возраста {storyData.age}</p>
           {isAdmin && (
             <div className="mt-2">
               <VisibilityToggle storyId={params.id} initialVisibility={storyData.visibility || "public"} />
@@ -401,6 +392,16 @@ export default async function StoryPage({
 
         {/* Client component for interactive story viewing */}
         <StoryViewer storyId={params.id} storyContent={storyContent} images={images} isGenerating={isGenerating} />
+
+        {/* Back button - below the book */}
+        <div className="mt-6 text-center">
+          <Link href="/">
+            <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
+              <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
+              <span className="font-medium">{t.backToHome}</span>
+            </Button>
+          </Link>
+        </div>
       </div>
     </main>
   )

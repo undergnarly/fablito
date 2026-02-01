@@ -35,7 +35,14 @@ export interface Translations {
   childAge: string
   childAgeYears: string
   childAgeRange: string
+  childGender: string
+  boy: string
+  girl: string
   pageCount: string
+  characterPhoto: string
+  characterPhotoDesc: string
+  imageFormats: string
+  backToStories: string
   heroPhoto: string
   heroPhotoOptional: string
   clickToUpload: string
@@ -246,7 +253,14 @@ export const translations: Record<Language, Translations> = {
     childAge: "Child's Age",
     childAgeYears: 'years old',
     childAgeRange: 'years',
+    childGender: "Child's Gender",
+    boy: 'Boy',
+    girl: 'Girl',
     pageCount: 'Number of pages',
+    characterPhoto: 'Photo of your child',
+    characterPhotoDesc: 'Upload a photo to create a character that looks like your child',
+    imageFormats: 'PNG, JPG up to 5MB',
+    backToStories: 'Back to Stories',
     heroPhoto: 'Hero Photo',
     heroPhotoOptional: 'optional',
     clickToUpload: 'Click to upload hero photo',
@@ -456,7 +470,14 @@ export const translations: Record<Language, Translations> = {
     childAge: 'Возраст Ребёнка',
     childAgeYears: 'лет',
     childAgeRange: 'года',
+    childGender: 'Пол ребёнка',
+    boy: 'Мальчик',
+    girl: 'Девочка',
     pageCount: 'Количество страниц',
+    characterPhoto: 'Фото ребёнка',
+    characterPhotoDesc: 'Загрузите фото, чтобы создать персонажа, похожего на вашего ребёнка',
+    imageFormats: 'PNG, JPG до 5МБ',
+    backToStories: 'Назад к историям',
     heroPhoto: 'Фото Героя',
     heroPhotoOptional: 'необязательно',
     clickToUpload: 'Нажмите для загрузки фото героя',
@@ -666,7 +687,14 @@ export const translations: Record<Language, Translations> = {
     childAge: 'Бала Жасы',
     childAgeYears: 'жаста',
     childAgeRange: 'жас',
+    childGender: 'Баланың жынысы',
+    boy: 'Ұл',
+    girl: 'Қыз',
     pageCount: 'Беттер саны',
+    characterPhoto: 'Баланың суреті',
+    characterPhotoDesc: 'Балаңызға ұқсас кейіпкер жасау үшін сурет жүктеңіз',
+    imageFormats: 'PNG, JPG 5МБ дейін',
+    backToStories: 'Ертегілерге оралу',
     heroPhoto: 'Батыр Суреті',
     heroPhotoOptional: 'міндетті емес',
     clickToUpload: 'Батыр суретін жүктеу үшін басыңыз',

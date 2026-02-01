@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, ArrowRight, Share2, RefreshCw, Sparkles, Download, Facebook, Twitter, BookOpen, Maximize, Minimize, ZoomIn, ZoomOut, Volume2, Play } from "lucide-react"
+import { ArrowLeft, ArrowRight, Share2, RefreshCw, Sparkles, Download, Facebook, Twitter, BookOpen, Maximize, Minimize, Volume2, Play } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import { ALPHABET } from "@/lib/constants"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -91,6 +91,16 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
           await (fullscreenRef.current as any).msRequestFullscreen()
         }
         setIsFullscreen(true)
+
+        // Try to lock orientation to landscape on mobile
+        try {
+          if (screen.orientation && (screen.orientation as any).lock) {
+            await (screen.orientation as any).lock('landscape')
+          }
+        } catch (e) {
+          // Orientation lock not supported or not allowed
+          console.log('Orientation lock not available')
+        }
       } else {
         if (document.exitFullscreen) {
           await document.exitFullscreen()
@@ -98,6 +108,15 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
           await (document as any).webkitExitFullscreen()
         } else if ((document as any).msExitFullscreen) {
           await (document as any).msExitFullscreen()
+        }
+
+        // Unlock orientation when exiting fullscreen
+        try {
+          if (screen.orientation && screen.orientation.unlock) {
+            screen.orientation.unlock()
+          }
+        } catch (e) {
+          console.log('Orientation unlock not available')
         }
         setIsFullscreen(false)
       }
@@ -590,17 +609,7 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
           <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
         </Button>
 
-        {/* Fullscreen and Zoom Controls */}
-        <div className="flex items-center gap-1">
-          <Button variant="outline" size="icon" onClick={handleZoomOut} disabled={zoomLevel <= 0.5} className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white disabled:opacity-50">
-            <ZoomOut className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={resetZoom} className="min-w-[60px] bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white">
-            {Math.round(zoomLevel * 100)}%
-          </Button>
-          <Button variant="outline" size="icon" onClick={handleZoomIn} disabled={zoomLevel >= 2} className="bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white disabled:opacity-50">
-            <ZoomIn className="h-4 w-4" />
-          </Button>
+        {/* Fullscreen Control */}
         <Button variant="outline" size="icon" onClick={toggleFullscreen} className="relative overflow-hidden group bg-white/10 border-white/20 text-white hover:bg-white/20 hover:text-white">
           {isFullscreen ? <Minimize className="h-4 w-4" /> : <Maximize className="h-4 w-4" />}
           <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
@@ -629,30 +638,16 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
           <Play className="h-4 w-4" />
           <span className="absolute inset-0 bg-gradient-to-r from-purple-500/20 to-pink-500/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-md"></span>
         </Button>
-        </div>
       </div>
-
-      {/* Keyboard shortcuts hint */}
-      {!isFullscreen && (
-        <div className="text-center text-xs text-white/50 mb-4">
-          <span className="hidden sm:inline">
-            Нажмите F11 для полноэкранного режима • + / - для масштабирования • 0 для сброса
-          </span>
-        </div>
-      )}
 
       {/* Book Layout */}
       <div
         ref={fullscreenRef}
         className={`relative w-full mx-auto transition-all duration-300 ${
-          isFullscreen 
-            ? 'fixed inset-0 z-50 bg-black flex items-center justify-center' 
+          isFullscreen
+            ? 'fixed inset-0 z-50 bg-black flex items-center justify-center p-4'
             : 'max-w-6xl'
         }`}
-        style={{
-          transform: `scale(${zoomLevel})`,
-          transformOrigin: isFullscreen ? 'center' : 'top center'
-        }}
       >
         <div
           ref={storyContainerRef}
@@ -661,12 +656,13 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
         <div className={`book-container relative bg-white rounded-lg shadow-2xl overflow-hidden ${
           isFullscreen ? 'shadow-none border-2 border-white/20' : ''
         }`}>
-          {/* Book spine shadow */}
-          <div className="absolute left-1/2 top-0 bottom-0 w-6 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 shadow-inner transform -translate-x-1/2 z-10"></div>
-          
-          <div className="flex">
-            {/* Left page - Image */}
-            <div className="w-1/2 relative book-page">
+          {/* Book spine shadow - hidden on mobile */}
+          <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-6 bg-gradient-to-r from-gray-300 via-gray-200 to-gray-300 shadow-inner transform -translate-x-1/2 z-10"></div>
+
+          {/* Mobile: vertical layout, Desktop: horizontal layout */}
+          <div className="flex flex-col md:flex-row">
+            {/* Image - full width on mobile, half on desktop */}
+            <div className="w-full md:w-1/2 relative book-page">
               <div
                 className={`relative aspect-[3/4] w-full bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 transition-all duration-300 ${
                   pageTransition === "fade-out" ? "opacity-0" : pageTransition === "fade-in" ? "opacity-100" : ""
@@ -744,8 +740,8 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
               </div>
             </div>
 
-            {/* Right page - Text */}
-            <div className="w-1/2 relative book-page bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
+            {/* Text - full width on mobile, half on desktop */}
+            <div className="w-full md:w-1/2 relative book-page bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
               <div
                 className={`p-6 md:p-10 h-full flex flex-col justify-center transition-all duration-300 ${
                   pageTransition === "fade-out" ? "opacity-0" : pageTransition === "fade-in" ? "opacity-100" : ""

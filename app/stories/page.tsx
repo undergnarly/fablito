@@ -116,18 +116,16 @@ export default function StoriesPage() {
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">
           <div className="flex items-center mb-4 md:mb-0">
             <Link href="/">
-              <Button variant="ghost" className="group">
+              <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 font-medium">
-                  {t.backToHome}
-                </span>
+                <span className="font-medium">{t.backToHome}</span>
               </Button>
             </Link>
           </div>
 
           <div className="flex items-center space-x-2">
             <Link href="/#create-story">
-              <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
+              <Button className="bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 transition-all duration-300 text-white font-semibold">
                 <Sparkles className="mr-2 h-4 w-4" />
                 {t.createNewStory}
               </Button>
@@ -138,41 +136,42 @@ export default function StoriesPage() {
         {/* Title Section */}
         <div className="flex flex-col items-center justify-center text-center mb-12">
           <div className="relative">
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
-            <div className="bg-white dark:bg-gray-800 p-4 rounded-full shadow-md mb-6 relative z-10">
-              <BookOpen size={48} className="text-primary" />
+            <div className="absolute inset-0 bg-gradient-to-r from-pink-400 to-orange-400 rounded-full blur-xl opacity-30 animate-pulse"></div>
+            <div className="magic-card p-4 rounded-full mb-6 relative z-10">
+              <BookOpen size={48} className="text-white" />
             </div>
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
+          <h1 className="text-4xl md:text-5xl font-bold text-white glow-text mb-4" style={{ fontFamily: 'SuperJoyful, sans-serif' }}>
             {t.allStories}
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">{t.browseAllStories}</p>
+          <p className="text-lg text-white/70 max-w-2xl">{t.browseAllStories}</p>
         </div>
 
         {/* Search and Filter Section */}
-        <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-xl p-6 mb-8 shadow-md">
+        <div className="magic-card rounded-xl p-6 mb-8">
           <div className="flex flex-col md:flex-row md:items-center gap-4">
             <div className="flex-1">
               <div className="relative">
                 <input
                   type="search"
-                  placeholder="Search stories..."
-                  className="w-full pl-10 pr-4 py-2 border rounded-lg"
+                  placeholder="Поиск историй..."
+                  className="w-full pl-10 pr-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder:text-white/50 focus:outline-none focus:border-pink-400 focus:ring-1 focus:ring-pink-400"
                   value={searchTerm}
                   onChange={(e) => {
-                    // Simple search without URL updates for now
                     console.log('Search term changed:', e.target.value)
                   }}
                 />
-                <div className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground">
-                  🔍
+                <div className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/50">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+                  </svg>
                 </div>
               </div>
               {searchTerm && (
-                <p className="mt-2 text-sm text-muted-foreground">
+                <p className="mt-2 text-sm text-white/60">
                   {stories.length === 0
-                    ? `No stories found for "${searchTerm}"`
-                    : `Found ${stories.length} ${stories.length === 1 ? "story" : "stories"} for "${searchTerm}"`}
+                    ? `Истории не найдены для "${searchTerm}"`
+                    : `Найдено ${stories.length} ${stories.length === 1 ? "история" : "историй"} для "${searchTerm}"`}
                 </p>
               )}
             </div>
