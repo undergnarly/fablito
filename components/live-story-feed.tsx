@@ -153,7 +153,7 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
   if (stories.length === 0) return null
 
   return (
-    <div className="w-full max-w-4xl mx-auto px-4">
+    <div className="w-full max-w-[calc(100vw-2rem)] md:max-w-4xl mx-auto px-2 md:px-4">
       {/* Header */}
       <div className="flex items-center justify-center gap-2 mb-3">
         <div className="flex items-center gap-1.5">
@@ -173,7 +173,7 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
         <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/20 to-transparent z-10 pointer-events-none" />
         <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black/20 to-transparent z-10 pointer-events-none" />
 
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+        <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
           {visibleStories.map((story) => (
             <Link
               key={`${story.id}-${story.displayTime}`}
@@ -181,7 +181,7 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
               className={`
                 flex-shrink-0 snap-start
                 group relative
-                w-[140px] md:w-[160px]
+                w-[100px] md:w-[140px] lg:w-[160px]
                 transition-all duration-500 ease-out
                 ${story.isNew ? 'animate-slide-in scale-105' : 'scale-100'}
               `}
@@ -215,19 +215,19 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
 
                   {/* New badge */}
                   {story.isNew && (
-                    <div className="absolute top-2 left-2 flex items-center gap-1 bg-green-500 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full animate-pulse">
-                      <Sparkles className="w-2.5 h-2.5" />
+                    <div className="absolute top-1 left-1 md:top-2 md:left-2 flex items-center gap-0.5 bg-green-500 text-white text-[8px] md:text-[10px] font-medium px-1 md:px-1.5 py-0.5 rounded-full animate-pulse">
+                      <Sparkles className="w-2 h-2 md:w-2.5 md:h-2.5" />
                       NEW
                     </div>
                   )}
 
                   {/* Time badge */}
-                  <div className="absolute bottom-2 left-2 right-2">
-                    <p className="text-[10px] md:text-xs text-white/90 truncate font-medium mb-0.5">
+                  <div className="absolute bottom-1 left-1 right-1 md:bottom-2 md:left-2 md:right-2">
+                    <p className="text-[8px] md:text-[10px] lg:text-xs text-white/90 truncate font-medium mb-0.5">
                       {story.title}
                     </p>
                     <p className={`
-                      text-[9px] md:text-[10px]
+                      text-[7px] md:text-[9px] lg:text-[10px]
                       ${story.displayTime < 10 ? 'text-green-300' : 'text-white/60'}
                       transition-colors duration-300
                     `}>
