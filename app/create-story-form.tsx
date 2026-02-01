@@ -40,7 +40,7 @@ function SubmitButton({ disabled, createText, creatingText }: { disabled?: boole
       type="submit"
       size="lg"
       disabled={pending || disabled}
-      className="w-full text-lg py-6 rounded-xl bg-pink-500 hover:bg-orange-500 text-white font-semibold transition-colors"
+      className="w-full text-lg py-6 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-semibold transition-all"
     >
       {pending ? (
         <span className="flex items-center">
@@ -450,7 +450,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
             onClick={() => setChildGender("boy")}
             className={`flex-1 py-6 rounded-xl transition-all ${
               childGender === "boy"
-                ? "bg-blue-500 hover:bg-blue-600 text-white"
+                ? "bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white border-0"
                 : "bg-white/10 border-white/30 text-white hover:bg-white/20"
             }`}
           >
@@ -462,7 +462,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
             onClick={() => setChildGender("girl")}
             className={`flex-1 py-6 rounded-xl transition-all ${
               childGender === "girl"
-                ? "bg-pink-500 hover:bg-pink-600 text-white"
+                ? "bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0"
                 : "bg-white/10 border-white/30 text-white hover:bg-white/20"
             }`}
           >
