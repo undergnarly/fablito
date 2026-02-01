@@ -8,8 +8,10 @@ import { kv } from "@vercel/kv"
 // Admin authentication
 export async function adminLogin(formData: FormData) {
   const password = formData.get("password") as string
-  const adminPassword = process.env.ADMIN_PASSWORD
+  const adminPassword = process.env.ADMIN_PASSWORD || "admin123" // Default for development
   const cookiesList = await cookies();
+
+  console.log("[ADMIN] Login attempt, password provided:", !!password, "env set:", !!process.env.ADMIN_PASSWORD)
 
   if (!password || password !== adminPassword) {
     return { success: false, message: "Invalid password" }

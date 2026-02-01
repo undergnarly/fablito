@@ -6,7 +6,7 @@ import { hashPassword } from "@/lib/auth"
 // Check admin auth
 async function checkAdminAuth() {
   const cookieStore = await cookies()
-  return cookieStore.get("admin_authenticated")?.value === "true"
+  return cookieStore.get("admin_session")?.value === "true"
 }
 
 // GET - Get all users
