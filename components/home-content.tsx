@@ -50,14 +50,14 @@ export function HomeContent({ stories }: HomeContentProps) {
         />
         {/* Magic dust particles - spread across full screen */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {Array.from({ length: 40 }).map((_, i) => {
-            const sizes = ['tiny', 'small', 'medium', 'large']
+          {Array.from({ length: 120 }).map((_, i) => {
+            const sizes = ['small', 'medium', 'large', 'xlarge']
             const size = sizes[i % 4]
-            const orbitX = (i % 2 === 0 ? 1 : -1) * (15 + (i % 6) * 8)
-            const orbitY = (i % 3 === 0 ? 1 : -1) * (10 + (i % 5) * 6)
-            // Spread particles across full screen height and width
-            const left = (i * 7 + (i % 3) * 11) % 100
-            const top = (i * 5 + (i % 4) * 13) % 100
+            const orbitX = (i % 2 === 0 ? 1 : -1) * (20 + (i % 6) * 10)
+            const orbitY = (i % 3 === 0 ? 1 : -1) * (15 + (i % 5) * 8)
+            // Spread particles across full screen height and width with more variation
+            const left = (i * 3.7 + (i % 5) * 7 + Math.sin(i) * 10) % 100
+            const top = (i * 2.9 + (i % 7) * 5 + Math.cos(i) * 10) % 100
             return (
               <div
                 key={i}
@@ -65,12 +65,12 @@ export function HomeContent({ stories }: HomeContentProps) {
                 style={{
                   left: `${left}%`,
                   top: `${top}%`,
-                  animationDelay: `${i * 0.2}s`,
-                  '--orbit-duration': `${4 + (i % 6)}s`,
+                  animationDelay: `${(i * 0.1) % 5}s`,
+                  '--orbit-duration': `${3 + (i % 8)}s`,
                   '--orbit-x': `${orbitX}px`,
                   '--orbit-y': `${orbitY}px`,
-                  '--twinkle-duration': `${1.5 + (i % 4) * 0.5}s`,
-                  '--drift-duration': `${12 + (i % 8)}s`,
+                  '--twinkle-duration': `${1 + (i % 5) * 0.4}s`,
+                  '--drift-duration': `${10 + (i % 10)}s`,
                 } as React.CSSProperties}
               />
             )

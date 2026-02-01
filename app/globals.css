@@ -478,19 +478,23 @@
   border-radius: 50%;
 }
 
-/* Different particle sizes */
+/* Different particle sizes - increased for more visibility */
 .magic-particle.tiny {
-  --particle-size: 2px;
+  --particle-size: 4px;
 }
 
 .magic-particle.small {
-  --particle-size: 3px;
+  --particle-size: 6px;
 }
 
 .magic-particle.medium {
-  --particle-size: 5px;
+  --particle-size: 9px;
 }
 
 .magic-particle.large {
-  --particle-size: 7px;
+  --particle-size: 12px;
+}
+
+.magic-particle.xlarge {
+  --particle-size: 16px;
 }
