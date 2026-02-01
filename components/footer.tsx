@@ -8,7 +8,7 @@ export function Footer() {
   const { t } = useLanguage()
   return (
     <footer
-      className="w-full py-12 pb-24 md:pb-12 border-t border-white/10 bg-[#2d0f47]"
+      className="w-full py-12 pb-24 md:pb-12 border-t border-white/10 bg-[#2d0f47] relative z-10"
       role="contentinfo"
     >
       <div className="container px-4 md:px-6">
