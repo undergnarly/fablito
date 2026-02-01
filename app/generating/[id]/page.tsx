@@ -165,42 +165,41 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4 md:p-8 flex items-center justify-center">
-      <Card className="w-full max-w-md border-2 border-primary/20 shadow-lg rounded-xl">
-        <CardContent className="pt-6">
+    <main className="min-h-screen bg-gradient-to-b from-[#411369] via-[#5a1a8a] to-[#411369] p-4 md:p-8 flex items-center justify-center">
+      <Card className="w-full max-w-md border border-white/20 shadow-2xl rounded-2xl bg-gradient-to-br from-[#A31CF5]/90 to-[#7b2cbf]/90 backdrop-blur-sm">
+        <CardContent className="pt-8 pb-8">
           <div className="flex flex-col items-center text-center space-y-6">
             {error ? (
-              <div className="text-red-500">
-                <h2 className="text-xl font-bold mb-2">{t.error}</h2>
+              <div className="text-red-300">
+                <h2 className="text-xl font-bold mb-2 text-white">{t.error}</h2>
                 <p>{error}</p>
               </div>
             ) : (
               <>
                 <div className="relative w-24 h-24 flex items-center justify-center">
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Loader2 className="w-16 h-16 text-primary/30 animate-spin" />
+                    <Loader2 className="w-16 h-16 text-white/30 animate-spin" />
                   </div>
                   <div className="absolute inset-0 flex items-center justify-center">{getStatusIcon()}</div>
                 </div>
 
                 <div className="space-y-4 w-full">
-                  <h2 className="text-xl font-bold">{getStatusMessage()}</h2>
-                  <Progress value={progress} className="h-2" />
-                  <p className="text-muted-foreground text-sm">
+                  <h2 className="text-xl font-bold text-white">{getStatusMessage()}</h2>
+                  <Progress value={progress} className="h-2 bg-white/20" />
+                  <p className="text-white/70 text-sm">
                     {t.generationTakesTime}
                   </p>
                 </div>
 
-
                 {canShowPreview() && (
                   <div className="w-full pt-4">
                     <Link href={`/story/${id}`}>
-                      <Button className="w-full">
+                      <Button className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white rounded-full py-6">
                         <Eye className="mr-2 h-4 w-4" />
                         {t.viewStoryInProgress}
                       </Button>
                     </Link>
-                    <p className="text-xs text-muted-foreground mt-2">
+                    <p className="text-xs text-white/60 mt-2">
                       {t.storyStillGenerating}
                     </p>
                   </div>

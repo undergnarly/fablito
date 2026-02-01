@@ -109,7 +109,7 @@ export default function StoriesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-black dark:via-black dark:to-black/90">
+    <div className="min-h-screen bg-gradient-to-b from-[#411369] via-[#5a1a8a] to-[#411369]">
 
       <div className="max-w-6xl mx-auto px-4 py-12 md:px-8">
         {/* Header Section */}
