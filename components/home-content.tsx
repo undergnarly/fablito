@@ -121,9 +121,6 @@ export function HomeContent({ stories }: HomeContentProps) {
           <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-3 gap-4 md:gap-8 snap-x snap-mandatory md:snap-none scrollbar-hide">
             {/* Step 1 */}
             <div className="flex-shrink-0 w-[280px] md:w-auto snap-center magic-card rounded-2xl p-6 md:p-8 text-center">
-              <div className="bg-gradient-to-r from-pink-500 to-purple-500 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg mx-auto mb-4 md:mb-6">
-                1
-              </div>
               <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto">
                 <Wand2 className="h-8 w-8 md:h-10 md:w-10 text-white" />
               </div>
@@ -133,9 +130,6 @@ export function HomeContent({ stories }: HomeContentProps) {
 
             {/* Step 2 */}
             <div className="flex-shrink-0 w-[280px] md:w-auto snap-center magic-card rounded-2xl p-6 md:p-8 text-center">
-              <div className="bg-gradient-to-r from-pink-500 to-purple-500 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg mx-auto mb-4 md:mb-6">
-                2
-              </div>
               <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto">
                 <Sparkles className="h-8 w-8 md:h-10 md:w-10 text-white" />
               </div>
@@ -145,9 +139,6 @@ export function HomeContent({ stories }: HomeContentProps) {
 
             {/* Step 3 */}
             <div className="flex-shrink-0 w-[280px] md:w-auto snap-center magic-card rounded-2xl p-6 md:p-8 text-center">
-              <div className="bg-gradient-to-r from-pink-500 to-purple-500 w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center text-white font-bold text-lg md:text-xl shadow-lg mx-auto mb-4 md:mb-6">
-                3
-              </div>
               <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto">
                 <BookOpen className="h-8 w-8 md:h-10 md:w-10 text-white" />
               </div>
