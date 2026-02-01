@@ -386,11 +386,11 @@
 
 /* Hero background - responsive images */
 .hero-background {
-  background-image: url('/images/hero-mobile.png');
+  background-image: url('/images/hero-mobile.webp');
 }
 
 @media (min-width: 768px) {
   .hero-background {
-    background-image: url('/images/hero-desktop.png');
+    background-image: url('/images/hero-desktop.webp');
   }
 }
