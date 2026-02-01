@@ -48,24 +48,29 @@ export function HomeContent({ stories }: HomeContentProps) {
             background: 'linear-gradient(to bottom, transparent 0%, transparent 70%, rgba(65, 19, 105, 0.8) 90%, rgb(65, 19, 105) 100%)'
           }}
         />
-        {/* Magic dust particles */}
+        {/* Magic dust particles - spread across full screen */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[5, 15, 25, 35, 45, 55, 65, 75, 85, 95, 10, 20, 30, 40, 50, 60, 70, 80, 90, 3, 12, 28, 42, 58, 72, 88].map((left, i) => {
-            const sizes = ['small', 'medium', 'large']
-            const size = sizes[i % 3]
-            const driftX = (i % 2 === 0 ? 1 : -1) * (20 + (i % 5) * 10)
+          {Array.from({ length: 40 }).map((_, i) => {
+            const sizes = ['tiny', 'small', 'medium', 'large']
+            const size = sizes[i % 4]
+            const orbitX = (i % 2 === 0 ? 1 : -1) * (15 + (i % 6) * 8)
+            const orbitY = (i % 3 === 0 ? 1 : -1) * (10 + (i % 5) * 6)
+            // Spread particles across full screen height and width
+            const left = (i * 7 + (i % 3) * 11) % 100
+            const top = (i * 5 + (i % 4) * 13) % 100
             return (
               <div
                 key={i}
                 className={`magic-particle ${size}`}
                 style={{
                   left: `${left}%`,
-                  bottom: `${(i * 1.2) % 25}%`,
-                  animationDelay: `${i * 0.3}s`,
-                  '--float-duration': `${7 + (i % 5)}s`,
-                  '--twinkle-duration': `${1.5 + (i % 3) * 0.5}s`,
-                  '--sway-duration': `${2 + (i % 4)}s`,
-                  '--drift-x': `${driftX}px`,
+                  top: `${top}%`,
+                  animationDelay: `${i * 0.2}s`,
+                  '--orbit-duration': `${4 + (i % 6)}s`,
+                  '--orbit-x': `${orbitX}px`,
+                  '--orbit-y': `${orbitY}px`,
+                  '--twinkle-duration': `${1.5 + (i % 4) * 0.5}s`,
+                  '--drift-duration': `${12 + (i % 8)}s`,
                 } as React.CSSProperties}
               />
             )
