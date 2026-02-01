@@ -9,8 +9,8 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Sparkles, Wand2, AlertTriangle, Upload, Mic, MicOff, User, Palette, FileText, X, Volume2, Trash2 } from "lucide-react"
 import { createStoryAction } from "./actions"
-import { useFormStatus } from "react-dom"
-import { useState, useEffect, useRef } from "react"
+import { useFormStatus, useActionState } from "react-dom"
+import { useState, useEffect, useRef, useTransition } from "react"
 import { useLanguage } from "@/lib/language-context"
 import { Slider } from "@/components/ui/slider"
 import { Switch } from "@/components/ui/switch"
@@ -328,6 +328,8 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
     setAgeRange(value)
   }
 
+  const [isPending, startTransition] = useTransition()
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     console.log("Form submit started")
@@ -353,23 +355,25 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
     if (Object.values(newErrors).every((error) => error === "")) {
       console.log("Validation passed, creating form data")
       const formData = new FormData(e.currentTarget)
-      
+
       // Log form data for debugging
       console.log("FormData contents:")
       for (let [key, value] of formData.entries()) {
         console.log(`${key}: ${value}`)
       }
-      
+
       setSubmitError("") // Clear previous errors
-      
+
       console.log("Calling createStoryAction...")
-      try {
-        await createStoryAction(formData)
-        // Redirect happens in server action - no need to handle here
-      } catch (error) {
-        console.error("Error creating story:", error)
-        setSubmitError(error instanceof Error ? error.message : "Failed to create story. Please try again.")
-      }
+      startTransition(async () => {
+        try {
+          await createStoryAction(formData)
+          // Redirect happens in server action - no need to handle here
+        } catch (error) {
+          console.error("Error creating story:", error)
+          setSubmitError(error instanceof Error ? error.message : "Failed to create story. Please try again.")
+        }
+      })
     } else {
       console.log("Validation failed, not submitting")
     }
