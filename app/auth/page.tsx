@@ -6,7 +6,7 @@ import { LoginForm } from "@/components/auth/login-form"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useLanguage } from "@/lib/language-context"
 import Link from "next/link"
-import { ArrowLeft, Sparkles } from "lucide-react"
+import { ArrowLeft } from "lucide-react"
 
 export default function AuthPage() {
   const { t } = useLanguage()
@@ -17,16 +17,9 @@ export default function AuthPage() {
       <div className="w-full max-w-md">
         {/* Logo/Title */}
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="relative">
-              <Sparkles className="h-12 w-12 text-pink-400" />
-              <div className="absolute -top-1 -right-1 w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
-            </div>
-          </div>
           <h1 className="text-3xl font-bold text-white glow-text font-logo">
             Fablito
           </h1>
-          <p className="text-white/60 mt-2">Волшебные истории для детей</p>
         </div>
 
         <div className="magic-card rounded-2xl p-6">

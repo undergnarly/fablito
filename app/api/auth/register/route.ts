@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
     // If no anonymous user to convert, create new user
     if (!user) {
-      const REGISTRATION_COINS = 100 // 50 welcome + 50 registration
+      const REGISTRATION_COINS = 500 // Welcome bonus
 
       user = await createUser({
         email,

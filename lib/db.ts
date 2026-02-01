@@ -619,7 +619,7 @@ export async function updateUser(id: string, updates: Partial<User>): Promise<Us
  * Create anonymous user with welcome coins
  */
 export async function createAnonymousUser(): Promise<User> {
-  const WELCOME_COINS = 50
+  const WELCOME_COINS = 500
 
   const user: User = {
     id: crypto.randomUUID(),

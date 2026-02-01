@@ -1,8 +1,23 @@
 import { put } from "@vercel/blob"
 import { nanoid } from "nanoid"
+import sharp from "sharp"
 
 /**
- * Uploads a base64 image to Vercel Blob storage
+ * Converts image buffer to WebP format for better compression
+ */
+async function convertToWebP(buffer: Buffer): Promise<Buffer> {
+  try {
+    return await sharp(buffer)
+      .webp({ quality: 85 })
+      .toBuffer()
+  } catch (error) {
+    console.error("[BLOB-STORAGE] WebP conversion failed, using original:", error)
+    return buffer
+  }
+}
+
+/**
+ * Uploads a base64 image to Vercel Blob storage (converted to WebP)
  * @param base64Data The base64 data URL of the image
  * @param storyId The ID of the story
  * @param pageIndex The index of the page in the story
@@ -17,7 +32,6 @@ export async function uploadImageToBlob(base64Data: string, storyId: string, pag
 
     // Для локальной разработки без BLOB_READ_WRITE_TOKEN возвращаем base64 данные
     if (!process.env.BLOB_READ_WRITE_TOKEN) {
-      console.log("[BLOB-STORAGE] Local development mode: returning base64 data")
       return base64Data
     }
 
@@ -28,19 +42,20 @@ export async function uploadImageToBlob(base64Data: string, storyId: string, pag
       throw new Error("Invalid base64 data")
     }
 
-    const mimeType = matches[1]
     const base64Content = matches[2]
 
     // Convert base64 to buffer
-    const buffer = Buffer.from(base64Content, "base64")
+    let buffer = Buffer.from(base64Content, "base64")
 
-    // Generate a unique filename
-    const extension = mimeType.split("/")[1] || "png"
-    const filename = `${storyId}-page-${pageIndex}-${nanoid(6)}.${extension}`
+    // Convert to WebP for better compression
+    buffer = await convertToWebP(buffer)
+
+    // Generate a unique filename with .webp extension
+    const filename = `${storyId}-page-${pageIndex}-${nanoid(6)}.webp`
 
     // Upload to Vercel Blob
     const blob = await put(filename, buffer, {
-      contentType: mimeType,
+      contentType: "image/webp",
       access: "public",
     })
 

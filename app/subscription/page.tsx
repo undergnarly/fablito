@@ -111,11 +111,7 @@ export default function SubscriptionPage() {
             <ul className="space-y-2 text-sm">
               <li className="flex items-center gap-2 text-white/70">
                 <Check className="w-4 h-4 text-white/50" />
-                <span>{t.welcomeBonus}: 50 {t.coinsLabel}</span>
-              </li>
-              <li className="flex items-center gap-2 text-white/70">
-                <Check className="w-4 h-4 text-white/50" />
-                <span>{t.registrationBonus}: +50 {t.coinsLabel}</span>
+                <span>{t.welcomeBonus}: 500 {t.coinsLabel}</span>
               </li>
             </ul>
           </CardContent>

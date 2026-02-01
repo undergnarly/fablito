@@ -52,16 +52,6 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
 
   // Определяем язык истории
   const storyLanguage = storyContent.style?.language || detectLanguageFromStory(storyContent)
-  
-  // Отладочная информация
-  console.log(`[StoryViewer] Story language detection:`, {
-    storyId,
-    title: storyContent.title,
-    hasStyle: !!storyContent.style,
-    styleLanguage: storyContent.style?.language,
-    detectedLanguage: detectLanguageFromStory(storyContent),
-    finalLanguage: storyLanguage
-  })
   const [imageError, setImageError] = useState<boolean>(false)
   const [currentImages, setCurrentImages] = useState<string[]>(images)
   const [pageTransition, setPageTransition] = useState<"none" | "fade-out" | "fade-in">("none")

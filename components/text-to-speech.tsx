@@ -22,14 +22,6 @@ export function TextToSpeech({ text, language = 'ru', className = '', isStoryMod
   const [selectedVoice, setSelectedVoice] = useState<SpeechSynthesisVoice | null>(null)
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null)
 
-  // Отладочная информация
-  console.log(`[TextToSpeech] Component props:`, {
-    language,
-    isStoryMode,
-    textLength: text?.length,
-    textPreview: text?.substring(0, 50) + '...'
-  })
-
   // Check if speech synthesis is supported
   useEffect(() => {
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -132,13 +124,6 @@ export function TextToSpeech({ text, language = 'ru', className = '', isStoryMod
       // Set voice
       if (selectedVoice) {
         utterance.voice = selectedVoice
-        console.log(`[TextToSpeech] Using voice:`, {
-          name: selectedVoice.name,
-          lang: selectedVoice.lang,
-          language: language
-        })
-      } else {
-        console.log(`[TextToSpeech] No voice selected for language:`, language)
       }
 
     // Set speech parameters based on mode
