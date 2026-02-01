@@ -373,25 +373,28 @@ export default async function StoryPage({
           </Card>
         )}
 
-        <div className="text-center mb-4 relative">
-          <div className="absolute right-0 top-0">
-            <FavoriteButton
-              storyId={params.id}
-              storyTitle={storyContent.title}
-              createdAt={storyData.createdAt}
-              previewImage={previewImage}
-              style={storyData.style}
-            />
-          </div>
+        {/* Buttons container */}
+        <div className="flex justify-end gap-2 mb-4">
+          <ExportButtons storyId={params.id} storyTitle={storyContent.title} />
+          <FavoriteButton
+            storyId={params.id}
+            storyTitle={storyContent.title}
+            createdAt={storyData.createdAt}
+            previewImage={previewImage}
+            style={storyData.style}
+          />
+          <DeleteStoryButton storyId={params.id} storyTitle={storyContent.title} />
+          {isAdmin && (
+            <VisibilityToggle storyId={params.id} initialVisibility={storyData.visibility || "public"} />
+          )}
+        </div>
+
+        {/* Story Header */}
+        <div className="text-center mb-4">
           <h1 className="text-2xl md:text-4xl lg:text-5xl font-bold text-white glow-text mb-2">
             {storyContent.title}
           </h1>
           <p className="text-white/60 text-sm md:text-base">История для возраста {storyData.age}</p>
-          {isAdmin && (
-            <div className="mt-2">
-              <VisibilityToggle storyId={params.id} initialVisibility={storyData.visibility || "public"} />
-            </div>
-          )}
         </div>
 
         {/* Client component for interactive story viewing */}

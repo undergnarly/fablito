@@ -223,7 +223,7 @@ export function TextToSpeech({ text, language = 'ru', className = '', isStoryMod
         size="sm"
         onClick={togglePlayPause}
         disabled={!text}
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 bg-purple-600/90 hover:bg-purple-700 border-purple-500 text-white"
       >
         {isPlaying && !isPaused ? (
           <Pause className="h-4 w-4" />
@@ -238,7 +238,7 @@ export function TextToSpeech({ text, language = 'ru', className = '', isStoryMod
           variant="outline"
           size="sm"
           onClick={stop}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 bg-purple-600/90 hover:bg-purple-700 border-purple-500 text-white"
         >
           <VolumeX className="h-4 w-4" />
           {t.stop}
@@ -246,8 +246,8 @@ export function TextToSpeech({ text, language = 'ru', className = '', isStoryMod
       )}
 
       {selectedVoice && (
-        <div className="text-xs text-muted-foreground">
-          {selectedVoice.name} ({selectedVoice.lang})
+        <div className="text-xs text-purple-700">
+          {selectedVoice.lang}
         </div>
       )}
     </div>

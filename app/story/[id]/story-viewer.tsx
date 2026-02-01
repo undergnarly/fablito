@@ -750,10 +750,7 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
                 {/* Page content */}
                 <div className="space-y-4 md:space-y-6">
                   <p className="text-base md:text-lg lg:text-xl leading-relaxed text-gray-800" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', lineHeight: '1.6' }}>
-                    <span className="text-3xl md:text-4xl lg:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 float-left mr-2 md:mr-3 leading-none drop-shadow-sm" style={{ fontFamily: 'SuperJoyful, system-ui, sans-serif' }}>
-                      {storyContent.pages[currentPage].text.charAt(0)}
-                    </span>
-                    {storyContent.pages[currentPage].text.substring(1)}
+                    {storyContent.pages[currentPage].text}
                   </p>
 
                   {/* Text-to-Speech controls */}
