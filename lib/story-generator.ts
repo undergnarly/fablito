@@ -75,34 +75,35 @@ export function getThemeDescription(theme: string, language: string): string {
 }
 
 // Age-appropriate language guidelines
+// ВАЖНО: Максимум 1-2 коротких предложения на страницу для удобства чтения на мобильных устройствах
 export function getAgeAppropriateGuidelines(age: number): string {
   if (age >= 3 && age <= 5) {
     return `AGE 3-5 YEARS:
-- Use very simple sentences (3-5 words each)
+- Use very simple sentences (3-6 words each)
 - Include repetition and predictable patterns
 - Focus on basic emotions and actions
 - Use familiar concepts (family, animals, toys)
-- Maximum 2 sentences per page`
+- CRITICAL: Maximum 1-2 SHORT sentences per page (for mobile reading)`
   } else if (age >= 6 && age <= 8) {
     return `AGE 6-8 YEARS:
-- Use longer sentences (5-8 words)
+- Use simple sentences (5-10 words each)
 - Include light humor and gentle challenges
 - Introduce problem-solving concepts
 - Can include mild adventure elements
-- 2-3 sentences per page`
+- CRITICAL: Maximum 1-2 sentences per page (for mobile reading)`
   } else if (age >= 9 && age <= 12) {
     return `AGE 9-12 YEARS:
-- Use complex sentences and richer vocabulary
+- Use moderate sentences and age-appropriate vocabulary
 - Include deeper moral concepts
 - Can handle more complex plot structures
 - Include character development and growth
-- 3-4 sentences per page`
+- CRITICAL: Maximum 2 sentences per page (for mobile reading)`
   } else {
     return `GENERAL GUIDELINES:
 - Age-appropriate language and concepts
 - Clear moral teachings
 - Engaging adventure elements
-- 2-4 sentences per page`
+- CRITICAL: Maximum 1-2 sentences per page (for mobile reading)`
   }
 }
 
@@ -197,6 +198,13 @@ STORY REQUIREMENTS:
 - Include dialogue and interactions with other characters
 - Make ${params.childName} brave, kind, and relatable
 
+CRITICAL TEXT LENGTH REQUIREMENT (FOR MOBILE READING):
+- Each page MUST have ONLY 1-2 SHORT sentences
+- Maximum 20-30 words per page
+- 80% of users read on mobile phones - text must fit on small screens
+- Break longer ideas into multiple pages
+- Keep each page text brief and impactful
+
 ${params.textStory ? 
   `PARENT'S STORY INSPIRATION:
 The parent provided this story idea: "${params.textStory}"
@@ -250,13 +258,15 @@ You are an expert children's story creator specializing in personalized, age-app
 
 Create stories that parents will love reading with their children and that children will remember fondly.
 
+FINAL REMINDER: Each page text MUST be 1-2 short sentences only (20-30 words max). This is for mobile phone reading.
+
 Return your response as JSON with this exact structure (REMEMBER: exactly ${pageCount} pages in the array!):
       {
         "title": "Story title here",
         "pages": [
           {
-            "chapter": "Page 1 title",
-            "text": "Page 1 story text",
+            "chapter": "Page 1",
+            "text": "One or two short sentences only. Maximum 20-30 words.",
             "imagePrompt": "Detailed image description for page 1"
           }
           // ... repeat for EXACTLY ${pageCount} pages total
