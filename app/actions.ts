@@ -9,6 +9,14 @@ import { getSetting, isKvAvailable } from "@/lib/settings"
 
 export async function createStoryAction(formData: FormData) {
   console.log("[ACTIONS] Starting createStoryAction")
+  console.log("[ACTIONS] Environment check:", {
+    hasKvUrl: !!process.env.KV_REST_API_URL,
+    hasKvToken: !!process.env.KV_REST_API_TOKEN,
+    hasOpenAI: !!process.env.OPENAI_API_KEY,
+    hasGoogleAI: !!process.env.GOOGLE_API_KEY,
+    isKvAvailable
+  })
+
   try {
     // Check if KV is available (imported from settings)
 
@@ -21,8 +29,12 @@ export async function createStoryAction(formData: FormData) {
     // Check if submissions are halted (только если KV доступен)
     let submissionsHalted = false
     if (isKvAvailable) {
-      submissionsHalted = await getSetting("SUBMISSIONS_HALTED")
-      console.log(`[ACTIONS] Submissions halted: ${submissionsHalted}`)
+      try {
+        submissionsHalted = await getSetting("SUBMISSIONS_HALTED")
+        console.log(`[ACTIONS] Submissions halted: ${submissionsHalted}`)
+      } catch (settingsError) {
+        console.error("[ACTIONS] Error getting settings:", settingsError)
+      }
     } else {
       console.log("[ACTIONS] KV недоступен - пропускаем проверку submissions_halted")
     }
@@ -73,29 +85,34 @@ export async function createStoryAction(formData: FormData) {
 
     // Create the story in KV with new fields
     console.log(`[ACTIONS] Creating story in database...`)
-    await createStory({
-      id: storyId,
-      title,
-      
-      // New required fields
-      childName,
-      childAge,
-      theme,
-      style: {
-        language: language as "ru" | "en" | "kz"
-      },
-      textStory: textStory || undefined,
-      
-      // Legacy fields for compatibility
-      prompt,
-      age: ageRange,
-      
-      visibility: visibility === "unlisted" ? "unlisted" : "public",
-      status: "generating",
-      createdAt: new Date().toISOString(),
-      deletionToken,
-    })
-    console.log(`[ACTIONS] Story created successfully in database`)
+    try {
+      await createStory({
+        id: storyId,
+        title,
+
+        // New required fields
+        childName,
+        childAge,
+        theme,
+        style: {
+          language: language as "ru" | "en" | "kz"
+        },
+        textStory: textStory || undefined,
+
+        // Legacy fields for compatibility
+        prompt,
+        age: ageRange,
+
+        visibility: visibility === "unlisted" ? "unlisted" : "public",
+        status: "generating",
+        createdAt: new Date().toISOString(),
+        deletionToken,
+      })
+      console.log(`[ACTIONS] Story created successfully in database`)
+    } catch (dbError) {
+      console.error(`[ACTIONS] Database error creating story:`, dbError)
+      throw new Error(`Failed to create story in database: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`)
+    }
 
     // Use after() to run the story generation after the response is sent
     console.log(`[ACTIONS] Scheduling background story generation...`)
