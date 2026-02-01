@@ -229,12 +229,6 @@ export function TextToSpeech({ text, language = 'ru', className = '', isStoryMod
           {t.stop}
         </Button>
       )}
-
-      {selectedVoice && (
-        <div className="text-xs text-purple-700">
-          {selectedVoice.lang}
-        </div>
-      )}
     </div>
   )
 }

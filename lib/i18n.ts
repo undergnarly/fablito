@@ -62,7 +62,9 @@ export interface Translations {
   realistic: string
   fantasy: string
   minimalist: string
-  
+  anime: string
+  handdrawn: string
+
   // Theme options
   selectThemePlaceholder: string
   relationshipsFriendship: string
@@ -372,10 +374,12 @@ export const translations: Record<Language, Translations> = {
     // Style options
     watercolor: 'Watercolor',
     cartoon: 'Cartoon',
-    realistic: 'Realistic',
+    realistic: 'Photorealistic',
     fantasy: 'Fantasy',
     minimalist: 'Minimalist',
-    
+    anime: 'Anime',
+    handdrawn: 'Child Drawing',
+
     // Theme options
     selectThemePlaceholder: 'Select story theme',
     relationshipsFriendship: '👫 Relationships and Friendship',
@@ -684,10 +688,12 @@ export const translations: Record<Language, Translations> = {
     // Style options
     watercolor: 'Акварель',
     cartoon: 'Мультяшный',
-    realistic: 'Реалистичный',
+    realistic: 'Фотореализм',
     fantasy: 'Фэнтези',
     minimalist: 'Минималистичный',
-    
+    anime: 'Аниме',
+    handdrawn: 'Детский рисунок',
+
     // Theme options
     selectThemePlaceholder: 'Выберите тему сказки',
     relationshipsFriendship: '👫 Отношения и дружба',
@@ -996,10 +1002,12 @@ export const translations: Record<Language, Translations> = {
     // Style options
     watercolor: 'Сулы бояу',
     cartoon: 'Мультфильм',
-    realistic: 'Реалистік',
+    realistic: 'Фотореалистік',
     fantasy: 'Фантазия',
     minimalist: 'Минималистік',
-    
+    anime: 'Аниме',
+    handdrawn: 'Балалар суреті',
+
     // Theme options
     selectThemePlaceholder: 'Ертегі тақырыбын таңдаңыз',
     relationshipsFriendship: '👫 Қарым-қатынас пен достық',

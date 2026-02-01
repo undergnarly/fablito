@@ -71,12 +71,12 @@ export const ILLUSTRATION_STYLES: Record<string, {
     lighting: "Bright, even lighting with simple cast shadows, high visibility"
   },
   realistic: {
-    name: "Semi-Realistic Digital Painting",
-    description: "Detailed digital painting with realistic proportions but stylized for children. Soft, rendered appearance with attention to texture and depth. Similar to Disney concept art or Pixar storybook illustrations.",
-    colorPalette: "Rich, natural colors with cinematic color grading, balanced saturation, realistic skin tones with warm undertones",
-    technique: "Detailed digital brushwork, soft blending, realistic textures, subtle gradients, painterly finish",
-    mood: "Magical yet grounded, immersive, emotionally resonant",
-    lighting: "Cinematic lighting with depth, rim lights, ambient occlusion, dramatic but child-friendly"
+    name: "Photorealistic Portrait Photography",
+    description: "Ultra-realistic photograph of a real child. Professional children's portrait photography with sharp focus, natural skin texture, and lifelike details. Looks like an actual photograph taken by a professional photographer, not an illustration or digital art.",
+    colorPalette: "True-to-life natural colors, accurate skin tones with natural variations, realistic eye colors with light reflections, natural hair color with individual strands visible",
+    technique: "Photorealistic rendering, sharp focus on face, natural skin pores and texture, realistic fabric textures on clothing, depth of field with soft background blur, high resolution details",
+    mood: "Warm, genuine, authentic, heartfelt, capturing real childhood moments",
+    lighting: "Natural soft lighting like golden hour photography, realistic shadows, catchlights in eyes, professional portrait lighting setup"
   },
   fantasy: {
     name: "Magical Fantasy Illustration",
@@ -93,6 +93,22 @@ export const ILLUSTRATION_STYLES: Record<string, {
     technique: "Simple geometric shapes, minimal details, clean lines, flat colors, thoughtful negative space, no outlines or thin lines only",
     mood: "Calm, modern, sophisticated yet playful, peaceful",
     lighting: "Flat, even lighting, minimal shadows, clean and bright"
+  },
+  anime: {
+    name: "Japanese Anime Style",
+    description: "Classic Japanese anime art style with expressive large eyes, stylized features, and dynamic compositions. Similar to Studio Ghibli or modern anime aesthetics. Appealing character designs with emotional expressiveness.",
+    colorPalette: "Vibrant anime colors, soft gradients on skin and hair, bright eye colors with detailed iris highlights, pastel backgrounds with saturated character colors",
+    technique: "Anime-style large expressive eyes with detailed highlights, small nose and mouth, stylized hair with flowing strands, clean linework, cel-shaded coloring, manga-inspired expressions",
+    mood: "Cute, expressive, heartwarming, adventurous, emotionally engaging",
+    lighting: "Anime-style lighting with soft shadows, hair shine highlights, glowing rim lights, dramatic backlighting for emotional scenes"
+  },
+  handdrawn: {
+    name: "Child's Hand-Drawn Art",
+    description: "Charming naive art style that looks like it was drawn by a talented child. Imperfect but endearing drawings with wobbly lines, simple shapes, and innocent creativity. Like crayon or colored pencil drawings from a child's imagination.",
+    colorPalette: "Bright crayon colors, uneven color fills that go outside the lines, primary colors mixed with unexpected combinations, white paper showing through",
+    technique: "Wobbly hand-drawn lines, stick-figure inspired proportions, simple circle heads with dot eyes, uneven coloring like crayon or colored pencil, charming imperfections, naive perspective",
+    mood: "Innocent, joyful, playful, imaginative, heartwarming in its simplicity",
+    lighting: "Flat childlike rendering, no complex shadows, simple sun in corner, basic day/night indication"
   }
 }
 

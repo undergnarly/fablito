@@ -646,6 +646,8 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
             <SelectItem value="realistic">{t.realistic}</SelectItem>
             <SelectItem value="fantasy">{t.fantasy}</SelectItem>
             <SelectItem value="minimalist">{t.minimalist}</SelectItem>
+            <SelectItem value="anime">{t.anime}</SelectItem>
+            <SelectItem value="handdrawn">{t.handdrawn}</SelectItem>
           </SelectContent>
         </Select>
       </div>
