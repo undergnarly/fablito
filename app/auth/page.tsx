@@ -16,7 +16,7 @@ function AuthContent() {
 
   // If there's a referral code, default to register tab
   const [activeTab, setActiveTab] = useState(referralCode ? "register" : "login")
-  const [requireCode, setRequireCode] = useState(false)
+  const [requireCode, setRequireCode] = useState<boolean | null>(null)
 
   useEffect(() => {
     fetch("/api/auth/registration-config")
@@ -24,6 +24,9 @@ function AuthContent() {
       .then(data => setRequireCode(data.requireCode))
       .catch(() => setRequireCode(false))
   }, [])
+
+  // Don't render form until we know if code is required (prevents hydration mismatch)
+  const isConfigLoaded = requireCode !== null
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -70,7 +73,13 @@ function AuthContent() {
             </TabsContent>
 
             <TabsContent value="register" className="mt-6">
-              <RegisterForm referralCode={referralCode || undefined} requireCode={requireCode} />
+              {isConfigLoaded ? (
+                <RegisterForm referralCode={referralCode || undefined} requireCode={requireCode} />
+              ) : (
+                <div className="flex justify-center py-8">
+                  <div className="animate-spin h-6 w-6 border-2 border-white/30 border-t-white rounded-full" />
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
