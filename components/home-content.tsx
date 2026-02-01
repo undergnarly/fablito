@@ -238,62 +238,55 @@ export function HomeContent({ stories }: HomeContentProps) {
               {/* Horizontal scroll on mobile */}
               <div className="flex overflow-x-auto pb-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-8 snap-x snap-mandatory md:snap-none scrollbar-hide">
                 {stories.slice(0, 6).map((story) => (
-                  <Card
-                    key={story.id}
-                    className="flex-shrink-0 w-[280px] md:w-auto snap-center group bg-gradient-to-br from-[#A31CF5]/90 to-[#7b2cbf]/90 border-white/20 backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_40px_rgba(255,107,157,0.5)] hover:border-pink-400/50 h-[380px] md:h-[420px] flex flex-col overflow-hidden"
-                  >
-                    <CardContent className="flex-1 flex flex-col p-0">
-                      {/* Image */}
-                      {story.previewImage && (
-                        <div className="aspect-video relative overflow-hidden">
-                          <img
-                            src={story.previewImage}
-                            alt={story.title}
-                            className="object-cover w-full h-full transition-all duration-500"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-[#A31CF5]/50 to-transparent" />
+                  <Link key={story.id} href={`/story/${story.id}`} className="flex-shrink-0 w-[280px] md:w-auto snap-center">
+                    <Card
+                      className="group bg-gradient-to-br from-[#A31CF5]/90 to-[#7b2cbf]/90 border-white/20 backdrop-blur-sm transition-all duration-300 hover:shadow-[0_0_40px_rgba(255,107,157,0.5)] hover:border-pink-400/50 flex flex-col overflow-hidden cursor-pointer h-full"
+                    >
+                      <CardContent className="flex-1 flex flex-col p-0">
+                        {/* Image */}
+                        {story.previewImage && (
+                          <div className="aspect-video relative overflow-hidden">
+                            <img
+                              src={story.previewImage}
+                              alt={story.title}
+                              className="object-cover w-full h-full transition-all duration-500 group-hover:scale-105"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-[#A31CF5]/50 to-transparent" />
 
-                          {/* Language flag */}
-                          {story.style?.language && (
-                            <div className="absolute top-3 left-3">
-                              <LanguageFlag language={story.style.language} size="sm" />
-                            </div>
-                          )}
-                        </div>
-                      )}
+                            {/* Language flag */}
+                            {story.style?.language && (
+                              <div className="absolute top-3 left-3">
+                                <LanguageFlag language={story.style.language} size="sm" />
+                              </div>
+                            )}
+                          </div>
+                        )}
 
-                      {/* Content */}
-                      <div className="p-4 md:p-5 flex-1 flex flex-col justify-between">
-                        <div>
+                        {/* Content */}
+                        <div className="p-4 md:p-5 flex flex-col">
                           <h3 className="font-bold text-lg md:text-xl mb-2 text-white line-clamp-2">
                             {story.title}
                           </h3>
-                          <p className="text-xs md:text-sm text-white/70">
+                          <p className="text-xs md:text-sm text-white/70 mb-3">
                             {story.childName && `${story.childName} • `}
                             {formatDate(story.createdAt)}
                           </p>
-                        </div>
 
-                        {/* Button */}
-                        <div className="flex justify-between items-center mt-3 md:mt-4">
-                          <span className="text-xs md:text-sm text-white/60 capitalize">
-                            {story.status === "generating" ? t.loading : ""}
-                          </span>
-                          <Link href={`/story/${story.id}`}>
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              className="bg-white/20 border-white/30 text-white hover:bg-white/30 rounded-full text-sm px-4 py-2 active:scale-95 transition-all"
-                            >
+                          {/* Button */}
+                          <div className="flex justify-between items-center">
+                            <span className="text-xs md:text-sm text-white/60 capitalize">
+                              {story.status === "generating" ? t.loading : ""}
+                            </span>
+                            <span className="bg-white/20 border border-white/30 text-white rounded-full text-sm px-4 py-2 flex items-center group-hover:bg-white/30 transition-all">
                               {t.read}
                               <ChevronRight className="ml-1 h-4 w-4" />
-                            </Button>
-                          </Link>
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
 
