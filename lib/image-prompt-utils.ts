@@ -23,6 +23,7 @@ export interface ImagePromptParams {
   character: CharacterParams
   style: string  // watercolor, cartoon, realistic, fantasy, minimalist
   isFirstImage: boolean
+  isChildPhoto?: boolean  // True if reference image is an uploaded photo of the real child
 }
 
 /**
@@ -185,10 +186,36 @@ export function buildImagePrompt(params: ImagePromptParams): string {
  * Focuses on maintaining character consistency from the reference image
  */
 export function buildReferenceImagePrompt(params: ImagePromptParams): string {
-  const { sceneDescription, character, style } = params
+  const { sceneDescription, character, style, isChildPhoto } = params
 
   const styleConfig = ILLUSTRATION_STYLES[style] || ILLUSTRATION_STYLES.watercolor
 
+  // Special prompt when reference is an actual photo of the child
+  if (isChildPhoto) {
+    return `Look at the photo of the real child above. Create a ${styleConfig.name} illustration where the main character looks EXACTLY like this child.
+
+CRITICAL - MATCH THE CHILD'S APPEARANCE:
+- The illustrated character ${character.name} must look like the child in the photo
+- PRESERVE: exact face shape, eye shape and color, nose shape, hair color and style
+- PRESERVE: skin tone, any distinctive features (freckles, dimples, etc.)
+- PRESERVE: the child's clothing style, colors, and any accessories visible in the photo
+- Transform the real child into an illustrated character in ${styleConfig.name} style
+- The character should be instantly recognizable as the child from the photo
+
+SCENE TO ILLUSTRATE:
+${sceneDescription}
+
+ART STYLE:
+- ${styleConfig.description}
+- ${styleConfig.technique}
+- ${styleConfig.colorPalette}
+- ${styleConfig.lighting}
+- ${styleConfig.mood}
+
+Create a beautiful children's book illustration where ${character.name} (the child from the photo) is the hero of this scene. The character must be recognizable as the same child throughout the story.`
+  }
+
+  // Standard prompt for generated image reference
   return `Using the character from the reference image above, create a new ${styleConfig.name} illustration.
 
 CRITICAL CHARACTER CONSISTENCY:

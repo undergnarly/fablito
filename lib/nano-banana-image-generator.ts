@@ -17,6 +17,7 @@ export interface ImageGenerationParams {
   storyId: string
   pageIndex: number
   referenceImage?: string
+  isChildPhoto?: boolean // True if referenceImage is an uploaded photo of the real child
 }
 
 /**
@@ -34,12 +35,12 @@ export interface ImageGenerationParams {
 export async function generateImageWithNanoBanana(
   params: ImageGenerationParams
 ): Promise<{ imageUrl: string; base64Data: string }> {
-  const { sceneDescription, character, style, storyId, pageIndex, referenceImage } = params
+  const { sceneDescription, character, style, storyId, pageIndex, referenceImage, isChildPhoto } = params
 
   console.log(`[NANO-BANANA] Starting image generation for story ${storyId}, page ${pageIndex}`)
   console.log(`[NANO-BANANA] Character: ${character.name}, ${character.age}yo ${character.gender}`)
   console.log(`[NANO-BANANA] Style: ${style}`)
-  console.log(`[NANO-BANANA] Has reference image: ${!!referenceImage}`)
+  console.log(`[NANO-BANANA] Has reference image: ${!!referenceImage}, Is child photo: ${!!isChildPhoto}`)
 
   const apiKey = process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENERATIVE_AI_API_KEY
 
@@ -64,7 +65,8 @@ export async function generateImageWithNanoBanana(
       sceneDescription,
       character,
       style,
-      isFirstImage: !referenceImage
+      isFirstImage: !referenceImage,
+      isChildPhoto: isChildPhoto
     }
 
     if (referenceImage) {

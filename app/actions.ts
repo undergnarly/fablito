@@ -70,11 +70,26 @@ export async function createStoryAction(formData: FormData) {
     const visibility = (formData.get("visibility") as string) || "public"
     const textStory = formData.get("textStory") as string
 
+    // Extract character photo if uploaded
+    let childPhotoBase64: string | undefined = undefined
+    const characterPhoto = formData.get("characterPhoto") as File | null
+    if (characterPhoto && characterPhoto.size > 0) {
+      console.log(`[ACTIONS] Character photo uploaded: ${characterPhoto.name}, size: ${characterPhoto.size}`)
+      try {
+        const arrayBuffer = await characterPhoto.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+        childPhotoBase64 = buffer.toString('base64')
+        console.log(`[ACTIONS] Character photo converted to base64 (${childPhotoBase64.length} chars)`)
+      } catch (photoError) {
+        console.error(`[ACTIONS] Error processing character photo:`, photoError)
+      }
+    }
+
     // Legacy compatibility
     const prompt = theme || "A fun alphabet adventure for children"
     const age = `${childAge}`
 
-    console.log(`[ACTIONS] Form data - Child: ${childName}, Gender: ${childGender}, Age: ${childAge}, Pages: ${pageCount}, Theme: ${theme}, Language: ${language}, Style: ${illustrationStyle}`)
+    console.log(`[ACTIONS] Form data - Child: ${childName}, Gender: ${childGender}, Age: ${childAge}, Pages: ${pageCount}, Theme: ${theme}, Language: ${language}, Style: ${illustrationStyle}, HasPhoto: ${!!childPhotoBase64}`)
 
     // Validation
     if (!childName) {
@@ -160,7 +175,8 @@ export async function createStoryAction(formData: FormData) {
               language: language as "ru" | "en" | "kz",
               illustration: illustrationStyle
             },
-            textStory: textStory || undefined
+            textStory: textStory || undefined,
+            childPhotoBase64
           })
         } catch (genError) {
           console.error(`[ACTIONS] Background generation error:`, genError)

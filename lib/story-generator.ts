@@ -29,6 +29,7 @@ interface StoryParams {
     illustration: string
   }
   textStory?: string
+  childPhotoBase64?: string // Uploaded photo of the child for character consistency
 }
 
 // Theme mapping for better story generation
@@ -383,7 +384,18 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
     const maxImages = story.pages.length // Generate all images
     console.log(`[STORY-GEN] Generating ${maxImages} illustrations with character consistency...`)
     const images: string[] = []
-    let characterReference: string | undefined = undefined // Base64 of first image for consistency
+
+    // Use uploaded child photo as initial reference, or build from first generated image
+    let characterReference: string | undefined = params.childPhotoBase64
+    if (characterReference) {
+      console.log(`[STORY-GEN] 📸 Using uploaded child photo as character reference (${characterReference.length} chars)`)
+      // Save uploaded photo as story's character reference
+      await updateStory(storyId, {
+        characterReference: characterReference
+      })
+    } else {
+      console.log(`[STORY-GEN] No child photo uploaded - will use first generated image as reference`)
+    }
 
     for (let i = 0; i < maxImages; i++) {
       const page = story.pages[i]
@@ -395,6 +407,9 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
 
         // Use the new comprehensive image generation API
         // Passes all character details, style, and reference image for consistency
+        // Determine if we're using the uploaded child photo as reference
+        const isUsingChildPhoto = !!params.childPhotoBase64 && characterReference === params.childPhotoBase64
+
         const imagePromise = generateImage({
           sceneDescription: page.imagePrompt,
           character: {
@@ -405,7 +420,8 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
           style: params.style.illustration,
           storyId,
           pageIndex: i,
-          referenceImage: characterReference // Pass reference image for pages 2+
+          referenceImage: characterReference, // Pass uploaded photo or first generated image
+          isChildPhoto: isUsingChildPhoto // True when using uploaded photo of real child
         })
 
         const timeoutPromise = new Promise<{ imageUrl: string; base64Data: string }>((_, reject) => {
@@ -415,12 +431,11 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
         const result = await Promise.race([imagePromise, timeoutPromise])
         images.push(result.imageUrl)
 
-        // Save the first image's base64 as character reference for subsequent pages
-        if (i === 0 && result.base64Data) {
+        // If no uploaded photo, save the first generated image as character reference
+        if (i === 0 && !params.childPhotoBase64 && result.base64Data) {
           characterReference = result.base64Data
-          console.log(`[STORY-GEN] ✅ Character reference saved (${result.base64Data.length} chars)`)
+          console.log(`[STORY-GEN] ✅ First generated image saved as character reference (${result.base64Data.length} chars)`)
 
-          // Also save to story for potential future use
           await updateStory(storyId, {
             characterReference: result.base64Data
           })
