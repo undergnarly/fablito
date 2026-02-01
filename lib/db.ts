@@ -674,29 +674,50 @@ export async function getAllUsers(): Promise<User[]> {
   }
 
   try {
-    const allKeys = await kv.keys('user:*')
+    // Use SCAN instead of KEYS to avoid "too many keys" error
+    const userKeys: string[] = []
+    let cursor = 0
 
-    // Filter to only include actual user keys (user:uuid format)
-    // Exclude: user:email:*, user:uuid:transactions, etc.
-    const userKeys = allKeys.filter(key => {
-      const parts = key.split(':')
-      // Valid user key has exactly 2 parts: "user" and "uuid"
-      return parts.length === 2 && parts[0] === 'user'
-    })
+    do {
+      const [nextCursor, keys] = await kv.scan(cursor, { match: 'user:*', count: 100 })
+      cursor = nextCursor
 
-    // Fetch all users in parallel for better performance
-    const userResults = await Promise.all(
-      userKeys.map(async (key) => {
-        try {
-          return await kv.get(key) as User
-        } catch (e) {
-          console.error(`[DB] Error getting user for key ${key}:`, e)
-          return null
+      // Filter to only include actual user keys (user:uuid format)
+      // Exclude: user:email:*, user:uuid:transactions, referral:*, etc.
+      for (const key of keys) {
+        const parts = key.split(':')
+        // Valid user key has exactly 2 parts: "user" and "uuid"
+        if (parts.length === 2 && parts[0] === 'user') {
+          userKeys.push(key)
         }
-      })
-    )
+      }
+    } while (cursor !== 0)
 
-    const users = userResults.filter((user): user is User => user !== null && !!user.id && !!user.name)
+    console.log(`[DB] Found ${userKeys.length} user keys via SCAN`)
+
+    // Fetch users in batches to avoid overwhelming the connection
+    const BATCH_SIZE = 50
+    const users: User[] = []
+
+    for (let i = 0; i < userKeys.length; i += BATCH_SIZE) {
+      const batch = userKeys.slice(i, i + BATCH_SIZE)
+      const userResults = await Promise.all(
+        batch.map(async (key) => {
+          try {
+            return await kv.get(key) as User
+          } catch (e) {
+            console.error(`[DB] Error getting user for key ${key}:`, e)
+            return null
+          }
+        })
+      )
+
+      for (const user of userResults) {
+        if (user && user.id && user.name) {
+          users.push(user)
+        }
+      }
+    }
 
     return users.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   } catch (error) {

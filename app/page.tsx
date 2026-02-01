@@ -7,6 +7,9 @@ import { detectLanguageFromStory } from "@/lib/language-detector"
 
 export const maxDuration = 120
 
+// Maximum stories to show on home page (to keep cache under 2MB limit)
+const MAX_HOME_STORIES = 100
+
 // Cache the stories for 30 seconds
 const getStoriesWithCache = unstable_cache(
   async () => {
@@ -16,36 +19,40 @@ const getStoriesWithCache = unstable_cache(
       return []
     }
 
-    // Process stories for the response
-    const processedStories = allStories.map((story) => {
-      // Remove sensitive data but keep style information
-      const { deletionToken, storyContent, images, ...safeStoryData } = story
+    // Filter out failed stories and unlisted stories first
+    // Then sort by creation date (newest first)
+    const filteredStories = allStories
+      .filter((story) => story.status !== "failed")
+      .filter((story) => story.visibility !== "unlisted")
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, MAX_HOME_STORIES) // Limit to avoid cache overflow
 
-      // Parse images with error handling
+    // Process stories for the response - only keep essential fields for home page
+    return filteredStories.map((story) => {
+      // Parse images with error handling - only get first image for preview
       let previewImage = null
       try {
-        if (images) {
-          const parsedImages = JSON.parse(images)
+        if (story.images) {
+          const parsedImages = JSON.parse(story.images)
           previewImage = parsedImages[0] || null
         }
       } catch (error) {
         console.error(`Error parsing images for story ${story.id}:`, error)
       }
 
+      // Return only essential fields for home page display
       return {
-        ...safeStoryData,
+        id: story.id,
+        title: story.title,
+        childName: story.childName,
+        childAge: story.childAge,
+        status: story.status,
+        visibility: story.visibility,
+        createdAt: story.createdAt,
         previewImage,
-        // Ensure style information is preserved
         style: story.style || { language: detectLanguageFromStory(story) }
       }
     })
-
-    // Filter out failed stories and unlisted stories
-    // Then sort by creation date (newest first)
-    return processedStories
-      .filter((story) => story.status !== "failed")
-      .filter((story) => story.visibility !== "unlisted")
-      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   },
   ["stories-list"],
   { revalidate: 30 }, // Revalidate every 30 seconds
