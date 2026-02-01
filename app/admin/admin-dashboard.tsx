@@ -23,6 +23,7 @@ import { LanguageFlag } from "@/components/language-flag"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import SettingsPanel from "./settings-panel"
 import UsersPanel from "./users-panel"
+import StoryDetailsPanel from "./story-details-panel"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface Story {
@@ -32,9 +33,24 @@ interface Story {
   createdAt: string
   previewImage?: string
   visibility: string
+  childName?: string
+  childAge?: number
+  theme?: string
   style?: {
     language: 'ru' | 'en' | 'kz'
   }
+}
+
+interface StoryDetails extends Story {
+  completedAt?: string
+  storyContent?: {
+    title: string
+    pages: { text: string; imagePrompt?: string }[]
+    moral: string
+  }
+  images?: string[]
+  characterReference?: string
+  textStory?: string
 }
 
 export default function AdminDashboard() {
@@ -50,6 +66,9 @@ export default function AdminDashboard() {
   const [settings, setSettings] = useState({ ALPHABET_LETTERS_COUNT: 8, SUBMISSIONS_HALTED: false })
   const [loadingSettings, setLoadingSettings] = useState(true)
   const [visibilityFilter, setVisibilityFilter] = useState<"all" | "public" | "unlisted">("all")
+  const [selectedStory, setSelectedStory] = useState<StoryDetails | null>(null)
+  const [storyDetailsOpen, setStoryDetailsOpen] = useState(false)
+  const [loadingDetails, setLoadingDetails] = useState(false)
 
   const fetchStories = async () => {
     setLoading(true)
@@ -204,6 +223,29 @@ export default function AdminDashboard() {
     })
   }
 
+  const viewStoryDetails = async (storyId: string) => {
+    setLoadingDetails(true)
+    setStoryDetailsOpen(true)
+
+    try {
+      const response = await fetch(`/api/admin/stories/${storyId}`)
+      if (!response.ok) throw new Error("Failed to fetch story details")
+
+      const storyDetails = await response.json()
+      setSelectedStory(storyDetails)
+    } catch (error) {
+      console.error("Error fetching story details:", error)
+      toast({
+        title: "Error",
+        description: "Failed to load story details",
+        variant: "destructive",
+      })
+      setStoryDetailsOpen(false)
+    } finally {
+      setLoadingDetails(false)
+    }
+  }
+
   const handleManualCleanup = async () => {
     try {
       setLoading(true)
@@ -327,7 +369,7 @@ export default function AdminDashboard() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 gap-4">
-              {stories.map((story) => (
+              {stories.map((story, index) => (
                 <Card key={story.id} className="border border-primary/10 shadow overflow-hidden rounded-lg h-[200px] flex flex-col">
                   <div className="flex flex-col md:flex-row">
                     <div className="relative h-32 md:w-48 bg-gray-100">
@@ -392,6 +434,14 @@ export default function AdminDashboard() {
                           </div>
                         </div>
                         <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            onClick={() => viewStoryDetails(story.id)}
+                          >
+                            <BookOpen className="h-4 w-4 mr-1" />
+                            Details
+                          </Button>
                           <Link href={`/story/${story.id}`} target="_blank">
                             <Button size="sm" variant="outline">
                               View
@@ -476,6 +526,16 @@ export default function AdminDashboard() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Story Details Panel */}
+      <StoryDetailsPanel
+        story={selectedStory}
+        open={storyDetailsOpen}
+        onClose={() => {
+          setStoryDetailsOpen(false)
+          setSelectedStory(null)
+        }}
+      />
     </div>
   )
 }
