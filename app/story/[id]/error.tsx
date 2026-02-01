@@ -19,28 +19,28 @@ export default function Error({
   }, [error])
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 p-4 md:p-8">
+    <main className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <Link href="/stories">
-            <Button variant="ghost" className="pl-0">
+            <Button variant="ghost" className="pl-0 text-white hover:text-white/80 hover:bg-white/10">
               <ArrowLeft className="mr-2 h-4 w-4" />
               Back to Stories
             </Button>
           </Link>
         </div>
 
-        <Card className="border-2 border-red-200 shadow-lg rounded-xl">
+        <Card className="border-2 border-red-500/50 shadow-lg rounded-xl bg-white/10 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="flex items-center text-red-600">
+            <CardTitle className="flex items-center text-red-400">
               <AlertCircle className="mr-2 h-5 w-5" />
               Error Loading Story
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="mb-4">We encountered an error while trying to load this story.</p>
-            <div className="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-              <p className="text-sm text-blue-700">
+            <p className="mb-4 text-white/80">We encountered an error while trying to load this story.</p>
+            <div className="bg-white/10 border-l-4 border-blue-400 p-4 mb-4">
+              <p className="text-sm text-white/70">
                 <strong>For developers:</strong> If you're running this locally and seeing database errors, 
                 make sure to set up your Vercel KV credentials in the <code>.env.local</code> file.
               </p>

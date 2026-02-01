@@ -3,7 +3,7 @@ import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
 
 export default function Loading() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 dark:from-black dark:via-black dark:to-black/90">
+    <div className="min-h-screen">
       <div className="max-w-6xl mx-auto px-4 py-12 md:px-8">
         {/* Header Section Skeleton */}
         <div className="mb-8 flex flex-col md:flex-row md:items-center md:justify-between">

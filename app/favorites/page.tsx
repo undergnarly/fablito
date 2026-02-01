@@ -58,15 +58,13 @@ export default function FavoritesPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 p-4 md:p-8 dark:from-black dark:via-black dark:to-black/90">
+      <div className="min-h-screen p-4 md:p-8">
         <div className="max-w-4xl mx-auto">
           <div className="mb-8">
             <Link href="/">
-              <Button variant="ghost" className="group">
+              <Button variant="ghost" className="group text-white hover:text-white/80 hover:bg-white/10">
                 <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 font-medium">
-                  Back to Home
-                </span>
+                Back to Home
               </Button>
             </Link>
           </div>
@@ -88,7 +86,7 @@ export default function FavoritesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 p-4 md:p-8 dark:from-black dark:via-black dark:to-black/90">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <Link href="/">
@@ -108,22 +106,22 @@ export default function FavoritesPage() {
               <Heart size={48} className="text-primary" />
             </div>
           </div>
-          <h1 className="text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 mb-4">
+          <h1 className="text-4xl font-bold text-white glow-text mb-4">
             My Favorite Stories
           </h1>
-          <p className="text-lg text-muted-foreground max-w-2xl">Stories you've saved for easy access</p>
+          <p className="text-lg text-white/70 max-w-2xl">Stories you've saved for easy access</p>
         </div>
 
         {favorites.length === 0 ? (
-          <Card className="border border-primary/20 shadow-lg rounded-xl transform transition-all duration-300 hover:shadow-xl dark:bg-gray-800 dark:border-primary/10">
+          <Card className="border border-white/20 shadow-lg rounded-xl transform transition-all duration-300 hover:shadow-xl bg-white/10 backdrop-blur-sm">
             <CardContent className="pt-6 text-center py-12">
               <div className="flex justify-center mb-4">
                 <div className="relative">
-                  <Heart className="h-12 w-12 text-primary/30" />
+                  <Heart className="h-12 w-12 text-pink-400/50" />
                 </div>
               </div>
-              <h2 className="text-xl font-bold mb-4">No Favorites Yet</h2>
-              <p className="text-muted-foreground mb-6">You haven't added any stories to your favorites yet.</p>
+              <h2 className="text-xl font-bold mb-4 text-white">No Favorites Yet</h2>
+              <p className="text-white/70 mb-6">You haven't added any stories to your favorites yet.</p>
               <Link href="/stories">
                 <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 transition-all duration-300">
                   Browse Stories
@@ -136,7 +134,7 @@ export default function FavoritesPage() {
             {favorites.map((story, index) => (
               <Card
                 key={story.id}
-                className="border border-primary/20 shadow-lg overflow-hidden rounded-xl transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 dark:bg-gray-800 dark:border-primary/10 h-[400px] flex flex-col"
+                className="border border-white/20 shadow-lg overflow-hidden rounded-xl transform transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white/10 backdrop-blur-sm h-[400px] flex flex-col"
                 style={{
                   animationDelay: `${index * 0.1}s`,
                   opacity: 0,
@@ -145,8 +143,8 @@ export default function FavoritesPage() {
                 }}
               >
                 <CardHeader className="flex-shrink-0">
-                  <CardTitle className="text-xl line-clamp-2">{story.title}</CardTitle>
-                  <CardDescription>
+                  <CardTitle className="text-xl line-clamp-2 text-white">{story.title}</CardTitle>
+                  <CardDescription className="text-white/60">
                     {story.childName && `Starring ${story.childName} • `}
                     Added on {formatDate(story.createdAt)}
                   </CardDescription>
@@ -171,8 +169,8 @@ export default function FavoritesPage() {
                         )}
                       </div>
                     ) : (
-                      <div className="aspect-video bg-gray-100 dark:bg-gray-700 rounded-md flex items-center justify-center">
-                        <BookOpen className="h-12 w-12 text-gray-300" />
+                      <div className="aspect-video bg-white/10 rounded-md flex items-center justify-center">
+                        <BookOpen className="h-12 w-12 text-white/30" />
                       </div>
                     )}
                   </div>
@@ -187,9 +185,9 @@ export default function FavoritesPage() {
                       variant="outline"
                       size="icon"
                       onClick={() => handleRemoveFavorite(story)}
-                      className="flex-shrink-0"
+                      className="flex-shrink-0 border-white/20 bg-white/10 text-pink-400 hover:bg-white/20"
                     >
-                      <Heart className="h-4 w-4 fill-primary text-primary" />
+                      <Heart className="h-4 w-4 fill-pink-400 text-pink-400" />
                     </Button>
                   </div>
                 </CardContent>

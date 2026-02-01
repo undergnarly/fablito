@@ -19,28 +19,26 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-purple-50 via-blue-50 to-pink-50 p-4 md:p-8">
+    <div className="min-h-screen p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <Link href="/">
-            <Button variant="ghost" className="pl-0 group">
+            <Button variant="ghost" className="pl-0 group text-white hover:text-white/80 hover:bg-white/10">
               <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-600 to-pink-600 font-medium">
-                Back to Home
-              </span>
+              Back to Home
             </Button>
           </Link>
         </div>
 
-        <Card className="border-2 border-red-200 shadow-lg rounded-xl">
+        <Card className="border-2 border-red-500/50 shadow-lg rounded-xl bg-white/10 backdrop-blur-sm">
           <CardHeader>
-            <CardTitle className="flex items-center text-red-600">
+            <CardTitle className="flex items-center text-red-400">
               <AlertCircle className="mr-2 h-5 w-5" />
               Something went wrong!
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="mb-4">We encountered an error while trying to load the stories.</p>
+            <p className="mb-4 text-white/80">We encountered an error while trying to load the stories.</p>
             <Button onClick={reset} className="mr-2">
               <RefreshCw className="mr-2 h-4 w-4" />
               Try again
