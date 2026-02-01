@@ -656,11 +656,16 @@ export async function getAllUsers(): Promise<User[]> {
 
   try {
     const allKeys = await kv.keys('user:*')
-    console.log(`[DB] Found ${allKeys.length} total user-related keys`)
+    console.log(`[DB] Found ${allKeys.length} total user-related keys:`, allKeys)
 
-    // Filter out email mapping keys (user:email:*) - they contain IDs, not user objects
-    const userKeys = allKeys.filter(key => !key.includes(':email:'))
-    console.log(`[DB] Filtered to ${userKeys.length} actual user keys`)
+    // Filter to only include actual user keys (user:uuid format)
+    // Exclude: user:email:*, user:uuid:transactions, etc.
+    const userKeys = allKeys.filter(key => {
+      const parts = key.split(':')
+      // Valid user key has exactly 2 parts: "user" and "uuid"
+      return parts.length === 2 && parts[0] === 'user'
+    })
+    console.log(`[DB] Filtered to ${userKeys.length} actual user keys:`, userKeys)
 
     const users: User[] = []
 
