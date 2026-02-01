@@ -64,7 +64,7 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
     const initialCount = Math.min(5, stories.length)
     const initialStories = stories.slice(0, initialCount).map((story, index) => ({
       ...story,
-      displayTime: 20 + index * 10, // Stagger initial times
+      displayTime: 20 + index * 10,
       isNew: false
     }))
     setVisibleStories(initialStories)
@@ -80,9 +80,7 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
     const addNewStory = () => {
       setCurrentIndex(prev => {
         const nextIndex = prev + 1
-        // Reset when we've shown all stories
         if (nextIndex >= stories.length) {
-          // Reset visible stories and start over
           setVisibleStories([{
             ...stories[0],
             displayTime: 0,
@@ -96,7 +94,6 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
       setVisibleStories(prev => {
         const storyToAdd = stories[currentIndex % stories.length]
 
-        // Check if this story is already visible
         const alreadyVisible = prev.some(s => s.id === storyToAdd.id)
         if (alreadyVisible) {
           return prev.map(s => ({ ...s, isNew: false }))
@@ -108,13 +105,11 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
           isNew: true
         }
 
-        // Keep max 20 stories visible, remove oldest
         const updated = [newStory, ...prev.map(s => ({ ...s, isNew: false }))]
         return updated.slice(0, maxVisible)
       })
     }
 
-    // Random interval between 5-15 seconds
     const getRandomInterval = () => Math.floor(Math.random() * 10000) + 5000
 
     let timeoutId: NodeJS.Timeout
@@ -126,7 +121,6 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
       }, getRandomInterval())
     }
 
-    // Start after initial delay
     timeoutId = setTimeout(() => {
       addNewStory()
       scheduleNext()
@@ -142,7 +136,7 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
         prev.map(story => ({
           ...story,
           displayTime: story.displayTime + 1,
-          isNew: story.displayTime < 3 // Keep "new" effect for 3 seconds
+          isNew: story.displayTime < 3
         }))
       )
     }, 1000)
@@ -152,49 +146,60 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
 
   if (stories.length === 0) return null
 
+  // Calculate opacity based on index (first 3 fully visible, then fade)
+  const getOpacity = (index: number) => {
+    if (index < 3) return 1
+    if (index === 3) return 0.5
+    if (index === 4) return 0.25
+    return 0.1
+  }
+
   return (
-    <div className="w-full max-w-[calc(100vw-2rem)] md:max-w-4xl mx-auto px-2 md:px-4">
+    <div className="w-full max-w-[calc(100vw-2rem)] md:max-w-2xl mx-auto px-2 md:px-4">
       {/* Header */}
-      <div className="flex items-center justify-center gap-2 mb-3">
-        <div className="flex items-center gap-1.5">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+      <div className="flex items-center justify-center gap-2 mb-4">
+        <div className="flex items-center gap-2">
+          <span className="relative flex h-2.5 w-2.5">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-orange-400 opacity-75"></span>
+            <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-orange-500"></span>
           </span>
-          <span className="text-xs text-white/60 uppercase tracking-wider">
+          <span
+            className="text-sm md:text-base font-medium text-white uppercase tracking-wide"
+            style={{ textShadow: '0 2px 4px rgba(0,0,0,0.5), 0 4px 8px rgba(0,0,0,0.3)' }}
+          >
             {language === 'ru' ? 'Создаётся прямо сейчас' : language === 'kz' ? 'Қазір жасалуда' : 'Creating now'}
           </span>
         </div>
       </div>
 
-      {/* Stories feed - horizontal scroll */}
-      <div className="relative">
-        {/* Gradient fade on edges */}
-        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-black/20 to-transparent z-10 pointer-events-none" />
-        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-black/20 to-transparent z-10 pointer-events-none" />
+      {/* Stories feed */}
+      <div className="relative overflow-hidden">
+        {/* Gradient fade on right edge */}
+        <div className="absolute right-0 top-0 bottom-0 w-24 md:w-32 bg-gradient-to-l from-[#411369] via-[#411369]/80 to-transparent z-10 pointer-events-none" />
 
-        <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-          {visibleStories.map((story) => (
+        <div className="flex gap-3 md:gap-4 overflow-x-auto pb-2 scrollbar-hide">
+          {visibleStories.map((story, index) => (
             <Link
               key={`${story.id}-${story.displayTime}`}
               href={`/story/${story.id}`}
-              className={`
-                flex-shrink-0 snap-start
-                group relative
-                w-[100px] md:w-[140px] lg:w-[160px]
-                transition-all duration-500 ease-out
-                ${story.isNew ? 'animate-slide-in scale-105' : 'scale-100'}
-              `}
+              className="flex-shrink-0 group relative"
+              style={{
+                opacity: getOpacity(index),
+                transition: 'opacity 0.5s ease-out'
+              }}
             >
               {/* Card */}
-              <div className={`
-                relative rounded-xl overflow-hidden
-                bg-white/10 backdrop-blur-sm
-                border border-white/20
-                transition-all duration-300
-                group-hover:border-white/40 group-hover:bg-white/15
-                ${story.isNew ? 'ring-2 ring-green-400/50 shadow-[0_0_20px_rgba(74,222,128,0.3)]' : ''}
-              `}>
+              <div
+                className={`
+                  relative rounded-xl overflow-hidden
+                  w-[100px] md:w-[130px] lg:w-[150px]
+                  bg-white/10 backdrop-blur-sm
+                  border border-white/20
+                  transition-all duration-500
+                  group-hover:border-white/40 group-hover:bg-white/15
+                  ${story.isNew ? 'ring-2 ring-orange-400/70 shadow-[0_0_30px_rgba(251,146,60,0.5)]' : ''}
+                `}
+              >
                 {/* Image */}
                 <div className="aspect-[3/4] relative overflow-hidden">
                   {story.previewImage ? (
@@ -213,22 +218,22 @@ export function LiveStoryFeed({ stories }: LiveStoryFeedProps) {
                   {/* Overlay gradient */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                  {/* New badge */}
+                  {/* New badge - orange */}
                   {story.isNew && (
-                    <div className="absolute top-1 left-1 md:top-2 md:left-2 flex items-center gap-0.5 bg-green-500 text-white text-[8px] md:text-[10px] font-medium px-1 md:px-1.5 py-0.5 rounded-full animate-pulse">
+                    <div className="absolute top-1.5 left-1.5 md:top-2 md:left-2 flex items-center gap-0.5 bg-orange-500 text-white text-[8px] md:text-[10px] font-bold px-1.5 md:px-2 py-0.5 rounded-full shadow-lg animate-pulse">
                       <Sparkles className="w-2 h-2 md:w-2.5 md:h-2.5" />
                       NEW
                     </div>
                   )}
 
-                  {/* Time badge */}
-                  <div className="absolute bottom-1 left-1 right-1 md:bottom-2 md:left-2 md:right-2">
-                    <p className="text-[8px] md:text-[10px] lg:text-xs text-white/90 truncate font-medium mb-0.5">
+                  {/* Info */}
+                  <div className="absolute bottom-1.5 left-1.5 right-1.5 md:bottom-2 md:left-2 md:right-2">
+                    <p className="text-[9px] md:text-[11px] text-white/90 truncate font-medium mb-0.5">
                       {story.title}
                     </p>
                     <p className={`
-                      text-[7px] md:text-[9px] lg:text-[10px]
-                      ${story.displayTime < 10 ? 'text-green-300' : 'text-white/60'}
+                      text-[8px] md:text-[10px]
+                      ${story.displayTime < 10 ? 'text-orange-300' : 'text-white/50'}
                       transition-colors duration-300
                     `}>
                       {formatRelativeTime(story.displayTime)}
