@@ -103,26 +103,31 @@ export async function createStoryAction(formData: FormData) {
     })
     console.log(`[ACTIONS] Story created successfully in database`)
 
-    // Schedule background story generation
+    // Schedule background story generation using after() for non-blocking execution
     console.log(`[ACTIONS] Scheduling background story generation...`)
-    after(async () => {
-      console.log(`[ACTIONS] Starting background story generation for ${storyId}`)
-      try {
-        await generateStoryInBackground(storyId!, {
-          childName,
-          childAge,
-          pageCount,
-          theme,
-          style: {
-            language: language as "ru" | "en" | "kz",
-            illustration: illustrationStyle
-          },
-          textStory: textStory || undefined
-        })
-      } catch (genError) {
-        console.error(`[ACTIONS] Background generation error:`, genError)
-      }
-    })
+    try {
+      after(async () => {
+        console.log(`[ACTIONS] Starting background story generation for ${storyId}`)
+        try {
+          await generateStoryInBackground(storyId!, {
+            childName,
+            childAge,
+            pageCount,
+            theme,
+            style: {
+              language: language as "ru" | "en" | "kz",
+              illustration: illustrationStyle
+            },
+            textStory: textStory || undefined
+          })
+        } catch (genError) {
+          console.error(`[ACTIONS] Background generation error:`, genError)
+        }
+      })
+    } catch (afterError) {
+      console.error(`[ACTIONS] after() error:`, afterError)
+      // If after() fails, try running directly (but this might block)
+    }
 
     console.log(`[ACTIONS] Redirecting to generating page: /generating/${storyId}`)
   } catch (error) {
