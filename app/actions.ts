@@ -1,11 +1,18 @@
 "use server"
 
-import { redirect, unstable_rethrow } from "next/navigation"
+import { redirect } from "next/navigation"
 import { createStory, updateStory } from "@/lib/db"
 import { generateStoryInBackground } from "@/lib/story-generator"
 import crypto from "crypto"
 import { after } from "next/server"
 import { getSetting, isKvAvailable } from "@/lib/settings"
+
+// Helper to check if error is a Next.js redirect
+function isRedirectError(error: unknown): boolean {
+  return error instanceof Error && 'digest' in error &&
+    typeof (error as any).digest === 'string' &&
+    (error as any).digest.startsWith('NEXT_REDIRECT')
+}
 
 export async function createStoryAction(formData: FormData) {
   console.log("[ACTIONS] Starting createStoryAction")
@@ -17,15 +24,9 @@ export async function createStoryAction(formData: FormData) {
     isKvAvailable
   })
 
+  let storyId: string | null = null
+
   try {
-    // Check if KV is available (imported from settings)
-
-    // ВРЕМЕННО: Отключаем проверку KV для тестирования новой логики
-    if (!isKvAvailable) {
-      console.log("[ACTIONS] KV недоступен, но продолжаем для тестирования новой логики генерации")
-      // throw new Error("Story creation is currently unavailable. Please set up the database configuration.")
-    }
-
     // Check if submissions are halted (только если KV доступен)
     let submissionsHalted = false
     if (isKvAvailable) {
@@ -35,8 +36,6 @@ export async function createStoryAction(formData: FormData) {
       } catch (settingsError) {
         console.error("[ACTIONS] Error getting settings:", settingsError)
       }
-    } else {
-      console.log("[ACTIONS] KV недоступен - пропускаем проверку submissions_halted")
     }
 
     if (submissionsHalted) {
@@ -52,7 +51,7 @@ export async function createStoryAction(formData: FormData) {
     const illustrationStyle = formData.get("illustrationStyle") as string
     const visibility = (formData.get("visibility") as string) || "public"
     const textStory = formData.get("textStory") as string
-    
+
     // Legacy compatibility
     const prompt = theme || "A fun alphabet adventure for children"
     const age = `${childAge}`
@@ -74,52 +73,42 @@ export async function createStoryAction(formData: FormData) {
     const ageRange = age || "3-8"
 
     // Generate a unique ID for the story
-    const storyId = crypto.randomUUID() as string;
+    storyId = crypto.randomUUID()
     console.log(`[ACTIONS] Generated story ID: ${storyId}`)
 
     // Generate a deletion token
     const deletionToken = crypto.randomBytes(16).toString("hex")
-    
+
     // Generate automatic title based on child name and theme
     const title = `${childName}'s Adventure`
 
     // Create the story in KV with new fields
     console.log(`[ACTIONS] Creating story in database...`)
-    try {
-      await createStory({
-        id: storyId,
-        title,
+    await createStory({
+      id: storyId,
+      title,
+      childName,
+      childAge,
+      theme,
+      style: {
+        language: language as "ru" | "en" | "kz"
+      },
+      textStory: textStory || undefined,
+      prompt,
+      age: ageRange,
+      visibility: visibility === "unlisted" ? "unlisted" : "public",
+      status: "generating",
+      createdAt: new Date().toISOString(),
+      deletionToken,
+    })
+    console.log(`[ACTIONS] Story created successfully in database`)
 
-        // New required fields
-        childName,
-        childAge,
-        theme,
-        style: {
-          language: language as "ru" | "en" | "kz"
-        },
-        textStory: textStory || undefined,
-
-        // Legacy fields for compatibility
-        prompt,
-        age: ageRange,
-
-        visibility: visibility === "unlisted" ? "unlisted" : "public",
-        status: "generating",
-        createdAt: new Date().toISOString(),
-        deletionToken,
-      })
-      console.log(`[ACTIONS] Story created successfully in database`)
-    } catch (dbError) {
-      console.error(`[ACTIONS] Database error creating story:`, dbError)
-      throw new Error(`Failed to create story in database: ${dbError instanceof Error ? dbError.message : 'Unknown error'}`)
-    }
-
-    // Use after() to run the story generation after the response is sent
+    // Schedule background story generation
     console.log(`[ACTIONS] Scheduling background story generation...`)
-    if (isKvAvailable) {
-      after(async () => {
-        console.log(`[ACTIONS] Starting background story generation for ${storyId}`)
-        await generateStoryInBackground(storyId, {
+    after(async () => {
+      console.log(`[ACTIONS] Starting background story generation for ${storyId}`)
+      try {
+        await generateStoryInBackground(storyId!, {
           childName,
           childAge,
           pageCount,
@@ -130,34 +119,23 @@ export async function createStoryAction(formData: FormData) {
           },
           textStory: textStory || undefined
         })
-      })
-    } else {
-      // Для локальной разработки запускаем генерацию в фоне
-      console.log(`[ACTIONS] KV недоступен - запускаем генерацию в фоне для локальной разработки`)
-      after(async () => {
-        console.log(`[ACTIONS] Starting background story generation for ${storyId} (local mode)`)
-        await generateStoryInBackground(storyId, {
-          childName,
-          childAge,
-          pageCount,
-          theme,
-          style: {
-            language: language as "ru" | "en" | "kz",
-            illustration: illustrationStyle
-          },
-          textStory: textStory || undefined
-        })
-      })
-    }
+      } catch (genError) {
+        console.error(`[ACTIONS] Background generation error:`, genError)
+      }
+    })
 
-    // Всегда перенаправляем пользователя для показа процесса
     console.log(`[ACTIONS] Redirecting to generating page: /generating/${storyId}`)
-    redirect(`/generating/${storyId}`)
   } catch (error) {
-    unstable_rethrow(error)
-    console.error("Error creating story:", error)
+    // Re-throw redirect errors
+    if (isRedirectError(error)) {
+      throw error
+    }
+    console.error("[ACTIONS] Error creating story:", error)
     throw error
   }
+
+  // Redirect outside of try-catch to avoid catching the redirect error
+  redirect(`/generating/${storyId}`)
 }
 
 export async function updateStoryVisibilityAction(formData: FormData) {
