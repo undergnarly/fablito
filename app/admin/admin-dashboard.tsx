@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { adminLogout, deleteStoryAction, deleteAllStoriesAction } from "./actions"
-import { Trash2, LogOut, RefreshCw, BookOpen, Clock, Eye, EyeOff } from "lucide-react"
+import { Trash2, LogOut, RefreshCw, BookOpen, Clock, Eye, EyeOff, ChevronLeft, ChevronRight } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
 import {
   AlertDialog,
@@ -69,8 +69,11 @@ export default function AdminDashboard() {
   const [selectedStory, setSelectedStory] = useState<StoryDetails | null>(null)
   const [storyDetailsOpen, setStoryDetailsOpen] = useState(false)
   const [loadingDetails, setLoadingDetails] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalStories, setTotalStories] = useState(0)
+  const STORIES_PER_PAGE = 20
 
-  const fetchStories = async () => {
+  const fetchStories = async (pageNum = page) => {
     setLoading(true)
     try {
       // Check if still authenticated
@@ -81,18 +84,19 @@ export default function AdminDashboard() {
         return
       }
 
-      const storiesResponse = await fetch("/api/stories?includeUnlisted=true")
+      const storiesResponse = await fetch(`/api/stories?includeUnlisted=true&page=${pageNum}&limit=${STORIES_PER_PAGE}`)
       if (!storiesResponse.ok) throw new Error("Failed to fetch stories")
 
       const data = await storiesResponse.json()
 
-      // Apply visibility filter
+      // Apply visibility filter (done server-side would be better, but this works for now)
       let filteredStories = data.stories || []
       if (visibilityFilter !== "all") {
         filteredStories = filteredStories.filter((story: any) => story.visibility === visibilityFilter)
       }
 
       setStories(filteredStories)
+      setTotalStories(data.total || filteredStories.length)
     } catch (error) {
       console.error("Error fetching stories:", error)
       toast({
@@ -369,17 +373,18 @@ export default function AdminDashboard() {
             </Card>
           ) : (
             <div className="grid grid-cols-1 gap-4">
-              {stories.map((story, index) => (
+              {stories.map((story, idx) => (
                 <Card key={story.id} className="border border-primary/10 shadow overflow-hidden rounded-lg h-[200px] flex flex-col">
                   <div className="flex flex-col md:flex-row">
                     <div className="relative h-32 md:w-48 bg-gray-100">
                       {story.previewImage ? (
                         <Image
-                          src={story.previewImage || "/api/placeholder?text=Изображение&width=400&height=400"}
+                          src={story.previewImage}
                           alt={story.title}
-                          fill
-                          className="object-cover"
-                          priority={index < 2}
+                          width={192}
+                          height={128}
+                          className="object-cover w-full h-full"
+                          loading={idx < 4 ? "eager" : "lazy"}
                         />
                       ) : (
                         <div className="flex items-center justify-center h-full">
@@ -465,6 +470,44 @@ export default function AdminDashboard() {
                   </div>
                 </Card>
               ))}
+
+              {/* Pagination Controls */}
+              {totalStories > STORIES_PER_PAGE && (
+                <div className="flex items-center justify-between mt-6 pt-4 border-t">
+                  <div className="text-sm text-muted-foreground">
+                    Showing {((page - 1) * STORIES_PER_PAGE) + 1} - {Math.min(page * STORIES_PER_PAGE, totalStories)} of {totalStories}
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setPage(p => p - 1)
+                        fetchStories(page - 1)
+                      }}
+                      disabled={page === 1 || loading}
+                    >
+                      <ChevronLeft className="h-4 w-4 mr-1" />
+                      Previous
+                    </Button>
+                    <span className="flex items-center px-3 text-sm">
+                      Page {page} of {Math.ceil(totalStories / STORIES_PER_PAGE)}
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setPage(p => p + 1)
+                        fetchStories(page + 1)
+                      }}
+                      disabled={page >= Math.ceil(totalStories / STORIES_PER_PAGE) || loading}
+                    >
+                      Next
+                      <ChevronRight className="h-4 w-4 ml-1" />
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </TabsContent>
