@@ -27,6 +27,7 @@ interface StoryParams {
   style: {
     language: "ru" | "en" | "kz"
     illustration: string
+    imageQuality?: "standard" | "premium"
   }
   textStory?: string
   childPhotoBase64?: string // Uploaded photo of the child for character consistency
@@ -436,7 +437,8 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
           storyId,
           pageIndex: i,
           referenceImage: characterReference, // Pass uploaded photo or first generated image
-          isChildPhoto: isUsingChildPhoto // True when using uploaded photo of real child
+          isChildPhoto: isUsingChildPhoto, // True when using uploaded photo of real child
+          imageQuality: params.style.imageQuality || "standard"
         })
 
         const timeoutPromise = new Promise<{ imageUrl: string; base64Data: string }>((_, reject) => {
@@ -456,12 +458,23 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
           })
         }
 
-        console.log(`[STORY-GEN] ✅ Image ${i + 1} generated: ${result.imageUrl}`)
+        // Save progress after each image so the UI can show real-time updates
+        await updateStory(storyId, {
+          images: JSON.stringify(images)
+        })
+
+        console.log(`[STORY-GEN] ✅ Image ${i + 1}/${maxImages} generated: ${result.imageUrl}`)
       } catch (error) {
         console.error(`[STORY-GEN] ❌ Error generating image ${i + 1}:`, error)
         // Use placeholder for failed images
         const placeholderUrl = `/api/placeholder?height=400&width=600&text=${encodeURIComponent(page.imagePrompt.substring(0, 30))}`
         images.push(placeholderUrl)
+
+        // Save progress even for placeholder images
+        await updateStory(storyId, {
+          images: JSON.stringify(images)
+        })
+
         console.log(`[STORY-GEN] 🔄 Using placeholder for image ${i + 1}: ${placeholderUrl}`)
       }
     }

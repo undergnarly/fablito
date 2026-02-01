@@ -65,6 +65,14 @@ export interface Translations {
   anime: string
   handdrawn: string
 
+  // Image quality
+  imageQuality: string
+  standardQuality: string
+  premiumQuality: string
+  coinsPerPage: string
+  fasterGeneration: string
+  betterDetails: string
+
   // Theme options
   selectThemePlaceholder: string
   relationshipsFriendship: string
@@ -380,6 +388,14 @@ export const translations: Record<Language, Translations> = {
     anime: 'Anime',
     handdrawn: 'Child Drawing',
 
+    // Image quality
+    imageQuality: 'Image Quality',
+    standardQuality: 'Standard',
+    premiumQuality: 'Premium',
+    coinsPerPage: 'coins/page',
+    fasterGeneration: 'Faster generation',
+    betterDetails: 'Better details',
+
     // Theme options
     selectThemePlaceholder: 'Select story theme',
     relationshipsFriendship: '👫 Relationships and Friendship',
@@ -694,6 +710,14 @@ export const translations: Record<Language, Translations> = {
     anime: 'Аниме',
     handdrawn: 'Детский рисунок',
 
+    // Image quality
+    imageQuality: 'Качество изображений',
+    standardQuality: 'Стандарт',
+    premiumQuality: 'Премиум',
+    coinsPerPage: 'монет/стр.',
+    fasterGeneration: 'Быстрее',
+    betterDetails: 'Лучше детали',
+
     // Theme options
     selectThemePlaceholder: 'Выберите тему сказки',
     relationshipsFriendship: '👫 Отношения и дружба',
@@ -1007,6 +1031,14 @@ export const translations: Record<Language, Translations> = {
     minimalist: 'Минималистік',
     anime: 'Аниме',
     handdrawn: 'Балалар суреті',
+
+    // Image quality
+    imageQuality: 'Сурет сапасы',
+    standardQuality: 'Стандарт',
+    premiumQuality: 'Премиум',
+    coinsPerPage: 'тиын/бет',
+    fasterGeneration: 'Жылдам',
+    betterDetails: 'Жақсы детальдар',
 
     // Theme options
     selectThemePlaceholder: 'Ертегі тақырыбын таңдаңыз',

@@ -90,6 +90,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
   const [theme, setTheme] = useState("")
   const [storyLanguage, setStoryLanguage] = useState("en")
   const [illustrationStyle, setIllustrationStyle] = useState("watercolor")
+  const [imageQuality, setImageQuality] = useState<"standard" | "premium">("standard")
   const [voiceStory, setVoiceStory] = useState<File | null>(null)
   const [textStory, setTextStory] = useState("")
   const [characterPhoto, setCharacterPhoto] = useState<File | null>(null)
@@ -347,7 +348,9 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
 
   // Get actual page count (fixed for anonymous users)
   const actualPageCount = isAnonymous ? ANONYMOUS_PAGE_COUNT : pageCount
-  const generationCost = actualPageCount * 10
+  // Premium quality costs 20 tokens per page, standard costs 10
+  const costPerPage = (!isAnonymous && imageQuality === "premium") ? 20 : 10
+  const generationCost = actualPageCount * costPerPage
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -358,7 +361,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
     }
 
     // Check if user can afford the generation
-    if (!canAfford(actualPageCount)) {
+    if (!canAfford(generationCost)) {
       setShowUpsellModal(true)
       return
     }
@@ -652,6 +655,46 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
         </Select>
       </div>
 
+      {/* Image Quality - Only for registered users */}
+      {!isAnonymous && (
+        <div className="space-y-4">
+          <Label className="text-lg font-semibold flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-white" />
+            {t.imageQuality || "Image Quality"}
+          </Label>
+          <div className="grid grid-cols-2 gap-4">
+            <Button
+              type="button"
+              variant={imageQuality === "standard" ? "default" : "outline"}
+              className={`h-auto py-4 flex flex-col items-center gap-2 ${
+                imageQuality === "standard"
+                  ? "bg-gradient-to-r from-purple-500 to-pink-500 border-0"
+                  : "border-2 border-white/30 hover:border-white/50"
+              }`}
+              onClick={() => setImageQuality("standard")}
+            >
+              <span className="font-semibold">{t.standardQuality || "Standard"}</span>
+              <span className="text-xs opacity-80">10 {t.coinsPerPage || "coins/page"}</span>
+              <span className="text-xs opacity-60">{t.fasterGeneration || "Faster"}</span>
+            </Button>
+            <Button
+              type="button"
+              variant={imageQuality === "premium" ? "default" : "outline"}
+              className={`h-auto py-4 flex flex-col items-center gap-2 ${
+                imageQuality === "premium"
+                  ? "bg-gradient-to-r from-yellow-500 to-orange-500 border-0"
+                  : "border-2 border-white/30 hover:border-white/50"
+              }`}
+              onClick={() => setImageQuality("premium")}
+            >
+              <span className="font-semibold">{t.premiumQuality || "Premium"}</span>
+              <span className="text-xs opacity-80">20 {t.coinsPerPage || "coins/page"}</span>
+              <span className="text-xs opacity-60">{t.betterDetails || "Better details"}</span>
+            </Button>
+          </div>
+        </div>
+      )}
+
       {/* Story Input Options */}
       <div className="space-y-4">
         <Label className="text-lg font-semibold">
@@ -825,6 +868,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       <input type="hidden" name="theme" value={theme} />
       <input type="hidden" name="language" value={storyLanguage} />
       <input type="hidden" name="illustrationStyle" value={illustrationStyle} />
+      <input type="hidden" name="imageQuality" value={imageQuality} />
       <input type="hidden" name="textStory" value={textStory} />
 
       <div className="flex items-center justify-between space-x-2">
@@ -840,7 +884,7 @@ export default function CreateStoryForm({ submissionsHalted = false }: CreateSto
       </div>
 
       {/* Generation cost display */}
-      <GenerationCost pageCount={actualPageCount} userCoins={user?.coins} />
+      <GenerationCost pageCount={actualPageCount} userCoins={user?.coins} costPerPage={costPerPage} />
 
       <SubmitButton disabled={submissionsHalted} createText={t.createStory} creatingText={t.creatingStory} />
 

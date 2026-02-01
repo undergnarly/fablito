@@ -115,10 +115,9 @@ export function useAuth() {
     return null
   }, [])
 
-  // Check if user can afford a generation
-  const canAfford = useCallback((pageCount: number) => {
+  // Check if user can afford a generation (pass total cost directly)
+  const canAfford = useCallback((cost: number) => {
     if (!user) return false
-    const cost = pageCount * 10 // 10 coins per page
     return user.coins >= cost
   }, [user])
 

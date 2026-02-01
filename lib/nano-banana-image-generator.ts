@@ -18,6 +18,7 @@ export interface ImageGenerationParams {
   pageIndex: number
   referenceImage?: string
   isChildPhoto?: boolean // True if referenceImage is an uploaded photo of the real child
+  imageQuality?: "standard" | "premium" // standard = fast/cheap, premium = high quality
 }
 
 /**
@@ -32,12 +33,22 @@ export interface ImageGenerationParams {
  * @param params Image generation parameters
  * @returns Object with image URL and base64 data (for use as reference)
  */
+// Model selection based on quality
+const GEMINI_MODELS = {
+  standard: "gemini-2.5-flash-image",    // Fast, cheaper
+  premium: "gemini-3-pro-image-preview"   // Better quality, more expensive
+}
+
 export async function generateImageWithNanoBanana(
   params: ImageGenerationParams
 ): Promise<{ imageUrl: string; base64Data: string }> {
-  const { sceneDescription, character, style, storyId, pageIndex, referenceImage, isChildPhoto } = params
+  const { sceneDescription, character, style, storyId, pageIndex, referenceImage, isChildPhoto, imageQuality = "standard" } = params
+
+  // Select model based on quality
+  const model = GEMINI_MODELS[imageQuality]
 
   console.log(`[NANO-BANANA] Starting image generation for story ${storyId}, page ${pageIndex}`)
+  console.log(`[NANO-BANANA] Model: ${model} (${imageQuality} quality)`)
   console.log(`[NANO-BANANA] Character: ${character.name}, ${character.age}yo ${character.gender}`)
   console.log(`[NANO-BANANA] Style: ${style}`)
   console.log(`[NANO-BANANA] Has reference image: ${!!referenceImage}, Is child photo: ${!!isChildPhoto}`)
@@ -94,7 +105,7 @@ export async function generateImageWithNanoBanana(
 
     // Generate image using Gemini
     const response = await client.models.generateContent({
-      model: "gemini-3-pro-image-preview",
+      model: model,
       contents: contents,
       config: {
         responseModalities: [Modality.TEXT, Modality.IMAGE],

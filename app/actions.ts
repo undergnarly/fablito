@@ -9,7 +9,8 @@ import { cookies } from "next/headers"
 import { getSetting, isKvAvailable } from "@/lib/settings"
 
 // Cost per page in coins
-const COINS_PER_PAGE = 10
+const COINS_PER_PAGE_STANDARD = 10
+const COINS_PER_PAGE_PREMIUM = 20
 
 // Helper to check if error is a Next.js redirect
 function isRedirectError(error: unknown): boolean {
@@ -67,6 +68,7 @@ export async function createStoryAction(formData: FormData) {
     const theme = formData.get("theme") as string
     const language = formData.get("language") as string
     const illustrationStyle = formData.get("illustrationStyle") as string
+    const imageQuality = (formData.get("imageQuality") as string) || "standard"
     const visibility = (formData.get("visibility") as string) || "public"
     const textStory = formData.get("textStory") as string
 
@@ -89,7 +91,7 @@ export async function createStoryAction(formData: FormData) {
     const prompt = theme || "A fun alphabet adventure for children"
     const age = `${childAge}`
 
-    console.log(`[ACTIONS] Form data - Child: ${childName}, Gender: ${childGender}, Age: ${childAge}, Pages: ${pageCount}, Theme: ${theme}, Language: ${language}, Style: ${illustrationStyle}, HasPhoto: ${!!childPhotoBase64}`)
+    console.log(`[ACTIONS] Form data - Child: ${childName}, Gender: ${childGender}, Age: ${childAge}, Pages: ${pageCount}, Theme: ${theme}, Language: ${language}, Style: ${illustrationStyle}, Quality: ${imageQuality}, HasPhoto: ${!!childPhotoBase64}`)
 
     // Validation
     if (!childName) {
@@ -102,9 +104,10 @@ export async function createStoryAction(formData: FormData) {
       throw new Error("Age must be between 2 and 12 years")
     }
 
-    // Check coin balance
-    const generationCost = pageCount * COINS_PER_PAGE
-    console.log(`[ACTIONS] Generation cost: ${generationCost} coins (${pageCount} pages x ${COINS_PER_PAGE})`)
+    // Check coin balance - premium quality costs more
+    const coinsPerPage = imageQuality === "premium" ? COINS_PER_PAGE_PREMIUM : COINS_PER_PAGE_STANDARD
+    const generationCost = pageCount * coinsPerPage
+    console.log(`[ACTIONS] Generation cost: ${generationCost} coins (${pageCount} pages x ${coinsPerPage} for ${imageQuality})`)
     console.log(`[ACTIONS] User ${userId} has ${user.coins} coins`)
 
     if (user.coins < generationCost) {
@@ -173,7 +176,8 @@ export async function createStoryAction(formData: FormData) {
             theme,
             style: {
               language: language as "ru" | "en" | "kz",
-              illustration: illustrationStyle
+              illustration: illustrationStyle,
+              imageQuality: imageQuality as "standard" | "premium"
             },
             textStory: textStory || undefined,
             childPhotoBase64

@@ -65,11 +65,13 @@ export function CoinBalance({ showBuyButton = true, compact = false }: CoinBalan
 interface GenerationCostProps {
   pageCount: number
   userCoins?: number
+  cost?: number // Optional: pass actual cost if different from pageCount * 10
+  costPerPage?: number // Optional: cost per page (default 10)
 }
 
-export function GenerationCost({ pageCount, userCoins }: GenerationCostProps) {
+export function GenerationCost({ pageCount, userCoins, cost: providedCost, costPerPage = 10 }: GenerationCostProps) {
   const { t } = useLanguage()
-  const cost = pageCount * 10 // 10 coins per page
+  const cost = providedCost ?? pageCount * costPerPage
   const canAfford = userCoins !== undefined ? userCoins >= cost : true
 
   return (
@@ -84,7 +86,7 @@ export function GenerationCost({ pageCount, userCoins }: GenerationCostProps) {
           {t.generationCost}: {cost} {t.coinsLabel}
         </span>
         <span className="text-xs text-white/50">
-          {pageCount} {t.pagesMultiplier}
+          {pageCount} {t.pagesMultiplier} × {costPerPage} {t.coinsLabel}
         </span>
       </div>
       {!canAfford && userCoins !== undefined && (
