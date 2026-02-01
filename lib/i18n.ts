@@ -820,7 +820,7 @@ export const translations: Record<Language, Translations> = {
     normalMode: 'Обычный режим',
     
     // Authentication
-    login: 'Вход',
+    login: 'Войти',
     register: 'Регистрация',
     logout: 'Выход',
     signIn: 'Войти',
