@@ -53,6 +53,7 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
   // Определяем язык истории
   const storyLanguage = storyContent.style?.language || detectLanguageFromStory(storyContent)
   const [imageError, setImageError] = useState<boolean>(false)
+  const [imageLoading, setImageLoading] = useState<boolean>(false)
   const [currentImages, setCurrentImages] = useState<string[]>(images)
   const [pageTransition, setPageTransition] = useState<"none" | "fade-out" | "fade-in">("none")
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
@@ -330,10 +331,11 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       speechSynthesis.cancel()
     }
-    
+
     if (storyContent && currentPage < storyContent.pages.length - 1) {
       setPageTransition("fade-out")
       setTimeout(() => {
+        setImageLoading(true) // Start loading new image
         setCurrentPage(currentPage + 1)
         setImageError(false)
         setPageTransition("fade-in")
@@ -352,10 +354,11 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
       speechSynthesis.cancel()
     }
-    
+
     if (currentPage > 0) {
       setPageTransition("fade-out")
       setTimeout(() => {
+        setImageLoading(true) // Start loading new image
         setCurrentPage(currentPage - 1)
         setImageError(false)
         setPageTransition("fade-in")
@@ -544,6 +547,9 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
       if (hash.startsWith("#page-")) {
         const pageNumber = Number.parseInt(hash.replace("#page-", ""), 10)
         if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= storyContent.pages.length) {
+          if (pageNumber - 1 !== currentPage) {
+            setImageLoading(true)
+          }
           setCurrentPage(pageNumber - 1)
         }
       }
@@ -559,6 +565,9 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
     if (hash.startsWith("#page-")) {
       const pageNumber = Number.parseInt(hash.replace("#page-", ""), 10)
       if (!isNaN(pageNumber) && pageNumber >= 1 && pageNumber <= storyContent.pages.length) {
+        if (pageNumber - 1 !== currentPage) {
+          setImageLoading(true)
+        }
         setCurrentPage(pageNumber - 1)
         setImageError(false)
       }
@@ -660,20 +669,33 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
               >
                 {currentImages[currentPage] && !imageError ? (
                   <div className="relative w-full h-full">
+                    {/* Loading placeholder - shown while new image loads */}
+                    {imageLoading && (
+                      <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 flex items-center justify-center z-10">
+                        <div className="text-center space-y-3">
+                          <div className="w-12 h-12 mx-auto border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
+                          <p className="text-sm text-purple-600 font-medium">Загрузка...</p>
+                        </div>
+                      </div>
+                    )}
                     <Image
+                      key={`page-image-${currentPage}`}
                       src={currentImages[currentPage] || "/api/placeholder?text=Иллюстрация загружается...&width=400&height=400"}
                       alt={`Illustration for "${storyContent.pages[currentPage].text.substring(0, 50)}..."`}
                       fill
-                      className="object-cover"
+                      className={`object-cover transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}
                       onError={handleImageError}
+                      onLoad={() => setImageLoading(false)}
                       unoptimized={currentImages[currentPage].startsWith("data:")}
                       priority={currentPage === 0}
                     />
 
                     {/* Decorative sparkles */}
-                    <div className="absolute top-2 right-2 animate-float-slow opacity-70">
-                      <Sparkles className="h-6 w-6 text-yellow-400 filter drop-shadow" />
-                    </div>
+                    {!imageLoading && (
+                      <div className="absolute top-2 right-2 animate-float-slow opacity-70">
+                        <Sparkles className="h-6 w-6 text-yellow-400 filter drop-shadow" />
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <div className="relative w-full h-full bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 dark:from-purple-900/20 dark:via-blue-900/20 dark:to-pink-900/20 flex items-center justify-center">
