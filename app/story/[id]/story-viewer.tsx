@@ -749,8 +749,8 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
               >
                 {/* Page content */}
                 <div className="space-y-6">
-                  <p className="text-xl md:text-2xl leading-relaxed text-gray-800 font-serif" style={{ fontFamily: 'Georgia, "Times New Roman", serif' }}>
-                    <span className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 float-left mr-3 leading-none drop-shadow-sm">
+                  <p className="text-xl md:text-2xl leading-relaxed text-gray-800" style={{ fontFamily: 'system-ui, -apple-system, "Segoe UI", Roboto, sans-serif', lineHeight: '1.8' }}>
+                    <span className="text-5xl md:text-6xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-600 to-pink-600 float-left mr-3 leading-none drop-shadow-sm" style={{ fontFamily: 'SuperJoyful, system-ui, sans-serif' }}>
                       {storyContent.pages[currentPage].text.charAt(0)}
                     </span>
                     {storyContent.pages[currentPage].text.substring(1)}
@@ -780,21 +780,22 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
               onClick={handlePrevPage}
               disabled={currentPage === 0}
               variant="outline"
-              className="group relative overflow-hidden bg-white/80 border-purple-300 text-purple-700 hover:bg-purple-100 disabled:opacity-50"
+              size="icon"
+              className="group relative overflow-hidden bg-white/80 border-purple-300 text-purple-700 hover:bg-purple-100 disabled:opacity-50 w-12 h-12 rounded-full"
               aria-label={t.previousPageAria}
             >
-              <ArrowLeft className="mr-2 h-4 w-4 transition-transform group-hover:-translate-x-1" />
-              {t.previousPage}
+              <ArrowLeft className="h-5 w-5 transition-transform group-hover:-translate-x-1" />
             </Button>
 
-            <div className="text-purple-600 font-medium">
+            <div className="text-purple-600 font-medium text-lg">
               {currentPage + 1} / {storyContent.pages.length}
             </div>
 
             <Button
               onClick={handleNextPage}
               disabled={isLastPage && !storyContent.moral}
-              className={`group relative overflow-hidden ${
+              size="icon"
+              className={`group relative overflow-hidden w-12 h-12 rounded-full ${
                 isLastPage
                   ? "bg-white/80 border border-purple-300 text-purple-700 hover:bg-purple-100"
                   : "bg-gradient-to-r from-pink-500 to-orange-500 hover:from-pink-600 hover:to-orange-600 text-white"
@@ -802,14 +803,9 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
               aria-label={isLastPage ? t.endOfStoryAria : t.nextPageAria}
             >
               {isLastPage ? (
-                <>
-                  {storyContent.moral ? t.seeMoral : t.theEnd}
-                </>
+                storyContent.moral ? <Sparkles className="h-5 w-5" /> : <BookOpen className="h-5 w-5" />
               ) : (
-                <>
-                  {t.nextPage}
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </>
+                <ArrowRight className="h-5 w-5 transition-transform group-hover:translate-x-1" />
               )}
             </Button>
           </div>
