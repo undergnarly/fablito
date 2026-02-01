@@ -208,12 +208,12 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
 
                 {/* Fun Fact Section */}
                 <div className="w-full bg-white/10 rounded-xl p-4 min-h-[120px] flex flex-col justify-center">
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center justify-center gap-2 mb-2">
                     <Lightbulb className="w-5 h-5 text-yellow-400" />
                     <span className="text-sm font-semibold text-yellow-400">{didYouKnow}</span>
                   </div>
                   <p
-                    className={`text-white/90 text-sm leading-relaxed transition-opacity duration-300 ${
+                    className={`text-white/90 text-sm leading-relaxed text-center transition-opacity duration-300 ${
                       factFading ? 'opacity-0' : 'opacity-100'
                     }`}
                   >

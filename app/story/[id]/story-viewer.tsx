@@ -578,7 +578,7 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
 
   return (
     <>
-      <div className="flex justify-end mb-4 gap-2">
+      <div className="flex justify-center md:justify-end mb-4 gap-2 flex-wrap">
         <Button
           variant="outline"
           size="icon"
