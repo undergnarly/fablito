@@ -13,7 +13,7 @@ export function CreateStorySection({ submissionsHalted }: CreateStorySectionProp
   const { t } = useLanguage()
 
   return (
-    <section id="create-story" className="py-20 px-4 md:px-8 relative bg-gradient-to-b from-[#411369] via-[#5a1a8a] to-[#411369]">
+    <section id="create-story" className="py-20 pb-8 px-4 md:px-8 relative bg-[#411369]">
       <div className="max-w-4xl mx-auto">
         <Card className="magic-card border-white/20 shadow-2xl overflow-hidden">
           <CardHeader className="text-center relative z-10 pb-4">
