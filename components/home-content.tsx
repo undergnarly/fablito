@@ -161,8 +161,8 @@ export function HomeContent({ stories }: HomeContentProps) {
                 <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto backdrop-blur-sm">
                   <Wand2 className="h-8 w-8 md:h-10 md:w-10 text-white" />
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep1Title}</h3>
-                <p className="text-white/90 text-sm md:text-base">{t.howItWorksStep1Desc}</p>
+                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 4px 8px rgba(0,0,0,0.6)' }}>{t.howItWorksStep1Title}</h3>
+                <p className="text-white/90 text-sm md:text-base" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>{t.howItWorksStep1Desc}</p>
               </div>
             </div>
 
@@ -180,8 +180,8 @@ export function HomeContent({ stories }: HomeContentProps) {
                 <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto backdrop-blur-sm">
                   <Sparkles className="h-8 w-8 md:h-10 md:w-10 text-white" />
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep2Title}</h3>
-                <p className="text-white/90 text-sm md:text-base">{t.howItWorksStep2Desc}</p>
+                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 4px 8px rgba(0,0,0,0.6)' }}>{t.howItWorksStep2Title}</h3>
+                <p className="text-white/90 text-sm md:text-base" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>{t.howItWorksStep2Desc}</p>
               </div>
             </div>
 
@@ -199,8 +199,8 @@ export function HomeContent({ stories }: HomeContentProps) {
                 <div className="bg-white/20 w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-4 md:mb-6 mx-auto backdrop-blur-sm">
                   <BookOpen className="h-8 w-8 md:h-10 md:w-10 text-white" />
                 </div>
-                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white">{t.howItWorksStep3Title}</h3>
-                <p className="text-white/90 text-sm md:text-base">{t.howItWorksStep3Desc}</p>
+                <h3 className="text-xl md:text-2xl font-bold mb-2 md:mb-3 text-white" style={{ textShadow: '0 2px 4px rgba(0,0,0,0.8), 0 4px 8px rgba(0,0,0,0.6)' }}>{t.howItWorksStep3Title}</h3>
+                <p className="text-white/90 text-sm md:text-base" style={{ textShadow: '0 1px 3px rgba(0,0,0,0.8), 0 2px 6px rgba(0,0,0,0.6)' }}>{t.howItWorksStep3Desc}</p>
               </div>
             </div>
           </div>

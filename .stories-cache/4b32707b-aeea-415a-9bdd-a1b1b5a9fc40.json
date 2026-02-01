@@ -1,0 +1,13 @@
+{
+  "id": "4b32707b-aeea-415a-9bdd-a1b1b5a9fc40",
+  "title": "Nikita and the Magical Garden of Responsibility",
+  "status": "complete",
+  "createdAt": "2026-02-01T11:07:10.636Z",
+  "completedAt": "2026-02-01T11:07:10.636Z",
+  "storyContent": "{\"title\":\"Nikita and the Magical Garden of Responsibility\",\"pages\":[{\"text\":\"Nikita found a shiny key. \\\"What is this for?\\\" he asked. A magic door appeared. \\\"Come with me,\\\" said the door. Nikita stepped through and smiled bright.\",\"imagePrompt\":\"Illustrate a 5-year-old Nikita with short black hair and twinkling eyes, holding a small shiny key in his hand. He wears a blue T-shirt, yellow shorts, and red sneakers. Nikita stands in a lush, magical garden, full of colorful flowers and a big, mysterious door in front of him. Create a whimsical, light-dappled scene that gives a sense of wonder and possibility, using a watercolor style.\"}],\"moral\":\"Responsibility means taking care of things we value.\"}",
+  "images": "[\"/generated-images/4b32707b-aeea-415a-9bdd-a1b1b5a9fc40-page-0-1769944030617.png\"]",
+  "childName": "Nikita",
+  "childAge": 5,
+  "theme": "responsibility",
+  "visibility": "public"
+}

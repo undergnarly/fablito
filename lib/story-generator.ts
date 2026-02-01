@@ -155,9 +155,12 @@ export async function generateStoryInBackground(storyId: string, params: StoryPa
           model: 'gpt-4o',
           messages: [{
             role: 'user',
-            content: `Create a personalized children's story for ${params.childName}, a ${params.childAge}-year-old child.
+            content: `CRITICAL: Create a story with EXACTLY ${pageCount} pages. Not more, not less. The "pages" array must contain exactly ${pageCount} items.
+
+Create a personalized children's story for ${params.childName}, a ${params.childAge}-year-old child.
 
 STORY PARAMETERS:
+- NUMBER OF PAGES: EXACTLY ${pageCount} pages (this is mandatory!)
 - Main Character: ${params.childName} (${params.childAge} years old)
 - Theme/Moral: ${getThemeDescription(params.theme, params.style.language)}
 - Story Type: High-quality children's fairy tale with adventure and moral lesson
@@ -215,7 +218,7 @@ CHARACTER CONSISTENCY REQUIREMENTS:
 - ${params.childName} must wear the SAME outfit throughout the entire story - do not change clothing between pages
 - Maintain consistent ${params.style.illustration} art style throughout all illustrations
 - Describe ${params.childName}'s EXACT physical appearance and clothing in detail for each image prompt
-- CRITICAL: The character's appearance, clothing, and style must be identical across all 10 pages
+- CRITICAL: The character's appearance, clothing, and style must be identical across all ${pageCount} pages
 - Do not vary the character's outfit, hairstyle, or physical features between scenes
 
 TITLE GENERATION:
@@ -236,7 +239,7 @@ You are an expert children's story creator specializing in personalized, age-app
 1. PERSONALIZATION: Feature the named child as the protagonist in every scene
 2. AGE ADAPTATION: Adjust vocabulary, sentence length, and complexity based on the child's age  
 3. EDUCATIONAL VALUE: Seamlessly weave in the specified moral/theme
-4. STRUCTURE: Follow the 10-page structure with clear introduction, adventure, resolution, and moral
+4. STRUCTURE: Follow the ${pageCount}-page structure with clear introduction, adventure, resolution, and moral
 5. LANGUAGE: Write exclusively in the specified language with perfect grammar
 6. REPETITION: Include a memorable phrase that repeats 2-3 times throughout the story
 7. IMAGERY: Ensure every scene can be visualized for illustration purposes
@@ -244,16 +247,16 @@ You are an expert children's story creator specializing in personalized, age-app
 
 Create stories that parents will love reading with their children and that children will remember fondly.
 
-Return your response as JSON with this exact structure:
+Return your response as JSON with this exact structure (REMEMBER: exactly ${pageCount} pages in the array!):
       {
         "title": "Story title here",
         "pages": [
           {
-            "chapter": "Page 1 title", 
+            "chapter": "Page 1 title",
             "text": "Page 1 story text",
             "imagePrompt": "Detailed image description for page 1"
           }
-          // ... repeat for all pages
+          // ... repeat for EXACTLY ${pageCount} pages total
         ],
         "moral": "The moral lesson of the story"
       }`
