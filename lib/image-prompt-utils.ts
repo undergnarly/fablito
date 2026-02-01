@@ -123,23 +123,34 @@ export function generateRandomAppearance(gender: "boy" | "girl", age: number): C
   const eyeColors = ["bright blue", "warm brown", "hazel green", "dark brown", "light gray-blue"]
   const skinTones = ["fair with rosy cheeks", "light with freckles", "warm olive", "tan", "medium brown", "dark brown"]
 
+  // Varied clothing options without specific patterns that models might fixate on
   const boyClothing = [
-    "bright red t-shirt with a yellow star and blue jeans",
-    "green hoodie with orange stripes and gray shorts",
-    "blue and white striped shirt with brown pants",
-    "yellow sweater with a dinosaur print and dark jeans",
-    "purple t-shirt with white sneakers and khaki shorts"
+    "bright red t-shirt and blue jeans",
+    "green hoodie with gray shorts",
+    "blue polo shirt with khaki pants",
+    "yellow sweater and dark jeans",
+    "orange jacket over white t-shirt and brown pants",
+    "navy blue long-sleeve shirt and cargo shorts",
+    "striped green and white t-shirt with black pants",
+    "turquoise hoodie and denim shorts",
+    "red plaid flannel shirt and jeans",
+    "plain white t-shirt with blue vest and tan shorts"
   ]
   const girlClothing = [
-    "pink dress with white polka dots and white shoes",
+    "pink dress with white shoes",
     "blue denim overalls over a yellow t-shirt",
-    "purple sweater with a rainbow and pink leggings",
-    "red cardigan over a white dress with flower patterns",
-    "teal t-shirt with a unicorn and purple skirt"
+    "purple sweater and pink leggings",
+    "red cardigan over a white dress",
+    "teal t-shirt and purple skirt",
+    "orange sundress with sandals",
+    "light blue blouse and navy skirt",
+    "green hoodie with pink shorts",
+    "yellow t-shirt and denim skirt",
+    "lavender dress with white cardigan"
   ]
 
-  const boyAccessories = ["small blue backpack", "red baseball cap", "green wristband", ""]
-  const girlAccessories = ["pink hair bow", "small yellow backpack", "butterfly hair clips", "flower bracelet", ""]
+  const boyAccessories = ["small blue backpack", "baseball cap", "wristband", "watch", ""]
+  const girlAccessories = ["hair bow", "small backpack", "hair clips", "bracelet", "headband", ""]
 
   const distinctiveFeatures = [
     "small dimples when smiling",
