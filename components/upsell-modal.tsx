@@ -92,7 +92,7 @@ export function UpsellModal({ open, onOpenChange, requiredCoins, userCoins }: Up
               </Button>
             )}
 
-            {/* Option 2: Subscribe */}
+            {/* Option 2: Starter Pack */}
             <Button
               onClick={handleSubscribe}
               variant="outline"
@@ -101,8 +101,8 @@ export function UpsellModal({ open, onOpenChange, requiredCoins, userCoins }: Up
               <div className="flex items-center gap-3 w-full">
                 <Sparkles className="h-5 w-5 flex-shrink-0 text-purple-500" />
                 <div className="text-left flex-1">
-                  <div className="font-semibold">{t.getSubscription || "Get a subscription"}</div>
-                  <div className="text-xs text-muted-foreground">{t.unlimitedStories || "Create unlimited stories"}</div>
+                  <div className="font-semibold">{t.starterPack} — {t.starterPackPrice}</div>
+                  <div className="text-xs text-muted-foreground">{t.starterPackDesc}</div>
                 </div>
               </div>
             </Button>

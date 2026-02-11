@@ -6,41 +6,20 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
-import { Coins, Sparkles, Check, CreditCard, ArrowLeft, Zap } from "lucide-react"
+import { Coins, Check, ArrowLeft, Zap, AlertCircle } from "lucide-react"
 import Link from "next/link"
 import { useState } from "react"
 
+const PAYPAL_LINK = "https://www.paypal.com/ncp/payment/CEDEQLBE4Y7GL"
+
 export default function SubscriptionPage() {
   const { t } = useLanguage()
-  const { user, isLoading, refreshUser } = useAuth()
-  const [isProcessing, setIsProcessing] = useState(false)
+  const { user, isLoading } = useAuth()
+  const [showInstructions, setShowInstructions] = useState(false)
 
-  const handleSubscribe = async () => {
-    setIsProcessing(true)
-    try {
-      const response = await fetch('/api/stripe/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-
-      const data = await response.json()
-
-      if (data.url) {
-        window.location.href = data.url
-      } else if (data.success) {
-        await refreshUser()
-        alert(`${data.coinsAdded} ${t.coinsLabel} added! New balance: ${data.newBalance}`)
-      } else if (data.error) {
-        alert(data.message || data.error)
-      }
-    } catch (error) {
-      console.error('Subscription error:', error)
-      alert('Failed to start subscription process')
-    } finally {
-      setIsProcessing(false)
-    }
+  const handleBuyWithPaypal = () => {
+    window.open(PAYPAL_LINK, "_blank")
+    setShowInstructions(true)
   }
 
   if (isLoading) {
@@ -119,7 +98,7 @@ export default function SubscriptionPage() {
 
         <Separator className="bg-white/10 my-6" />
 
-        {/* Subscription plan */}
+        {/* Starter Pack */}
         <Card className="bg-white/5 border-white/10 overflow-hidden">
           <CardHeader>
             <div className="flex items-center justify-between">
@@ -128,11 +107,11 @@ export default function SubscriptionPage() {
                   <Zap className="w-5 h-5 text-white/80" />
                 </div>
                 <div>
-                  <CardTitle className="text-lg text-white">{t.monthlyPlan}</CardTitle>
-                  <CardDescription className="text-white/50">{t.monthlyPlanDesc}</CardDescription>
+                  <CardTitle className="text-lg text-white">{t.starterPack}</CardTitle>
+                  <CardDescription className="text-white/50">{t.starterPackDesc}</CardDescription>
                 </div>
               </div>
-              <Badge className="bg-white/10 text-white/80 hover:bg-white/10">Pro</Badge>
+              <Badge className="bg-white/10 text-white/80 hover:bg-white/10">{t.starterPackPrice}</Badge>
             </div>
           </CardHeader>
 
@@ -140,16 +119,16 @@ export default function SubscriptionPage() {
             {/* Stats */}
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-white/5 rounded-lg p-3 text-center">
-                <p className="text-2xl font-semibold text-white">3000</p>
-                <p className="text-xs text-white/50">{t.coinsPerMonth}</p>
+                <p className="text-2xl font-semibold text-white">500</p>
+                <p className="text-xs text-white/50">{t.starterPackCoins}</p>
               </div>
               <div className="bg-white/5 rounded-lg p-3 text-center">
-                <p className="text-2xl font-semibold text-white">300</p>
-                <p className="text-xs text-white/50">{t.pagesPerMonth}</p>
+                <p className="text-2xl font-semibold text-white">50</p>
+                <p className="text-xs text-white/50">{t.starterPackPages}</p>
               </div>
               <div className="bg-white/5 rounded-lg p-3 text-center">
-                <p className="text-2xl font-semibold text-white">~30</p>
-                <p className="text-xs text-white/50">{t.booksPerMonth}</p>
+                <p className="text-2xl font-semibold text-white">~5</p>
+                <p className="text-xs text-white/50">{t.starterPackBooks}</p>
               </div>
             </div>
 
@@ -158,35 +137,32 @@ export default function SubscriptionPage() {
             {/* Price and CTA */}
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-semibold text-white">$9.99</span>
-                <span className="text-white/50 ml-1">/month</span>
+                <span className="text-3xl font-semibold text-white">$5</span>
               </div>
 
               <Button
-                onClick={handleSubscribe}
-                disabled={isProcessing}
+                onClick={handleBuyWithPaypal}
                 className="bg-white text-black hover:bg-white/90 font-medium px-6"
               >
-                {isProcessing ? (
-                  <>
-                    <div className="animate-spin mr-2 w-4 h-4 border-2 border-black border-t-transparent rounded-full"></div>
-                    {t.subscribing}
-                  </>
-                ) : (
-                  <>
-                    <CreditCard className="mr-2 w-4 h-4" />
-                    {t.subscribe}
-                  </>
-                )}
+                <Coins className="mr-2 w-4 h-4" />
+                {t.buyWithPaypal}
               </Button>
             </div>
+
+            {/* Post-click instructions */}
+            {showInstructions && (
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-4 bg-green-500/10 border border-green-500/20 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-green-400 mt-0.5 flex-shrink-0" />
+                  <div className="space-y-1">
+                    <p className="text-sm text-green-300 font-medium">{t.paymentPending}</p>
+                    <p className="text-xs text-green-300/70">{t.paymentInstructions}</p>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
-
-        {/* Footer note */}
-        <p className="text-center text-xs text-white/40 mt-6">
-          Cancel anytime. No commitment required.
-        </p>
       </div>
     </main>
   )

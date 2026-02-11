@@ -255,6 +255,17 @@ export interface Translations {
   registrationBonus: string
   perPage: string
 
+  // Starter Pack
+  starterPack: string
+  starterPackDesc: string
+  starterPackPrice: string
+  starterPackCoins: string
+  starterPackPages: string
+  starterPackBooks: string
+  buyWithPaypal: string
+  paymentPending: string
+  paymentInstructions: string
+
   // Submissions halted
   submissionsHalted: string
   submissionsHaltedDesc: string
@@ -578,6 +589,17 @@ export const translations: Record<Language, Translations> = {
     registrationBonus: 'Registration bonus',
     perPage: 'per page',
 
+    // Starter Pack
+    starterPack: 'Starter Pack',
+    starterPackDesc: '500 coins — create ~5 stories with illustrations',
+    starterPackPrice: '$5',
+    starterPackCoins: 'coins',
+    starterPackPages: 'pages',
+    starterPackBooks: 'books',
+    buyWithPaypal: 'Buy with PayPal',
+    paymentPending: 'After payment, coins will be credited within 24 hours',
+    paymentInstructions: 'Please include your email or username in the PayPal payment note so we can identify your account',
+
     // Submissions halted
     submissionsHalted: 'Submissions Temporarily Halted',
     submissionsHaltedDesc: 'Due to high demand, we\'ve temporarily paused new story submissions. Please check back later!',
@@ -900,6 +922,17 @@ export const translations: Record<Language, Translations> = {
     registrationBonus: 'Бонус за регистрацию',
     perPage: 'за страницу',
 
+    // Starter Pack
+    starterPack: 'Стартовый пакет',
+    starterPackDesc: '500 монеток — создайте ~5 историй с иллюстрациями',
+    starterPackPrice: '$5',
+    starterPackCoins: 'монеток',
+    starterPackPages: 'страниц',
+    starterPackBooks: 'книг',
+    buyWithPaypal: 'Купить через PayPal',
+    paymentPending: 'После оплаты монетки будут начислены в течение 24 часов',
+    paymentInstructions: 'Укажите ваш email или имя пользователя в примечании к платежу PayPal, чтобы мы могли идентифицировать ваш аккаунт',
+
     // Submissions halted
     submissionsHalted: 'Создание историй временно приостановлено',
     submissionsHaltedDesc: 'Из-за высокой нагрузки мы временно приостановили создание новых историй. Пожалуйста, попробуйте позже!',
@@ -1221,6 +1254,17 @@ export const translations: Record<Language, Translations> = {
     welcomeBonus: 'Қош келдіңіз бонусы',
     registrationBonus: 'Тіркелу бонусы',
     perPage: 'бір бет үшін',
+
+    // Starter Pack
+    starterPack: 'Стартер пакет',
+    starterPackDesc: '500 монета — ~5 әңгіме жасаңыз суреттермен',
+    starterPackPrice: '$5',
+    starterPackCoins: 'монета',
+    starterPackPages: 'бет',
+    starterPackBooks: 'кітап',
+    buyWithPaypal: 'PayPal арқылы сатып алу',
+    paymentPending: 'Төлемнен кейін монеталар 24 сағат ішінде есептеледі',
+    paymentInstructions: 'Аккаунтыңызды анықтау үшін PayPal төлем жазбасына email немесе пайдаланушы атыңызды жазыңыз',
 
     // Submissions halted
     submissionsHalted: 'Әңгімелер жасау уақытша тоқтатылды',
