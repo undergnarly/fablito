@@ -22,7 +22,7 @@ export function Header() {
   const { user, isAuthenticated, logout, isLoading } = useAuth()
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-transparent">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-b from-black/80 via-black/40 to-transparent">
       <a
         href="#main-content"
         className="sr-only focus:not-sr-only focus:absolute focus:p-4 focus:bg-background focus:z-50"
