@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, use } from "react"
+import { useEffect, useState, useRef, use } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
@@ -26,6 +26,8 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
     Math.floor(Math.random() * FUN_FACTS.length)
   )
   const [factFading, setFactFading] = useState<boolean>(false)
+  const redirectingRef = useRef(false)
+  const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
   // Change fact every 15 seconds with fade animation
   useEffect(() => {
@@ -133,7 +135,7 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
 
                 notification.onclick = () => {
                   window.focus()
-                  router.push(`/story/${id}`)
+                  window.location.href = `/story/${id}`
                 }
               }
             } catch (e) {
@@ -142,10 +144,14 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
             setNotificationSent(true)
           }
 
-          // Redirect to the story page after a short delay
-          setTimeout(() => {
-            router.push(`/story/${id}`)
-          }, 1500)
+          // Redirect to the story page - only once
+          if (!redirectingRef.current) {
+            redirectingRef.current = true
+            if (intervalRef.current) clearInterval(intervalRef.current)
+            setTimeout(() => {
+              window.location.href = `/story/${id}`
+            }, 1500)
+          }
         } else if (data.status === "failed") {
           setError(data.error || "Story generation failed")
         }
@@ -158,10 +164,12 @@ export default function GeneratingPage({ params }: { params: Promise<{ id: strin
     checkStatus()
 
     // Then check every 3 seconds
-    const interval = setInterval(checkStatus, 3000)
+    intervalRef.current = setInterval(checkStatus, 3000)
 
     // Clean up interval on unmount
-    return () => clearInterval(interval)
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
   }, [id, router, notificationPermission, notificationSent, pagesCount, t.storyReady])
 
   const getStatusMessage = () => {
