@@ -72,6 +72,7 @@ export default function RootLayout({
           "min-h-screen font-sans antialiased",
           "dark:bg-gradient-to-b dark:from-black dark:to-black/95"
         )}
+        suppressHydrationWarning
       >
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <LanguageProvider>
