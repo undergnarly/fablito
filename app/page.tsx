@@ -5,6 +5,7 @@ import { HomeContent } from "@/components/home-content"
 import { CreateStorySection } from "@/components/create-story-section"
 import { detectLanguageFromStory } from "@/lib/language-detector"
 
+export const dynamic = "force-dynamic"
 export const maxDuration = 120
 
 // Maximum stories to show on home page (to keep cache under 2MB limit)
