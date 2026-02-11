@@ -30,10 +30,11 @@ interface StoryViewerProps {
   storyId: string
   storyContent: StoryContent
   images: string[]
+  blurDataUrls?: string[]
   isGenerating?: boolean
 }
 
-export default function StoryViewer({ storyId, storyContent, images, isGenerating = false }: StoryViewerProps) {
+export default function StoryViewer({ storyId, storyContent, images, blurDataUrls = [], isGenerating = false }: StoryViewerProps) {
   const { toast } = useToast()
   const { t } = useLanguage()
   const [currentPage, setCurrentPage] = useState<number>(0)
@@ -55,6 +56,7 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
   const [imageError, setImageError] = useState<boolean>(false)
   const [imageLoading, setImageLoading] = useState<boolean>(false)
   const [currentImages, setCurrentImages] = useState<string[]>(images)
+  const [preloadedSet, setPreloadedSet] = useState<Set<number>>(new Set())
   const [pageTransition, setPageTransition] = useState<"none" | "fade-out" | "fade-in">("none")
   const [shareDialogOpen, setShareDialogOpen] = useState(false)
   const storyUrl = typeof window !== "undefined" ? `${window.location.origin}/story/${storyId}` : ""
@@ -326,6 +328,21 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
     setCurrentImages(images)
   }, [images])
 
+  // Preload ALL images when the component mounts or images change
+  // This ensures page navigation is instant after initial load
+  useEffect(() => {
+    const loaded = new Set<number>()
+    currentImages.forEach((src, index) => {
+      if (!src || src.startsWith('/api/placeholder')) return
+      const img = new window.Image()
+      img.onload = () => {
+        loaded.add(index)
+        setPreloadedSet(new Set(loaded))
+      }
+      img.src = src
+    })
+  }, [currentImages])
+
   const handleNextPage = () => {
     // Stop any current speech when changing pages
     if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
@@ -333,10 +350,12 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
     }
 
     if (storyContent && currentPage < storyContent.pages.length - 1) {
+      const nextPage = currentPage + 1
+      const isPreloaded = preloadedSet.has(nextPage)
       setPageTransition("fade-out")
       setTimeout(() => {
-        setImageLoading(true) // Start loading new image
-        setCurrentPage(currentPage + 1)
+        if (!isPreloaded) setImageLoading(true)
+        setCurrentPage(nextPage)
         setImageError(false)
         setPageTransition("fade-in")
         setTimeout(() => {
@@ -356,10 +375,12 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
     }
 
     if (currentPage > 0) {
+      const prevPage = currentPage - 1
+      const isPreloaded = preloadedSet.has(prevPage)
       setPageTransition("fade-out")
       setTimeout(() => {
-        setImageLoading(true) // Start loading new image
-        setCurrentPage(currentPage - 1)
+        if (!isPreloaded) setImageLoading(true)
+        setCurrentPage(prevPage)
         setImageError(false)
         setPageTransition("fade-in")
         setTimeout(() => {
@@ -669,18 +690,23 @@ export default function StoryViewer({ storyId, storyContent, images, isGeneratin
               >
                 {currentImages[currentPage] && !imageError ? (
                   <div className="relative w-full h-full">
-                    {/* Loading placeholder - shown while new image loads */}
-                    {imageLoading && (
+                    {/* Blur placeholder - shown while full image loads */}
+                    {imageLoading && blurDataUrls[currentPage] && (
+                      <img
+                        src={blurDataUrls[currentPage]}
+                        alt=""
+                        className="absolute inset-0 w-full h-full object-cover scale-110 blur-lg z-10"
+                      />
+                    )}
+                    {/* Spinner fallback when no blur data available */}
+                    {imageLoading && !blurDataUrls[currentPage] && (
                       <div className="absolute inset-0 bg-gradient-to-br from-purple-100 via-blue-100 to-pink-100 flex items-center justify-center z-10">
-                        <div className="text-center space-y-3">
-                          <div className="w-12 h-12 mx-auto border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
-                          <p className="text-sm text-purple-600 font-medium">Загрузка...</p>
-                        </div>
+                        <div className="w-12 h-12 mx-auto border-4 border-purple-300 border-t-purple-600 rounded-full animate-spin"></div>
                       </div>
                     )}
                     <Image
                       key={`page-image-${currentPage}`}
-                      src={currentImages[currentPage] || "/api/placeholder?text=Иллюстрация загружается...&width=400&height=400"}
+                      src={currentImages[currentPage]}
                       alt={`Illustration for "${storyContent.pages[currentPage].text.substring(0, 50)}..."`}
                       fill
                       className={`object-cover transition-opacity duration-300 ${imageLoading ? 'opacity-0' : 'opacity-100'}`}

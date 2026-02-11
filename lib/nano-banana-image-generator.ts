@@ -1,4 +1,5 @@
 import { GoogleGenAI, Modality } from "@google/genai"
+import sharp from "sharp"
 import { uploadImageToBlob } from "./blob-storage"
 import {
   buildImagePrompt,
@@ -6,6 +7,25 @@ import {
   type CharacterParams,
   type ImagePromptParams
 } from "./image-prompt-utils"
+
+/**
+ * Generate a tiny blurred base64 placeholder (LQIP) from a full image
+ * Returns a ~200 byte data URL for instant display while full image loads
+ */
+async function generateBlurPlaceholder(base64Image: string): Promise<string> {
+  try {
+    const buffer = Buffer.from(base64Image, 'base64')
+    const tiny = await sharp(buffer)
+      .resize(16, 16, { fit: 'cover' })
+      .blur(2)
+      .png({ quality: 20 })
+      .toBuffer()
+    return `data:image/png;base64,${tiny.toString('base64')}`
+  } catch (e) {
+    console.error('[NANO-BANANA] Failed to generate blur placeholder:', e)
+    return ''
+  }
+}
 
 /**
  * Parameters for image generation
@@ -41,7 +61,7 @@ const GEMINI_MODELS: Record<"standard" | "premium", string> = {
 
 export async function generateImageWithNanoBanana(
   params: ImageGenerationParams
-): Promise<{ imageUrl: string; base64Data: string }> {
+): Promise<{ imageUrl: string; base64Data: string; blurDataUrl: string }> {
   const { sceneDescription, character, style, storyId, pageIndex, referenceImage, isChildPhoto, imageQuality = "standard" } = params
 
   // Select model based on quality
@@ -59,7 +79,8 @@ export async function generateImageWithNanoBanana(
     console.log(`[NANO-BANANA] No API key found - returning placeholder`)
     return {
       imageUrl: `/api/placeholder?height=400&width=600&text=${encodeURIComponent(sceneDescription.substring(0, 30))}`,
-      base64Data: ""
+      base64Data: "",
+      blurDataUrl: ""
     }
   }
 
@@ -144,15 +165,19 @@ export async function generateImageWithNanoBanana(
     console.log(`[NANO-BANANA] Image generated successfully`)
     console.log(`[NANO-BANANA] Image data size: ${base64Image.length} characters`)
 
-    // Upload image to Vercel Blob
-    const dataUrl = `data:image/png;base64,${base64Image}`
-    const imageUrl = await uploadImageToBlob(dataUrl, storyId, pageIndex)
+    // Generate blur placeholder and upload image in parallel
+    const [blurDataUrl, imageUrl] = await Promise.all([
+      generateBlurPlaceholder(base64Image),
+      uploadImageToBlob(`data:image/png;base64,${base64Image}`, storyId, pageIndex)
+    ])
 
     console.log(`[NANO-BANANA] Successfully generated and uploaded image: ${imageUrl}`)
+    console.log(`[NANO-BANANA] Blur placeholder: ${blurDataUrl.length} chars`)
 
     return {
       imageUrl,
-      base64Data: base64Image
+      base64Data: base64Image,
+      blurDataUrl
     }
 
   } catch (error) {
@@ -163,7 +188,8 @@ export async function generateImageWithNanoBanana(
     // Return placeholder on error
     return {
       imageUrl: `/api/placeholder?height=400&width=600&text=${encodeURIComponent(sceneDescription.substring(0, 30))}`,
-      base64Data: ""
+      base64Data: "",
+      blurDataUrl: ""
     }
   }
 }

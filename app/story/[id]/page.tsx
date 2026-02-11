@@ -141,7 +141,8 @@ export default async function StoryPage({
       
       // Parse the story content and images with error handling
       let storyContent = null
-      let images = []
+      let images: string[] = []
+      let blurDataUrls: string[] = []
 
       try {
         if (storyData.storyContent) {
@@ -154,8 +155,8 @@ export default async function StoryPage({
       try {
         if (storyData.images) {
           const parsedImages = JSON.parse(storyData.images)
-          // Convert from array of objects to array of URLs
           images = parsedImages.map((img: any) => img.url || img)
+          blurDataUrls = parsedImages.map((img: any) => img.blur || '')
         }
       } catch (error) {
         console.error("Error parsing images:", error)
@@ -207,10 +208,11 @@ export default async function StoryPage({
             </div>
 
             {/* Client component for interactive story viewing */}
-            <StoryViewer 
+            <StoryViewer
               storyId={storyData.id}
-              storyContent={storyContent} 
-              images={images} 
+              storyContent={storyContent}
+              images={images}
+              blurDataUrls={blurDataUrls}
               isGenerating={storyData.status !== "complete"}
             />
           </div>
@@ -231,7 +233,8 @@ export default async function StoryPage({
 
   // Parse the story content and images with error handling
   let storyContent = null
-  let images = []
+  let images: string[] = []
+  let blurDataUrls: string[] = []
 
   try {
     if (storyData.storyContent) {
@@ -244,8 +247,9 @@ export default async function StoryPage({
   try {
     if (storyData.images) {
       const parsedImages = JSON.parse(storyData.images)
-      // Convert from array of objects to array of URLs
+      // Convert from array of objects to array of URLs, extract blur data
       images = parsedImages.map((img: any) => img.url || img)
+      blurDataUrls = parsedImages.map((img: any) => img.blur || '')
     }
   } catch (error) {
     console.error("Error parsing images:", error)
@@ -398,7 +402,7 @@ export default async function StoryPage({
         </div>
 
         {/* Client component for interactive story viewing */}
-        <StoryViewer storyId={params.id} storyContent={storyContent} images={images} isGenerating={isGenerating} />
+        <StoryViewer storyId={params.id} storyContent={storyContent} images={images} blurDataUrls={blurDataUrls} isGenerating={isGenerating} />
 
         {/* Back button - below the book */}
         <div className="mt-6 text-center">

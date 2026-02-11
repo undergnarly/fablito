@@ -446,7 +446,7 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
         })
 
         const result = await Promise.race([imagePromise, timeoutPromise])
-        images.push(result.imageUrl)
+        images.push({ url: result.imageUrl, blur: result.blurDataUrl || '' })
 
         // If no uploaded photo, save the first generated image as character reference
         if (i === 0 && !params.childPhotoBase64 && result.base64Data) {
@@ -468,7 +468,7 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
         console.error(`[STORY-GEN] ❌ Error generating image ${i + 1}:`, error)
         // Use placeholder for failed images
         const placeholderUrl = `/api/placeholder?height=400&width=600&text=${encodeURIComponent(page.imagePrompt.substring(0, 30))}`
-        images.push(placeholderUrl)
+        images.push({ url: placeholderUrl, blur: '' })
 
         // Save progress even for placeholder images
         await updateStory(storyId, {
@@ -483,7 +483,7 @@ Return your response as JSON with this exact structure (REMEMBER: exactly ${page
     for (let i = maxImages; i < story.pages.length; i++) {
       const page = story.pages[i]
       const placeholderUrl = `/api/placeholder?height=400&width=600&text=${encodeURIComponent(page.imagePrompt.substring(0, 30))}`
-      images.push(placeholderUrl)
+      images.push({ url: placeholderUrl, blur: '' })
       console.log(`[STORY-GEN] 🔄 Added placeholder for image ${i + 1}: ${placeholderUrl}`)
     }
 

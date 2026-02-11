@@ -9,7 +9,7 @@ import type { CharacterParams } from "./image-prompt-utils"
  */
 export async function generateImage(
   params: ImageGenerationParams
-): Promise<{ imageUrl: string; base64Data: string }> {
+): Promise<{ imageUrl: string; base64Data: string; blurDataUrl: string }> {
   const { sceneDescription, character, style, storyId, pageIndex, referenceImage } = params
 
   console.log(`[IMAGE-GEN] Starting image generation for story ${storyId}, page ${pageIndex}`)
